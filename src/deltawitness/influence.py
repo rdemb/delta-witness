@@ -13,7 +13,7 @@ from typing import Any, Mapping, Sequence
 
 from . import __version__
 from .config import WitnessConfig
-from .errors import VerificationError
+from .errors import UnsupportedClaimError, VerificationError
 from .gitops import (
     PathClassification,
     changed_paths,
@@ -628,9 +628,14 @@ def analyze_patch_influence(
         config,
         include_output=include_output,
     )
-    if not matrix_report.complete or not matrix_report.supported:
+    if not matrix_report.complete:
         raise VerificationError(
-            "Exact patch influence requires a complete, supported canonical four-state witness"
+            "Exact patch influence requires a complete canonical four-state witness"
+        )
+    if not matrix_report.supported:
+        raise UnsupportedClaimError(
+            "The canonical four-state witness completed but is unsupported; "
+            "exact patch influence was not run"
         )
 
     ensure_clean(repo)
