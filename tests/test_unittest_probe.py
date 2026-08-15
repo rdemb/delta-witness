@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import gc
+import io
 import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+import weakref
 
 from deltawitness.receipt import load_outcome_receipt
+from deltawitness.unittest_probe import _ReceiptTestResult
 
 _BINDING = "c" * 64
 
@@ -46,6 +50,19 @@ class UnittestProbeTests(unittest.TestCase):
         if test_source is not None:
             (tests / "test_example.py").write_text(test_source, encoding="utf-8")
         return project
+
+    def test_result_retains_logical_test_objects_until_aggregation(self) -> None:
+        result = _ReceiptTestResult(io.StringIO(), False, 0)
+        test = unittest.FunctionTestCase(lambda: None)
+        reference = weakref.ref(test)
+
+        result.startTest(test)
+        del test
+        gc.collect()
+
+        self.assertIsNotNone(reference())
+        self.assertEqual(result.receipt_counts()["tests_run"], 1)
+        self.assertEqual(result.receipt_counts()["passed"], 1)
 
     def test_passing_test_emits_passed_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
