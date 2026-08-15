@@ -180,15 +180,36 @@ def verify_report_document(document: object) -> tuple[bool, tuple[str, ...]]:
     return not errors, tuple(errors)
 
 
-def load_report(path: Path) -> dict[str, Any]:
+def _decode_json_strict(raw: bytes, *, path: Path) -> object:
+    """Decode one unambiguous UTF-8 JSON document, rejecting duplicate keys."""
+
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        document: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in document:
+                raise ValueError(f"duplicate key: {key}")
+            document[key] = value
+        return document
+
     try:
-        raw = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise ReportError(f"Cannot read report: {path}: {exc}") from exc
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ReportError(f"Report is not valid UTF-8: {path}: {exc}") from exc
+
     try:
-        document = json.loads(raw)
+        return json.loads(text, object_pairs_hook=reject_duplicates)
     except json.JSONDecodeError as exc:
         raise ReportError(f"Invalid JSON report: {path}: {exc}") from exc
+    except ValueError as exc:
+        raise ReportError(f"Invalid strict JSON report: {path}: {exc}") from exc
+
+
+def load_report(path: Path) -> dict[str, Any]:
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise ReportError(f"Cannot read report: {path}: {exc}") from exc
+    document = _decode_json_strict(raw, path=path)
     if not isinstance(document, dict):
         raise ReportError("Report root must be a JSON object")
     return document
