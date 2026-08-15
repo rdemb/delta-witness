@@ -78,6 +78,24 @@ class UnittestProbeTests(unittest.TestCase):
         self.assertEqual(receipt.counts["failures"], 1)
         self.assertEqual(receipt.counts["errors"], 0)
 
+    def test_multiple_failing_subtests_count_as_one_logical_test_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = self._project(
+                directory,
+                "import unittest\n\n"
+                "class Example(unittest.TestCase):\n"
+                "    def test_many_cases(self):\n"
+                "        for value in (1, 2, 3):\n"
+                "            with self.subTest(value=value):\n"
+                "                self.assertEqual(value, 0)\n",
+            )
+            completed, receipt = invoke_probe(project)
+
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        self.assertEqual(receipt.outcome, "test_failure")
+        self.assertEqual(receipt.counts["tests_run"], 1)
+        self.assertEqual(receipt.counts["failures"], 1)
+
     def test_import_error_is_not_typed_as_regression_failure(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project = self._project(
