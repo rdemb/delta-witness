@@ -25,10 +25,23 @@ The current protocol additionally requires:
 - no more than eight changed code paths;
 - at least one changed path classified as tests;
 - every changed path classified exactly once as code, tests, or documentation;
+- no changed path is an ancestor or descendant of another changed path;
 - no changed submodule or symbolic-link entry;
 - explicit command and observer semantics for every claim.
 
+Ancestor/descendant path sets arise in file-to-directory and directory-to-file transitions. They are rejected before canonical matrix or coalition materialization because the current path-unit model cannot represent them as independent interventions without one selected unit implicitly adding, removing, or replacing another.
+
 If any precondition fails, no influence report is produced.
+
+### Prerequisite outcome and CLI exit semantics
+
+The prerequisite matrix is evaluated before influence enumeration:
+
+- a complete and supported canonical witness permits influence analysis;
+- a complete but unsupported canonical witness stops influence analysis and `deltawitness influence` returns `1`;
+- an incomplete witness, unsafe Git state, malformed observation, or other execution failure returns `2`.
+
+The complete-but-unsupported case is negative evidence about the declared witness, not an infrastructure error. No influence report is emitted in either stopped case.
 
 ## Intervention units
 
@@ -40,7 +53,7 @@ N = [p0, p1, ..., p(n-1)]
 
 Each path is one intervention unit. A coalition is represented by an integer mask `m` in `[0, 2^n - 1]`. Path `pi` is selected when bit `i` is set.
 
-The current unit is a complete Git path, not a hunk, function, statement, AST node, dependency edge, or semantic feature. Attribution therefore depends on path grouping.
+The current unit is a complete Git path, not a hunk, function, statement, AST node, dependency edge, or semantic feature. Attribution therefore depends on path grouping. The accepted unit set must be prefix-free: no unit may be an ancestor or descendant of another unit.
 
 ## Controlled state construction
 
