@@ -32,13 +32,25 @@ class _ReceiptTestResult(unittest.TextTestResult):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
-        self._logical_outcomes: dict[int, str] = {}
+        # The object is retained alongside its identity key. Storing only id(test)
+        # would permit CPython to reuse that integer after an executed test object
+        # is released by a cleaning TestSuite, silently merging unrelated outcomes.
+        self._logical_outcomes: dict[int, tuple[object, str]] = {}
 
-    def _record(self, test: unittest.case.TestCase, outcome: str) -> None:
+    def _record(self, test: object, outcome: str) -> None:
         key = id(test)
         previous = self._logical_outcomes.get(key)
-        if previous is None or _OUTCOME_PRECEDENCE[outcome] > _OUTCOME_PRECEDENCE[previous]:
-            self._logical_outcomes[key] = outcome
+        if previous is not None and previous[0] is not test:
+            raise ReceiptError(
+                "test_identity_collision",
+                "A logical unittest object identity was reused during one receipt run",
+            )
+        previous_outcome = previous[1] if previous is not None else None
+        if (
+            previous_outcome is None
+            or _OUTCOME_PRECEDENCE[outcome] > _OUTCOME_PRECEDENCE[previous_outcome]
+        ):
+            self._logical_outcomes[key] = (test, outcome)
 
     def startTest(self, test: unittest.case.TestCase) -> None:  # noqa: N802 - unittest API
         self._record(test, "passed")
@@ -93,7 +105,7 @@ class _ReceiptTestResult(unittest.TextTestResult):
         super().addSubTest(test, subtest, err)  # type: ignore[arg-type]
 
     def receipt_counts(self) -> dict[str, int]:
-        categories = Counter(self._logical_outcomes.values())
+        categories = Counter(outcome for _, outcome in self._logical_outcomes.values())
         return {
             "tests_run": len(self._logical_outcomes),
             "passed": categories["passed"],
