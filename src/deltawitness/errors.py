@@ -19,3 +19,11 @@ class VerificationError(DeltaWitnessError):
 
 class ReportError(DeltaWitnessError):
     """Raised when a report is malformed or fails an integrity check."""
+
+
+class ReceiptError(DeltaWitnessError):
+    """Raised when a machine-readable outcome receipt is missing or invalid."""
+
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        super().__init__(message)
