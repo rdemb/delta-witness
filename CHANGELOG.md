@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-No unreleased changes are currently declared.
+- Reject duplicate object keys at every nesting level when loading matrix and influence reports.
+- Convert malformed UTF-8 report bytes into fail-closed `ReportError` outcomes before digest verification.
+- Preserve existing report schemas, canonical bytes, semantic digests, and valid-report behavior.
 
 ## 0.0.3 - 2026-08-15
 
