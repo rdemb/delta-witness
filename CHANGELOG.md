@@ -5,6 +5,9 @@
 - Reject duplicate object keys at every nesting level when loading matrix and influence reports.
 - Convert malformed UTF-8 report bytes into fail-closed `ReportError` outcomes before digest verification.
 - Preserve existing report schemas, canonical bytes, semantic digests, and valid-report behavior.
+- Reject ancestor/descendant changed-path sets from file-to-directory or directory-to-file transitions before matrix or influence materialization.
+- Preserve CLI outcome semantics for influence prerequisites: complete-but-unsupported witnesses return `1`, while incomplete or unsafe execution remains `2`.
+- Keep patch-influence report schemas, digest algorithms, coalition metrics, and public claim boundaries unchanged.
 
 ## 0.0.3 - 2026-08-15
 

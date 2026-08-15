@@ -43,6 +43,7 @@ The model includes:
 - stale, unrelated, or incorrectly selected Git refs;
 - hostile process-level Git environment overrides and replacement objects;
 - changed paths that are omitted, multiply classified, or incorrectly labeled as documentation;
+- ancestor/descendant changed paths from file-to-directory or directory-to-file transitions that make declared path units overlap;
 - documentation or configuration paths that influence execution while being held constant;
 - filenames that break line-delimited parsing or trigger pathspec interpretation;
 - changed submodule entries with unresolved external state;
@@ -73,7 +74,7 @@ The model includes:
 4. Git subprocesses ignore external repository, index, object-directory, global-config, and replacement-object overrides.
 5. Git paths are read through a NUL-delimited interface and unsafe cross-platform paths are rejected.
 6. Internal pathspecs are interpreted literally.
-7. Every changed path is classified exactly once.
+7. Every changed path is classified exactly once, and the complete changed-path set is prefix-free; ancestor/descendant pairs are rejected before any state materialization.
 8. Changed Git submodule entries are rejected.
 9. Changed symbolic-link entries are rejected before state materialization.
 
@@ -164,6 +165,8 @@ The built-in `unittest` producer executes inside the tested Python environment a
 ### Path-level interventions are coarse
 
 A path can contain multiple semantic changes, and one semantic change can span multiple paths. Renaming, splitting, or combining files can alter the coalition game without altering intended behavior.
+
+The current materializer additionally refuses file-to-directory and directory-to-file transitions when Git reports both an ancestor and descendant changed path. Supporting those transitions would require a different intervention-unit model or explicit grouping semantics; silently treating both paths as independent would make coalition membership diverge from the materialized tree.
 
 A zero influence value means only that a path did not change the declared witness across the recorded coalitions. It does not prove that the path is unnecessary in production or irrelevant to untested behavior.
 
