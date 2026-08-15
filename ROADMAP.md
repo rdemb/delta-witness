@@ -10,6 +10,8 @@ The roadmap is gated by evidence rather than dates.
 - [x] Unsafe cross-platform changed-path rejection
 - [x] Explicit and exclusive path classification
 - [x] Base-to-candidate ancestry check
+- [x] Changed-submodule rejection
+- [x] Changed symbolic-link rejection
 - [x] Exact tree identities for every state
 - [x] Deterministic synthetic commits for hybrid states
 - [x] Per-claim state restoration
