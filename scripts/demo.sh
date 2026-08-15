@@ -86,10 +86,11 @@ PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify \
 MATRIX_REPORT="$(git rev-parse --git-path deltawitness/report.json)"
 PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify-report "$MATRIX_REPORT"
 
-git status --porcelain=v1 | grep -q . && {
+if git status --porcelain=v1 | grep -q .; then
   echo "DeltaWitness demo error: matrix verification dirtied the working tree" >&2
+  git status --short >&2
   exit 1
-}
+fi
 
 PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli influence \
   --repo "$DEMO_ROOT" \
@@ -100,7 +101,10 @@ PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli influence \
 INFLUENCE_REPORT="$(git rev-parse --git-path deltawitness/influence.json)"
 PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify-report "$INFLUENCE_REPORT"
 
-git status --porcelain=v1 | grep -q . && {
+if git status --porcelain=v1 | grep -q .; then
   echo "DeltaWitness demo error: influence analysis dirtied the working tree" >&2
+  git status --short >&2
   exit 1
-}
+fi
+
+printf '%s\n' "DeltaWitness end-to-end demonstration passed."
