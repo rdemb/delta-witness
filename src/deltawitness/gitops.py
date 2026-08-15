@@ -48,6 +48,7 @@ def _git_environment() -> dict[str, str]:
             "GIT_TERMINAL_PROMPT": "0",
             "GCM_INTERACTIVE": "Never",
             "GIT_NO_REPLACE_OBJECTS": "1",
+            "GIT_LITERAL_PATHSPECS": "1",
             "GIT_CONFIG_NOSYSTEM": "1",
             "GIT_CONFIG_SYSTEM": os.devnull,
             "GIT_CONFIG_GLOBAL": os.devnull,
