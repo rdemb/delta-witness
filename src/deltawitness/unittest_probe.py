@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import io
 import os
 from pathlib import Path
@@ -16,6 +17,92 @@ from .receipt import build_receipt_document, classify_counts, write_outcome_rece
 _RECEIPT_PATH_ENV = "DELTAWITNESS_RECEIPT_PATH"
 _RECEIPT_BINDING_ENV = "DELTAWITNESS_RECEIPT_BINDING"
 _PRODUCER_NAME = "deltawitness-unittest"
+_OUTCOME_PRECEDENCE = {
+    "passed": 0,
+    "expected_failure": 1,
+    "skipped": 2,
+    "failure": 3,
+    "unexpected_success": 4,
+    "error": 5,
+}
+
+
+class _ReceiptTestResult(unittest.TextTestResult):
+    """Track one conservative final category per logical unittest test object."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self._logical_outcomes: dict[int, str] = {}
+
+    def _record(self, test: unittest.case.TestCase, outcome: str) -> None:
+        key = id(test)
+        previous = self._logical_outcomes.get(key)
+        if previous is None or _OUTCOME_PRECEDENCE[outcome] > _OUTCOME_PRECEDENCE[previous]:
+            self._logical_outcomes[key] = outcome
+
+    def startTest(self, test: unittest.case.TestCase) -> None:  # noqa: N802 - unittest API
+        self._record(test, "passed")
+        super().startTest(test)
+
+    def addSuccess(self, test: unittest.case.TestCase) -> None:  # noqa: N802 - unittest API
+        self._record(test, "passed")
+        super().addSuccess(test)
+
+    def addFailure(
+        self,
+        test: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object],
+    ) -> None:  # noqa: N802 - unittest API
+        self._record(test, "failure")
+        super().addFailure(test, err)  # type: ignore[arg-type]
+
+    def addError(
+        self,
+        test: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object],
+    ) -> None:  # noqa: N802 - unittest API
+        self._record(test, "error")
+        super().addError(test, err)  # type: ignore[arg-type]
+
+    def addSkip(self, test: unittest.case.TestCase, reason: str) -> None:  # noqa: N802 - unittest API
+        self._record(test, "skipped")
+        super().addSkip(test, reason)
+
+    def addExpectedFailure(
+        self,
+        test: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object],
+    ) -> None:  # noqa: N802 - unittest API
+        self._record(test, "expected_failure")
+        super().addExpectedFailure(test, err)  # type: ignore[arg-type]
+
+    def addUnexpectedSuccess(self, test: unittest.case.TestCase) -> None:  # noqa: N802 - unittest API
+        self._record(test, "unexpected_success")
+        super().addUnexpectedSuccess(test)
+
+    def addSubTest(
+        self,
+        test: unittest.case.TestCase,
+        subtest: unittest.case.TestCase,
+        err: tuple[type[BaseException], BaseException, object] | None,
+    ) -> None:  # noqa: N802 - unittest API
+        if err is not None:
+            failure_type = getattr(test, "failureException", AssertionError)
+            outcome = "failure" if issubclass(err[0], failure_type) else "error"
+            self._record(test, outcome)
+        super().addSubTest(test, subtest, err)  # type: ignore[arg-type]
+
+    def receipt_counts(self) -> dict[str, int]:
+        categories = Counter(self._logical_outcomes.values())
+        return {
+            "tests_run": len(self._logical_outcomes),
+            "passed": categories["passed"],
+            "failures": categories["failure"],
+            "errors": categories["error"],
+            "skipped": categories["skipped"],
+            "expected_failures": categories["expected_failure"],
+            "unexpected_successes": categories["unexpected_success"],
+        }
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -74,30 +161,6 @@ def _zero_counts() -> dict[str, int]:
     }
 
 
-def _counts_from_result(result: unittest.TestResult) -> dict[str, int]:
-    failures = len(result.failures)
-    errors = len(result.errors)
-    skipped = len(getattr(result, "skipped", ()))
-    expected_failures = len(getattr(result, "expectedFailures", ()))
-    unexpected_successes = len(getattr(result, "unexpectedSuccesses", ()))
-    tests_run = int(result.testsRun)
-    passed = tests_run - failures - errors - skipped - expected_failures - unexpected_successes
-    if passed < 0:
-        raise ReceiptError(
-            "inconsistent_result",
-            "unittest result categories exceed testsRun",
-        )
-    return {
-        "tests_run": tests_run,
-        "passed": passed,
-        "failures": failures,
-        "errors": errors,
-        "skipped": skipped,
-        "expected_failures": expected_failures,
-        "unexpected_successes": unexpected_successes,
-    }
-
-
 def _write(
     destination: Path,
     binding: str,
@@ -130,9 +193,12 @@ def run_probe(args: argparse.Namespace) -> int:
             verbosity=args.verbosity,
             failfast=False,
             buffer=True,
+            resultclass=_ReceiptTestResult,
         )
         result = runner.run(suite)
-        counts = _counts_from_result(result)
+        if not isinstance(result, _ReceiptTestResult):
+            raise ReceiptError("unexpected_result", "unittest returned an unexpected result type")
+        counts = result.receipt_counts()
         outcome = classify_counts(counts)
         _write(destination, binding, outcome=outcome, counts=counts)
     except ReceiptError:
