@@ -9,7 +9,7 @@ import sys
 
 from . import __version__
 from .config import load_config
-from .errors import DeltaWitnessError
+from .errors import DeltaWitnessError, UnsupportedClaimError
 from .gitops import find_repo_root, git_metadata_path, git_version
 from .influence import (
     InfluenceReport,
@@ -259,6 +259,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "verify-report":
             return _verify_report(args.report)
         parser.error(f"Unknown command: {args.command}")
+    except UnsupportedClaimError as exc:
+        print(f"DeltaWitness unsupported: {exc}", file=sys.stderr)
+        return 1
     except DeltaWitnessError as exc:
         print(f"DeltaWitness error: {exc}", file=sys.stderr)
         return 2
