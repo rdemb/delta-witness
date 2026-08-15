@@ -109,6 +109,43 @@ class UnittestProbeTests(unittest.TestCase):
         self.assertGreater(receipt.counts["errors"], 0)
         self.assertEqual(receipt.counts["failures"], 0)
 
+    def test_setup_error_is_not_typed_as_regression_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = self._project(
+                directory,
+                "import unittest\n\n"
+                "class Example(unittest.TestCase):\n"
+                "    def setUp(self):\n"
+                "        raise RuntimeError('synthetic setup error')\n\n"
+                "    def test_never_reaches_assertion(self):\n"
+                "        self.fail('must not execute')\n",
+            )
+            completed, receipt = invoke_probe(project)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        self.assertEqual(receipt.outcome, "test_error")
+        self.assertEqual(receipt.counts["errors"], 1)
+        self.assertEqual(receipt.counts["failures"], 0)
+
+    def test_mixed_failure_and_error_is_conservatively_typed_as_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = self._project(
+                directory,
+                "import unittest\n\n"
+                "class Example(unittest.TestCase):\n"
+                "    def test_assertion_failure(self):\n"
+                "        self.assertEqual('old', 'new')\n\n"
+                "    def test_unexpected_error(self):\n"
+                "        raise RuntimeError('synthetic error')\n",
+            )
+            completed, receipt = invoke_probe(project)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        self.assertEqual(receipt.outcome, "test_error")
+        self.assertEqual(receipt.counts["tests_run"], 2)
+        self.assertEqual(receipt.counts["failures"], 1)
+        self.assertEqual(receipt.counts["errors"], 1)
+
     def test_empty_discovery_is_typed_as_no_tests(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project = self._project(directory, None)
@@ -134,6 +171,39 @@ class UnittestProbeTests(unittest.TestCase):
         self.assertEqual(receipt.outcome, "no_effective_tests")
         self.assertEqual(receipt.counts["skipped"], 1)
         self.assertEqual(receipt.counts["passed"], 0)
+
+    def test_expected_failure_only_is_not_typed_as_passed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = self._project(
+                directory,
+                "import unittest\n\n"
+                "class Example(unittest.TestCase):\n"
+                "    @unittest.expectedFailure\n"
+                "    def test_known_failure(self):\n"
+                "        self.assertEqual('old', 'new')\n",
+            )
+            completed, receipt = invoke_probe(project)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        self.assertEqual(receipt.outcome, "no_effective_tests")
+        self.assertEqual(receipt.counts["expected_failures"], 1)
+        self.assertEqual(receipt.counts["passed"], 0)
+
+    def test_unexpected_success_is_review_required(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = self._project(
+                directory,
+                "import unittest\n\n"
+                "class Example(unittest.TestCase):\n"
+                "    @unittest.expectedFailure\n"
+                "    def test_unexpected_success(self):\n"
+                "        self.assertEqual('same', 'same')\n",
+            )
+            completed, receipt = invoke_probe(project)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        self.assertEqual(receipt.outcome, "unexpected_success")
+        self.assertEqual(receipt.counts["unexpected_successes"], 1)
 
 
 if __name__ == "__main__":
