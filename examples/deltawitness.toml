@@ -1,0 +1,21 @@
+[paths]
+code = ["src/**", "pyproject.toml"]
+tests = ["tests/**"]
+documentation = ["README.md", "docs/**"]
+
+[execution]
+pass_env = []
+
+[[claim]]
+id = "security-regression"
+description = "The candidate witness must expose the defect before the patch and pass after it."
+command = ["python", "-m", "pytest", "-q", "tests"]
+timeout_seconds = 300
+pass_exit_codes = [0]
+fail_exit_codes = [1]
+
+[claim.expect]
+base_base = "pass"
+base_candidate = "fail"
+candidate_base = "pass"
+candidate_candidate = "pass"

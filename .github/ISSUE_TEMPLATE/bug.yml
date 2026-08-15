@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a reproducible DeltaWitness defect using a safe fixture.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not disclose an unpatched security vulnerability here. Use a private security advisory instead.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.0.1 or commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the expected and observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Safe reproduction
+      description: Provide the smallest synthetic or authorized fixture that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Security and publication boundary
+      description: Confirm that the report contains no credentials, private data, or harmful exploit material.
+    validations:
+      required: true

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deltawitness"
+version = "0.0.1"
+description = "Counterfactual verification for AI-generated code changes."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Rafal Dembski" }
+]
+keywords = [
+  "ai-agents",
+  "coding-agents",
+  "software-testing",
+  "counterfactual-verification",
+  "devsecops",
+  "software-assurance"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Security",
+  "Typing :: Typed"
+]
+dependencies = []
+
+[project.scripts]
+deltawitness = "deltawitness.cli:main"
+
+[project.urls]
+Repository = "https://github.com/rdemb/delta-witness"
+Issues = "https://github.com/rdemb/delta-witness/issues"
+Security = "https://github.com/rdemb/delta-witness/security/advisories"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+deltawitness = ["py.typed"]
