@@ -4,6 +4,23 @@
 
 No unreleased changes are currently declared.
 
+## 0.0.3 - 2026-08-15
+
+- Added `deltawitness influence` for exhaustive intervention analysis of patches with at most eight changed code paths.
+- Added exact evaluation of every code-path coalition under both base and candidate test worlds.
+- Added `supported`, `unsupported`, and `indeterminate` coalition semantics that preserve incomplete execution instead of treating it as negative evidence.
+- Added mandatory endpoint anchors against the canonical four-state matrix and withheld attribution when held-constant paths alter endpoint semantics.
+- Added exact Git tree and deterministic synthetic commit identities for every intervention state.
+- Added every inclusion-minimal witness-sufficient coalition, global necessity, full-context necessity, standalone sufficiency, and paths absent from every minimal coalition.
+- Added positive and negative marginal swing counts without assuming monotonicity.
+- Added exact rational Shapley allocation, normalized Banzhaf influence, pairwise Banzhaf interaction, and an efficiency residual.
+- Added report schema `deltawitness.patch-influence.v1` with `influence_sha256` and complete-report integrity verification.
+- Added shared claim-state observation logic used by both canonical and intervention execution.
+- Added synthetic mathematical fixtures for collateral, alternative, jointly necessary, and non-monotonic path structures.
+- Added end-to-end fixtures for collateral changes, invalid partial import graphs, execution-sensitive documentation, and report tampering.
+- Expanded the self-contained demonstration to run typed four-state verification, exact influence analysis, and integrity verification without dirtying the repository.
+- Added the Exact Patch Influence protocol, architecture, threat model, evaluation hypotheses, prior-art boundary, and falsification criteria.
+
 ## 0.0.2 - 2026-08-15
 
 - Rejected changed symbolic-link entries before counterfactual hybrid-state materialization.
