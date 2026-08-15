@@ -40,18 +40,26 @@ No one signal answers all of these questions. DeltaWitness therefore separates t
 
 ### 2.1 Fail-to-pass validation
 
-Testing a candidate test against the old implementation and the fixed implementation is established practice in automated program repair and software-engineering benchmarks. TDD-Bench Verified explicitly uses fail-to-pass test validation:
+Testing a candidate test against the old implementation and the fixed implementation is established practice in automated program repair and software-engineering benchmarks. TDD-Bench Verified explicitly evaluates whether generated tests fail before an issue is resolved and pass after the reference repair:
 
-- https://github.com/kanishkamisra/tdd-bench-verified
+- official implementation: https://github.com/IBM/TDD-Bench-Verified
+- paper: https://arxiv.org/abs/2412.02883
 
-DeltaWitness does not claim novelty for the observation:
+SWE-bench likewise separates `FAIL_TO_PASS` tests from `PASS_TO_PASS` regression-preservation tests and classifies an instance as fully resolved only when both groups satisfy the harness criteria:
+
+- paper: https://arxiv.org/abs/2310.06770
+- reviewed grading implementation: https://github.com/SWE-bench/SWE-bench/blob/128cbd1a5759694874e6bd56624cb2fd6fb079e2/swebench/harness/grading.py
+
+DeltaWitness does not claim novelty for either observation:
 
 ```text
 candidate test fails before the fix
 candidate test passes after the fix
+
+original behavior-preservation tests pass after the fix
 ```
 
-Its four-state matrix additionally runs the original tests against both implementation-side trees, binds hybrid states to exact Git objects, and records machine-verifiable evidence. Whether that additional state and evidence produce useful incremental detection remains an empirical question.
+Its four-state matrix additionally executes the original tests against the base implementation, reconstructs every state from exact Git objects, and records observer evidence in an integrity-verifiable report. Whether the additional state, state construction, and evidence channel produce useful incremental detection remains an empirical question.
 
 ### 2.2 Delta debugging and change isolation
 
@@ -81,10 +89,10 @@ DeltaWitness does not attempt to solve the general patch-correctness problem. It
 
 Pairwise and relational execution have been used to determine whether a change preserves or alters behavior. Relevant directions include:
 
-- ChangeGuard, which validates behavior-preserving changes through comparative execution: https://arxiv.org/abs/2405.01594
-- Product-program approaches that reason about two related program executions: https://arxiv.org/abs/2501.13158
+- ChangeGuard, which validates code changes via pairwise learning-guided execution: https://doi.org/10.1145/3715760
+- P³, which constructs product programs for relational reasoning about pre- and post-patch behavior: https://doi.org/10.1145/3763145
 
-These approaches establish that cross-version relational reasoning is not new. DeltaWitness must demonstrate that its specific Git-native post-change workflow, state construction, evidence artifacts, and bounded intervention table provide useful operational evidence beyond existing behavioral validation.
+These approaches establish that cross-version relational reasoning is not new. ChangeGuard primarily targets behavior-preserving changes, while P³ supports explicit relational patch specifications and off-the-shelf program analyses. DeltaWitness must demonstrate that its test-witness workflow, exact Git state construction, typed observations, and bounded intervention table provide useful operational evidence beyond these and other behavioral-validation methods.
 
 ### 2.5 Test-oracle quality
 
