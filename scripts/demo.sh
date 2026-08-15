@@ -16,6 +16,10 @@ def is_admin(user):
     return bool(user.get("role"))
 PY
 
+cat > src/banner.py <<'PY'
+VERSION = 1
+PY
+
 cat > tests/test_access.py <<'PY'
 import sys
 import unittest
@@ -34,10 +38,14 @@ cat > deltawitness.toml <<'TOML'
 code = ["src/**"]
 tests = ["tests/**"]
 
+[execution]
+pass_env = ["PYTHONPATH"]
+
 [[claim]]
 id = "role-check-regression"
 description = "A viewer must not be treated as an administrator."
-command = ["python", "-m", "unittest", "discover", "-s", "tests"]
+observer = "outcome-receipt-v1"
+command = ["python", "-m", "deltawitness.unittest_probe", "--start-directory", "tests", "--verbosity", "0"]
 timeout_seconds = 30
 
 [claim.expect]
@@ -56,6 +64,10 @@ def is_admin(user):
     return user.get("role") == "admin"
 PY
 
+cat > src/banner.py <<'PY'
+VERSION = 2
+PY
+
 cat >> tests/test_access.py <<'PY'
 
     def test_viewer_is_denied(self):
@@ -63,7 +75,7 @@ cat >> tests/test_access.py <<'PY'
 PY
 
 git add .
-git commit -m "fix: require the admin role and add a regression witness" >/dev/null
+git commit -m "fix: require admin role, update banner, and add a regression witness" >/dev/null
 
 PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify \
   --repo "$DEMO_ROOT" \
@@ -74,3 +86,13 @@ PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify \
 
 PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify-report \
   "$DEMO_ROOT/.deltawitness/report.json"
+
+PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli influence \
+  --repo "$DEMO_ROOT" \
+  --base "$BASE" \
+  --head HEAD \
+  --spec deltawitness.toml \
+  --output .deltawitness/influence.json
+
+PYTHONPATH="$PROJECT_ROOT/src" python -m deltawitness.cli verify-report \
+  "$DEMO_ROOT/.deltawitness/influence.json"
