@@ -241,6 +241,8 @@ def ensure_supported_entries(repo: Path, base_sha: str, head_sha: str, paths: Se
             mode = _path_mode_at_ref(repo, ref, path)
             if mode == "160000":
                 raise GitError(f"Changed Git submodule entries are not supported: {path!r}")
+            if mode == "120000":
+                raise GitError(f"Changed symbolic-link entries are not supported: {path!r}")
 
 
 def overlay_paths(repo: Path, worktree: Path, source_ref: str, paths: Sequence[str]) -> None:
