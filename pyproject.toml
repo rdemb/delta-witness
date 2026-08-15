@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deltawitness"
-version = "0.0.2"
-description = "Counterfactual verification for AI-generated code changes."
+version = "0.0.3"
+description = "Counterfactual verification and exact patch influence for AI-generated code changes."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -17,6 +17,7 @@ keywords = [
   "coding-agents",
   "software-testing",
   "counterfactual-verification",
+  "patch-influence",
   "devsecops",
   "software-assurance"
 ]
