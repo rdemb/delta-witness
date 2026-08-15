@@ -13,6 +13,10 @@ class GitError(DeltaWitnessError):
     """Raised when Git operations fail or the repository is unsuitable."""
 
 
+class UnsupportedClaimError(DeltaWitnessError):
+    """Raised when complete observations show the declared claim is unsupported."""
+
+
 class VerificationError(DeltaWitnessError):
     """Raised when the verification harness cannot complete safely."""
 
