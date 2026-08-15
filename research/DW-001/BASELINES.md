@@ -278,7 +278,7 @@ Before held-out execution:
 - [ ] projection code cannot access undeclared states;
 - [ ] exit-code and typed-receipt arms use the same state inputs;
 - [ ] `indeterminate` is never converted into a semantic fail;
-- [ ] `not_applicable` is retained in denominators and flow counts;
+- [ ] `not_applicable` remains in the primary record, and every rate states whether its denominator is all scenarios or applicable scenarios;
 - [ ] a false-assurance scenario is detected by the expected incremental contrast;
 - [ ] a valid patch is not rejected solely because a method received hidden evidence;
 - [ ] cost runs execute only the states declared by the method;
