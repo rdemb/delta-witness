@@ -26,27 +26,41 @@ def witness_payload(document: dict[str, Any]) -> dict[str, Any]:
         for claim in document["claims"]:
             states = []
             for state in claim["states"]:
-                states.append(
-                    {
-                        "state": state["state"],
-                        "commit_sha": state["commit_sha"],
-                        "tree_sha": state["tree_sha"],
-                        "observed": state["observed"],
-                        "expected": state["expected"],
-                        "matched": state["matched"],
-                        "return_code": state["return_code"],
-                        "timed_out": state["timed_out"],
-                    }
-                )
-            claims.append(
-                {
-                    "claim_id": claim["claim_id"],
-                    "description": claim["description"],
-                    "supported": claim["supported"],
-                    "command": claim["command"],
-                    "states": states,
+                state_payload: dict[str, Any] = {
+                    "state": state["state"],
+                    "commit_sha": state["commit_sha"],
+                    "tree_sha": state["tree_sha"],
+                    "observed": state["observed"],
+                    "expected": state["expected"],
+                    "matched": state["matched"],
+                    "return_code": state["return_code"],
+                    "timed_out": state["timed_out"],
                 }
-            )
+                # Schema 0.3 adds typed observer evidence. Keeping these fields
+                # conditional preserves verification of already-issued 0.2 reports.
+                for key in (
+                    "observer",
+                    "invocation_binding",
+                    "receipt_sha256",
+                    "receipt_outcome",
+                    "receipt_producer",
+                    "receipt_counts",
+                    "observation_error",
+                ):
+                    if key in state:
+                        state_payload[key] = state[key]
+                states.append(state_payload)
+
+            claim_payload: dict[str, Any] = {
+                "claim_id": claim["claim_id"],
+                "description": claim["description"],
+                "supported": claim["supported"],
+                "command": claim["command"],
+                "states": states,
+            }
+            if "observer" in claim:
+                claim_payload["observer"] = claim["observer"]
+            claims.append(claim_payload)
 
         return {
             "schema_version": document["schema_version"],
