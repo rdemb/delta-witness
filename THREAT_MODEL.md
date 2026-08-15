@@ -6,6 +6,8 @@ DeltaWitness attempts to support or reject a narrow statement:
 
 > Under declared commands and exact Git states, the candidate implementation-side tree changes the observed behavior relative to the base tree, while the candidate test-side tree acts as a counterfactual witness.
 
+When a typed observer is enabled, the statement is further bounded by the semantic outcome reported by a cooperating test adapter.
+
 This statement does not establish full program correctness or security.
 
 ## Assets
@@ -15,6 +17,7 @@ The current design aims to protect:
 - the integrity of state construction;
 - the binding between state observations and exact Git objects;
 - explicit claim boundaries and expectations;
+- typed test outcomes from accidental cross-claim or cross-state reuse;
 - report integrity after generation;
 - host environment variables from accidental inheritance;
 - raw command output from accidental publication by default;
@@ -34,6 +37,8 @@ The initial model includes:
 - changed symbolic-link entries whose targets do not preserve the declared path boundary;
 - commands that return success without meaningful assertions;
 - test runners that reuse the same nonzero exit code for assertion failures, collection errors, and setup failures;
+- missing, stale, malformed, oversized, contradictory, or state-mismatched outcome receipts;
+- a malicious command that reads its invocation binding and forges a syntactically valid receipt;
 - nondeterministic tests and environment drift;
 - one claim contaminating a later claim through generated files;
 - command output containing credentials or private data;
@@ -42,7 +47,7 @@ The initial model includes:
 - unrecorded toolchain, dependency, or external executable drift;
 - malicious repository content or commands executed with the operator's privileges.
 
-## Security invariants in v0.0.1
+## Security invariants in v0.0.2
 
 1. Base and candidate resolve to different immutable commits.
 2. The base commit is an ancestor of the candidate commit.
@@ -61,9 +66,14 @@ The initial model includes:
 15. Absolute repository and specification paths are excluded from reports.
 16. Pass and fail exit-code classes are explicit and disjoint.
 17. Timeouts and unclassified return codes mark the run incomplete.
-18. The default report is stored in private Git metadata rather than the working tree.
-19. Ambiguous configuration and harness errors stop the run.
-20. Report and witness digests are independently verifiable.
+18. Receipt-aware claims receive a deterministic binding over claim, command, specification, state, tree, and commit.
+19. Outcome receipts must be bounded regular files with strict UTF-8 JSON, exact fields, duplicate-key rejection, internally consistent counts, and an exact binding match.
+20. A typed `pass` or `fail` is accepted only when receipt semantics and configured process exit codes agree.
+21. Missing, malformed, inconclusive, or contradictory receipts mark the observation incomplete.
+22. Receipt outcome, producer, counts, digest, binding, and observer error code are included in the witness digest.
+23. The default report is stored in private Git metadata rather than the working tree.
+24. Ambiguous configuration and harness errors stop the run.
+25. Report and witness digests are independently verifiable.
 
 ## Residual risks
 
@@ -79,18 +89,25 @@ A command can still:
 - consume excessive resources until external operating-system limits intervene;
 - inspect and modify the shared Git object store or refs through the linked worktree;
 - exploit the interpreter, Git, kernel, or another local dependency;
-- generate nondeterministic or misleading output.
+- generate nondeterministic or misleading output;
+- deliberately forge a receipt that matches the binding exposed in its environment.
 
 The sanitized environment reduces accidental credential exposure. It does not prevent a malicious process from searching the filesystem for credentials.
 
-The report records the declared command and output digests. Command arguments must not contain secrets. Output digests can reveal equality and can be brute-forced when the underlying value has low entropy.
+The report records the declared command, output digests, observer metadata, and aggregate receipt counts. Command arguments must not contain secrets. Output and receipt digests can reveal equality and can be brute-forced when the underlying value has low entropy.
 
-The current witness does not bind the complete operating-system image, executable binaries, dependencies, locale data, kernel, or network responses. Equivalent exit codes across different environments do not establish equivalent execution. A return code classified as `fail` is only an operational observation; it does not prove that the intended assertion failed when the runner uses the same code for collection, import, setup, or infrastructure errors.
+The current witness does not bind the complete operating-system image, executable binaries, dependencies, locale data, kernel, or network responses. Equivalent outcomes across different environments do not establish equivalent execution.
 
-The report digests detect modification only when compared with a separately trusted expected digest. Because they are unkeyed, an attacker who can rewrite the report can also recompute both values. They do not authenticate the producer. Signing and standard attestations remain future work.
+`exit-code-v1` remains a coarse operational observation and cannot establish that the intended assertion failed when the runner reuses one code for collection, import, setup, teardown, or infrastructure errors.
+
+`outcome-receipt-v1` improves semantic precision for a cooperating adapter, but the binding is not secret and the receipt is not signed. It prevents accidental reuse and detects malformed or contradictory results; it does not authenticate the producer, establish adapter integrity, or prove that a failing assertion is relevant to the claimed defect. The built-in `unittest` producer can also be influenced by interpreter import resolution and repository code because it executes inside the tested environment.
+
+The report digests detect modification only when compared with a separately trusted expected digest. Because they are unkeyed, an attacker who can rewrite the report can also recompute both values. They do not authenticate the producer. Signing, standard attestations, and environment provenance remain future work.
 
 ## Safe operation
 
 Run DeltaWitness only on repositories and commands you trust. Use an isolated, disposable environment without production credentials for all other code. Review every report before publication, and apply additional scrutiny to reports generated with `--include-output`.
+
+Prefer `outcome-receipt-v1` when a trusted adapter exists, but do not treat a receipt as an authorization decision or an attestation. Validate oracle relevance, patch causality, and environment provenance through separate controls.
 
 Never interpret `SUPPORTED_IN_SCOPE` as proof that a patch is correct, secure, complete, minimal, or free from overfitting.
