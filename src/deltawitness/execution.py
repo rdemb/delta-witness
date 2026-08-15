@@ -1,4 +1,4 @@
-"""Command execution with conservative environment handling."""
+"""Command execution with conservative environment and receipt handling."""
 
 from __future__ import annotations
 
@@ -12,7 +12,8 @@ import tempfile
 import time
 from typing import Sequence
 
-from .errors import VerificationError
+from .errors import ReceiptError, VerificationError
+from .receipt import load_outcome_receipt
 
 _OUTPUT_PREVIEW_LIMIT = 20_000
 _PRESERVED_ENV = (
@@ -25,6 +26,7 @@ _PRESERVED_ENV = (
     "COMSPEC",
     "PATHEXT",
 )
+_RECEIPT_OBSERVER = "outcome-receipt-v1"
 
 
 @dataclass(frozen=True)
@@ -36,6 +38,12 @@ class ProcessObservation:
     stderr_sha256: str
     stdout: str | None
     stderr: str | None
+    observer: str
+    receipt_sha256: str | None
+    receipt_outcome: str | None
+    receipt_producer: dict[str, str] | None
+    receipt_counts: dict[str, int] | None
+    receipt_error: str | None
 
 
 def _isolated_environment(
@@ -43,6 +51,9 @@ def _isolated_environment(
     worktree: Path,
     runtime_root: Path,
     pass_env: Sequence[str],
+    *,
+    receipt_path: Path | None,
+    receipt_binding: str | None,
 ) -> dict[str, str]:
     env: dict[str, str] = {}
     for name in _PRESERVED_ENV:
@@ -81,6 +92,11 @@ def _isolated_environment(
             "DELTAWITNESS_WORKTREE": str(worktree),
         }
     )
+    if receipt_path is not None or receipt_binding is not None:
+        if receipt_path is None or receipt_binding is None:
+            raise VerificationError("Receipt path and binding must be configured together")
+        env["DELTAWITNESS_RECEIPT_PATH"] = str(receipt_path)
+        env["DELTAWITNESS_RECEIPT_BINDING"] = receipt_binding
     return env
 
 
@@ -126,11 +142,28 @@ def run_command(
     timeout_seconds: int,
     pass_env: Sequence[str],
     include_output: bool,
+    observer: str,
+    receipt_binding: str | None,
 ) -> ProcessObservation:
+    if observer not in {"exit-code-v1", _RECEIPT_OBSERVER}:
+        raise VerificationError(f"Unsupported command observer: {observer}")
+    if observer == _RECEIPT_OBSERVER and receipt_binding is None:
+        raise VerificationError("Receipt-aware execution requires an invocation binding")
+    if observer != _RECEIPT_OBSERVER and receipt_binding is not None:
+        raise VerificationError("Exit-code execution must not receive a receipt binding")
+
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="deltawitness-runtime-") as runtime_directory:
         runtime_root = Path(runtime_directory)
-        env = _isolated_environment(state, cwd, runtime_root, pass_env)
+        receipt_path = runtime_root / "outcome-receipt.json" if observer == _RECEIPT_OBSERVER else None
+        env = _isolated_environment(
+            state,
+            cwd,
+            runtime_root,
+            pass_env,
+            receipt_path=receipt_path,
+            receipt_binding=receipt_binding,
+        )
         with tempfile.TemporaryFile() as stdout_file, tempfile.TemporaryFile() as stderr_file:
             try:
                 process = subprocess.Popen(
@@ -157,6 +190,31 @@ def run_command(
             duration = time.monotonic() - started
             stdout_sha256, stdout = _digest_and_preview(stdout_file, include_output)
             stderr_sha256, stderr = _digest_and_preview(stderr_file, include_output)
+
+            receipt_sha256: str | None = None
+            receipt_outcome: str | None = None
+            receipt_producer: dict[str, str] | None = None
+            receipt_counts: dict[str, int] | None = None
+            receipt_error: str | None = None
+            if observer == _RECEIPT_OBSERVER and not timed_out:
+                assert receipt_path is not None
+                assert receipt_binding is not None
+                try:
+                    receipt = load_outcome_receipt(
+                        receipt_path,
+                        expected_binding=receipt_binding,
+                    )
+                except ReceiptError as exc:
+                    receipt_error = exc.code
+                else:
+                    receipt_sha256 = receipt.sha256
+                    receipt_outcome = receipt.outcome
+                    receipt_producer = {
+                        "name": receipt.producer_name,
+                        "version": receipt.producer_version,
+                    }
+                    receipt_counts = dict(receipt.counts)
+
             return ProcessObservation(
                 return_code=None if timed_out else process.returncode,
                 duration_seconds=round(duration, 6),
@@ -165,4 +223,10 @@ def run_command(
                 stderr_sha256=stderr_sha256,
                 stdout=stdout,
                 stderr=stderr,
+                observer=observer,
+                receipt_sha256=receipt_sha256,
+                receipt_outcome=receipt_outcome,
+                receipt_producer=receipt_producer,
+                receipt_counts=receipt_counts,
+                receipt_error=receipt_error,
             )

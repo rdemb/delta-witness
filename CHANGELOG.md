@@ -2,7 +2,21 @@
 
 ## Unreleased
 
-- Reject changed symbolic-link entries before counterfactual hybrid-state materialization.
+No unreleased changes are currently declared.
+
+## 0.0.2 - 2026-08-15
+
+- Rejected changed symbolic-link entries before counterfactual hybrid-state materialization.
+- Added the optional `outcome-receipt-v1` observer for typed test outcomes.
+- Added deterministic invocation bindings over claim, command, specification, state, tree, and commit identities.
+- Added strict, bounded, duplicate-key-safe JSON receipt parsing with regular-file and symbolic-link checks.
+- Added dual-channel consistency checks between receipt semantics and configured process exit codes.
+- Added a built-in standard-library `unittest` receipt producer that distinguishes assertion failures from test errors, empty discovery, ineffective all-skipped execution, and unexpected successes.
+- Added aggregate logical-test accounting that handles multiple failing subtests conservatively.
+- Added report schema `0.3` with observer protocol, binding, receipt digest, producer, counts, outcome, and stable observer-error fields.
+- Bound typed observer evidence into the semantic witness digest while preserving integrity verification for earlier schema `0.2` reports.
+- Added adversarial tests for missing, malformed, oversized, state-mismatched, contradictory, and symbolic-link receipts.
+- Added protocol, architecture, threat-model, roadmap, and public claim-boundary documentation.
 
 ## 0.0.1 - 2026-08-15
 

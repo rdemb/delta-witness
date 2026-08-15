@@ -44,9 +44,26 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(config.claims[0].claim_id, "regression")
         self.assertEqual(config.claims[0].expectations["base_candidate"], "fail")
         self.assertEqual(config.execution_policy.pass_env, ("DW_TEST_FLAG",))
+        self.assertEqual(config.claims[0].observer, "exit-code-v1")
         self.assertEqual(config.claims[0].pass_exit_codes, (0,))
         self.assertEqual(config.claims[0].fail_exit_codes, (1,))
         self.assertEqual(len(config.digest_sha256), 64)
+
+    def test_accepts_typed_outcome_receipt_observer(self) -> None:
+        custom = VALID.replace(
+            b'description = "candidate tests expose the old defect"',
+            b'description = "candidate tests expose the old defect"\nobserver = "outcome-receipt-v1"',
+        )
+        config = self._load(custom)
+        self.assertEqual(config.claims[0].observer, "outcome-receipt-v1")
+
+    def test_rejects_unknown_observer(self) -> None:
+        invalid = VALID.replace(
+            b'description = "candidate tests expose the old defect"',
+            b'description = "candidate tests expose the old defect"\nobserver = "trust-me-v1"',
+        )
+        with self.assertRaises(ConfigurationError):
+            self._load(invalid)
 
     def test_rejects_unknown_expectation(self) -> None:
         invalid = VALID.replace(b'base_candidate = "fail"', b'base_candidate = "maybe"')

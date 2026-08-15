@@ -56,6 +56,7 @@ def _doctor(repo_argument: Path) -> int:
     print(f"Git: {git_version()}")
     print(f"Repository: {repo}")
     print("Command environment: sanitized")
+    print("Observers: exit-code-v1, outcome-receipt-v1")
     print("Raw command output: excluded by default")
     print("Filesystem and network sandbox: unavailable")
     print("Status: prerequisites satisfied for trusted-code research runs")
@@ -69,6 +70,7 @@ def _render_report(report: VerificationReport) -> None:
         print(f"\nClaim: {claim.claim_id}")
         if claim.description:
             print(f"  {claim.description}")
+        print(f"  observer: {claim.observer}")
         for state in claim.states:
             marker = "OK" if state.matched else "NO"
             print(
@@ -76,6 +78,16 @@ def _render_report(report: VerificationReport) -> None:
                 f"expected={state.expected:<4} observed={state.observed:<7} "
                 f"exit={state.return_code}"
             )
+            if state.observer == "outcome-receipt-v1":
+                receipt = state.receipt_outcome or "unavailable"
+                producer = (
+                    state.receipt_producer.get("name", "unknown")
+                    if state.receipt_producer is not None
+                    else "unavailable"
+                )
+                print(f"       receipt={receipt} producer={producer}")
+            if state.observation_error:
+                print(f"       observer_error={state.observation_error}")
         if any(state.observed in {"timeout", "error"} for state in claim.states):
             verdict = "INCOMPLETE"
         else:

@@ -27,7 +27,7 @@ from .gitops import (
     worktree,
     write_tree,
 )
-from .reporting import compute_report_sha256, compute_witness_sha256
+from .reporting import compute_report_sha256, compute_witness_sha256, sha256_document
 
 _STATE_ORDER = ("base_base", "base_candidate", "candidate_base", "candidate_candidate")
 
@@ -47,12 +47,20 @@ class CommandResult:
     stderr_sha256: str
     stdout: str | None
     stderr: str | None
+    observer: str
+    invocation_binding: str
+    receipt_sha256: str | None
+    receipt_outcome: str | None
+    receipt_producer: dict[str, str] | None
+    receipt_counts: dict[str, int] | None
+    observation_error: str | None
 
 
 @dataclass(frozen=True)
 class ClaimResult:
     claim_id: str
     description: str
+    observer: str
     supported: bool
     command: tuple[str, ...]
     states: tuple[CommandResult, ...]
@@ -80,6 +88,62 @@ class VerificationReport:
     report_sha256: str | None = None
 
 
+def _invocation_binding(
+    claim: Claim,
+    *,
+    state: str,
+    tree_sha: str,
+    commit_sha: str,
+    spec_sha256: str,
+) -> str:
+    return sha256_document(
+        {
+            "schema_version": "deltawitness.invocation.v1",
+            "claim_id": claim.claim_id,
+            "state": state,
+            "tree_sha": tree_sha,
+            "commit_sha": commit_sha,
+            "observer": claim.observer,
+            "command": list(claim.command),
+            "spec_sha256": spec_sha256,
+        }
+    )
+
+
+def _classify_observation(
+    claim: Claim,
+    *,
+    return_code: int | None,
+    timed_out: bool,
+    receipt_outcome: str | None,
+    receipt_error: str | None,
+) -> tuple[str, str | None]:
+    if timed_out:
+        return "timeout", None
+
+    if claim.observer == "exit-code-v1":
+        if return_code in claim.pass_exit_codes:
+            return "pass", None
+        if return_code in claim.fail_exit_codes:
+            return "fail", None
+        return "error", "unclassified_exit_code"
+
+    if receipt_error is not None:
+        return "error", receipt_error
+    if receipt_outcome is None:
+        return "error", "missing_receipt_outcome"
+
+    if receipt_outcome == "passed":
+        if return_code in claim.pass_exit_codes:
+            return "pass", None
+        return "error", "receipt_exit_mismatch"
+    if receipt_outcome == "test_failure":
+        if return_code in claim.fail_exit_codes:
+            return "fail", None
+        return "error", "receipt_exit_mismatch"
+    return "error", f"receipt_outcome:{receipt_outcome}"
+
+
 def _run_claim(
     claim: Claim,
     state: str,
@@ -90,6 +154,13 @@ def _run_claim(
     include_output: bool,
 ) -> CommandResult:
     restore_commit(cwd, commit_sha)
+    invocation_binding = _invocation_binding(
+        claim,
+        state=state,
+        tree_sha=tree_sha,
+        commit_sha=commit_sha,
+        spec_sha256=config.digest_sha256,
+    )
     observation = run_command(
         claim.command,
         state=state,
@@ -97,15 +168,18 @@ def _run_claim(
         timeout_seconds=claim.timeout_seconds,
         pass_env=config.execution_policy.pass_env,
         include_output=include_output,
+        observer=claim.observer,
+        receipt_binding=(
+            invocation_binding if claim.observer == "outcome-receipt-v1" else None
+        ),
     )
-    if observation.timed_out:
-        observed = "timeout"
-    elif observation.return_code in claim.pass_exit_codes:
-        observed = "pass"
-    elif observation.return_code in claim.fail_exit_codes:
-        observed = "fail"
-    else:
-        observed = "error"
+    observed, observation_error = _classify_observation(
+        claim,
+        return_code=observation.return_code,
+        timed_out=observation.timed_out,
+        receipt_outcome=observation.receipt_outcome,
+        receipt_error=observation.receipt_error,
+    )
     expected = claim.expectations[state]
     matched = expected == observed or (expected == "any" and observed in {"pass", "fail"})
     return CommandResult(
@@ -122,6 +196,13 @@ def _run_claim(
         stderr_sha256=observation.stderr_sha256,
         stdout=observation.stdout,
         stderr=observation.stderr,
+        observer=observation.observer,
+        invocation_binding=invocation_binding,
+        receipt_sha256=observation.receipt_sha256,
+        receipt_outcome=observation.receipt_outcome,
+        receipt_producer=observation.receipt_producer,
+        receipt_counts=observation.receipt_counts,
+        observation_error=observation_error,
     )
 
 
@@ -211,6 +292,7 @@ def verify_repository(
                 ClaimResult(
                     claim_id=claim.claim_id,
                     description=claim.description,
+                    observer=claim.observer,
                     supported=all(result.matched for result in state_results),
                     command=claim.command,
                     states=state_results,
@@ -225,7 +307,7 @@ def verify_repository(
     supported = complete and all(result.supported for result in claim_results)
     spec_label, spec_external = safe_path_label(config.path, repo)
     report = VerificationReport(
-        schema_version="0.2",
+        schema_version="0.3",
         tool_version=__version__,
         created_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         repository=repo.name,
@@ -239,6 +321,7 @@ def verify_repository(
             "pass_env": list(config.execution_policy.pass_env),
             "output_included": include_output,
             "sandboxed": False,
+            "observer_protocols": sorted({claim.observer for claim in config.claims}),
         },
         classification=_serialize_classification(classification),
         state_trees=state_trees,
