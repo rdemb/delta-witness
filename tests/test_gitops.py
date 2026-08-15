@@ -10,6 +10,7 @@ from deltawitness.errors import GitError
 from deltawitness.gitops import (
     _validate_changed_path,
     changed_paths,
+    ensure_supported_entries,
     git_metadata_path,
     resolve_ref,
 )
@@ -112,6 +113,36 @@ class GitOperationsTests(unittest.TestCase):
                     os.environ["GIT_DIR"] = previous
 
         self.assertEqual(observed, expected)
+
+    @unittest.skipIf(os.name != "posix", "symbolic-link semantics required")
+    def test_rejects_changed_symbolic_link_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            run(repo, "git", "init", "-b", "main")
+            run(repo, "git", "config", "user.email", "test@example.invalid")
+            run(repo, "git", "config", "user.name", "DeltaWitness Test")
+            (repo / "src").mkdir()
+            (repo / "tests").mkdir()
+            (repo / "src" / "value.py").write_text("VALUE = 'base'\n", encoding="utf-8")
+            os.symlink("missing-target.py", repo / "tests" / "test_value.py")
+            run(repo, "git", "add", ".")
+            run(repo, "git", "commit", "-m", "base with symbolic-link test entry")
+            base = run(repo, "git", "rev-parse", "HEAD")
+
+            (repo / "src" / "value.py").write_text("VALUE = 'candidate'\n", encoding="utf-8")
+            (repo / "tests" / "test_value.py").unlink()
+            (repo / "tests" / "test_value.py").write_text("assert True\n", encoding="utf-8")
+            run(repo, "git", "add", ".")
+            run(repo, "git", "commit", "-m", "replace symbolic link with test file")
+            head = run(repo, "git", "rev-parse", "HEAD")
+
+            with self.assertRaisesRegex(GitError, "symbolic-link"):
+                ensure_supported_entries(
+                    repo,
+                    base,
+                    head,
+                    ["src/value.py", "tests/test_value.py"],
+                )
 
 
 if __name__ == "__main__":
