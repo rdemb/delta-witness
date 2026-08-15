@@ -1,0 +1,33 @@
+name: Research proposal
+description: Propose a falsifiable experiment, baseline, or prior-art correction.
+title: "research: "
+labels: ["research"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: State a narrow and falsifiable question.
+    validations:
+      required: true
+  - type: textarea
+    id: prior_art
+    attributes:
+      label: Direct prior art
+      description: Link primary sources and explain the closest baseline.
+    validations:
+      required: true
+  - type: textarea
+    id: protocol
+    attributes:
+      label: Proposed protocol
+      description: Describe data, controls, metrics, and falsification criteria.
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Safety and disclosure risks
+      description: Explain how the work remains synthetic, owned, licensed, or explicitly authorized.
+    validations:
+      required: true

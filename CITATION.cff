@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use DeltaWitness in research, please cite this repository."
+title: "DeltaWitness: Counterfactual Verification for AI-Generated Code Changes"
+type: software
+authors:
+  - family-names: "Dembski"
+    given-names: "Rafal"
+repository-code: "https://github.com/rdemb/delta-witness"
+license: "Apache-2.0"
+version: "0.0.1"
+date-released: "2026-08-15"
