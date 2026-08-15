@@ -12,6 +12,7 @@ from typing import Any
 from .errors import ConfigurationError
 
 _ALLOWED_EXPECTATIONS = {"pass", "fail", "any"}
+_ALLOWED_OBSERVERS = {"exit-code-v1", "outcome-receipt-v1"}
 _STATE_NAMES = ("base_base", "base_candidate", "candidate_base", "candidate_candidate")
 _CLAIM_ID = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 _ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -34,6 +35,7 @@ class ExecutionPolicy:
 class Claim:
     claim_id: str
     description: str
+    observer: str
     command: tuple[str, ...]
     timeout_seconds: int
     pass_exit_codes: tuple[int, ...]
@@ -147,6 +149,7 @@ def load_config(path: Path) -> WitnessConfig:
             {
                 "id",
                 "description",
+                "observer",
                 "command",
                 "timeout_seconds",
                 "pass_exit_codes",
@@ -158,6 +161,7 @@ def load_config(path: Path) -> WitnessConfig:
 
         claim_id = raw_claim.get("id")
         description = raw_claim.get("description", "")
+        observer = raw_claim.get("observer", "exit-code-v1")
         command = raw_claim.get("command")
         timeout = raw_claim.get("timeout_seconds", 300)
         pass_exit_codes = raw_claim.get("pass_exit_codes", [0])
@@ -174,6 +178,10 @@ def load_config(path: Path) -> WitnessConfig:
 
         if not isinstance(description, str):
             raise ConfigurationError(f"claim {claim_id!r}: description must be a string")
+        if not isinstance(observer, str) or observer not in _ALLOWED_OBSERVERS:
+            raise ConfigurationError(
+                f"claim {claim_id!r}: observer must be one of {sorted(_ALLOWED_OBSERVERS)}"
+            )
         if not isinstance(command, list) or not command:
             raise ConfigurationError(f"claim {claim_id!r}: command must be a non-empty string array")
         if not all(isinstance(item, str) and item and "\x00" not in item for item in command):
@@ -184,6 +192,7 @@ def load_config(path: Path) -> WitnessConfig:
             raise ConfigurationError(
                 f"claim {claim_id!r}: timeout_seconds must be between 1 and {_MAX_TIMEOUT_SECONDS}"
             )
+
         def validate_exit_codes(value: object, field: str) -> tuple[int, ...]:
             if not isinstance(value, list) or not value:
                 raise ConfigurationError(
@@ -239,6 +248,7 @@ def load_config(path: Path) -> WitnessConfig:
             Claim(
                 claim_id=claim_id,
                 description=description,
+                observer=observer,
                 command=tuple(command),
                 timeout_seconds=timeout,
                 pass_exit_codes=normalized_pass_codes,
