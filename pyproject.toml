@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deltawitness"
-version = "0.0.1"
+version = "0.0.2"
 description = "Counterfactual verification for AI-generated code changes."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,6 +37,7 @@ dependencies = []
 
 [project.scripts]
 deltawitness = "deltawitness.cli:main"
+deltawitness-unittest = "deltawitness.unittest_probe:main"
 
 [project.urls]
 Repository = "https://github.com/rdemb/delta-witness"
