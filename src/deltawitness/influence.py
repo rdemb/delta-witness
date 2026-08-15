@@ -98,6 +98,18 @@ class InfluenceReport:
     report_sha256: str | None = None
 
 
+@dataclass(frozen=True)
+class _InfluenceInputs:
+    """Immutable preflight result used by both the matrix and intervention table."""
+
+    base_sha: str
+    head_sha: str
+    classification: PathClassification
+    path_order: tuple[str, ...]
+    documentation_paths: tuple[str, ...]
+    test_paths: tuple[str, ...]
+
+
 def _serialize_classification(classification: PathClassification) -> dict[str, list[dict[str, str]]]:
     return {
         "code": [asdict(item) for item in classification.code],
@@ -130,12 +142,24 @@ def _validate_exact_truth_table(
     path_count = len(path_order)
     if not path_count:
         raise ValueError("At least one intervention path is required")
+    if path_count > _MAX_EXACT_CODE_PATHS:
+        raise ValueError(
+            f"Exact influence supports at most {_MAX_EXACT_CODE_PATHS} intervention paths"
+        )
+    if any(not isinstance(path, str) or not path for path in path_order):
+        raise ValueError("Intervention paths must be non-empty strings")
+    if len(set(path_order)) != path_count:
+        raise ValueError("Intervention path order must not contain duplicates")
+
+    masks = tuple(supported_by_mask)
+    if not all(isinstance(mask, int) and not isinstance(mask, bool) for mask in masks):
+        raise ValueError("Truth-table masks must be integer coalition identifiers")
     expected = set(range(1 << path_count))
-    if set(supported_by_mask) != expected:
-        missing = sorted(expected - set(supported_by_mask))
-        extra = sorted(set(supported_by_mask) - expected)
+    if set(masks) != expected:
+        missing = sorted(expected - set(masks))
+        extra = sorted(set(masks) - expected)
         raise ValueError(f"Truth table is incomplete or out of range; missing={missing}, extra={extra}")
-    if not all(isinstance(value, bool) for value in supported_by_mask.values()):
+    if not all(type(value) is bool for value in supported_by_mask.values()):
         raise ValueError("Truth-table values must be Booleans")
 
 
@@ -260,18 +284,27 @@ def compute_exact_influence_metrics(
         if supported_masks and all(mask & (1 << index) for mask in supported_masks)
     ]
 
-    truth_table = [
-        {
-            "mask": mask,
-            "supported": supported_by_mask[mask],
-        }
-        for mask in range(1 << path_count)
-    ]
+    truth_table = {
+        "path_order": list(paths),
+        "values": [
+            {
+                "mask": mask,
+                "supported": supported_by_mask[mask],
+            }
+            for mask in range(1 << path_count)
+        ],
+    }
     endpoint_delta = Fraction(
         int(supported_by_mask[full_mask]) - int(supported_by_mask[0]),
         1,
     )
     shapley_sum = sum(shapley_values, Fraction(0, 1))
+    efficiency_residual = shapley_sum - endpoint_delta
+    if efficiency_residual != 0:
+        raise ValueError(
+            "Exact Shapley efficiency invariant failed; attribution must not be released"
+        )
+
     return {
         "truth_table_sha256": sha256_document(truth_table),
         "supported_coalition_count": len(supported_masks),
@@ -291,7 +324,8 @@ def compute_exact_influence_metrics(
         "negative_edge_count": total_negative_swings,
         "endpoint_delta": _fraction_document(endpoint_delta),
         "shapley_sum": _fraction_document(shapley_sum),
-        "shapley_efficiency_residual": _fraction_document(shapley_sum - endpoint_delta),
+        "shapley_efficiency_verified": True,
+        "shapley_efficiency_residual": _fraction_document(efficiency_residual),
         "paths": path_metrics,
         "pair_interactions": pair_interactions,
     }
@@ -304,6 +338,44 @@ def _validate_canonical_claims(config: WitnessConfig) -> None:
                 f"Exact patch influence currently requires the canonical regression matrix for "
                 f"claim {claim.claim_id!r}: {_CANONICAL_EXPECTATIONS}"
             )
+
+
+def _prepare_influence_inputs(
+    repo: Path,
+    base_ref: str,
+    head_ref: str,
+    config: WitnessConfig,
+) -> _InfluenceInputs:
+    """Resolve immutable refs and reject infeasible analyses before running tests."""
+
+    ensure_clean(repo)
+    base_sha = resolve_ref(repo, base_ref)
+    head_sha = resolve_ref(repo, head_ref)
+    if base_sha == head_sha:
+        raise VerificationError("Base and candidate resolve to the same commit")
+    ensure_ancestor(repo, base_sha, head_sha)
+
+    changes = changed_paths(repo, base_sha, head_sha)
+    classification = classify_changes(changes, config.path_policy)
+    ensure_supported_entries(repo, base_sha, head_sha, [item.path for item in classification.all])
+
+    path_order = tuple(sorted({item.path for item in classification.code}))
+    if len(path_order) > _MAX_EXACT_CODE_PATHS:
+        raise VerificationError(
+            f"Exact patch influence supports at most {_MAX_EXACT_CODE_PATHS} changed code paths; "
+            f"received {len(path_order)}"
+        )
+
+    return _InfluenceInputs(
+        base_sha=base_sha,
+        head_sha=head_sha,
+        classification=classification,
+        path_order=path_order,
+        documentation_paths=tuple(
+            sorted({item.path for item in classification.documentation})
+        ),
+        test_paths=tuple(sorted({item.path for item in classification.tests})),
+    )
 
 
 def _command_signature(result: CommandResult) -> dict[str, object]:
@@ -545,10 +617,14 @@ def analyze_patch_influence(
 
     repo = repo.resolve()
     _validate_canonical_claims(config)
+    inputs = _prepare_influence_inputs(repo, base_ref, head_ref, config)
+
+    # Pass immutable SHAs into the canonical matrix. Branch names may move after
+    # preflight, but one influence report must remain bound to one exact range.
     matrix_report = verify_repository(
         repo,
-        base_ref,
-        head_ref,
+        inputs.base_sha,
+        inputs.head_sha,
         config,
         include_output=include_output,
     )
@@ -558,36 +634,20 @@ def analyze_patch_influence(
         )
 
     ensure_clean(repo)
-    base_sha = resolve_ref(repo, base_ref)
-    head_sha = resolve_ref(repo, head_ref)
-    ensure_ancestor(repo, base_sha, head_sha)
-    changes = changed_paths(repo, base_sha, head_sha)
-    classification = classify_changes(changes, config.path_policy)
-    ensure_supported_entries(repo, base_sha, head_sha, [item.path for item in classification.all])
-
-    path_order = tuple(sorted({item.path for item in classification.code}))
-    if len(path_order) > _MAX_EXACT_CODE_PATHS:
-        raise VerificationError(
-            f"Exact patch influence supports at most {_MAX_EXACT_CODE_PATHS} changed code paths; "
-            f"received {len(path_order)}"
-        )
-    documentation_paths = tuple(sorted({item.path for item in classification.documentation}))
-    test_paths = tuple(sorted({item.path for item in classification.tests}))
-
     coalition_results: list[CoalitionResult] = []
-    with worktree(repo, base_sha, "patch-influence") as intervention_worktree:
-        for mask in range(1 << len(path_order)):
+    with worktree(repo, inputs.base_sha, "patch-influence") as intervention_worktree:
+        for mask in range(1 << len(inputs.path_order)):
             coalition_results.append(
                 _run_coalition(
                     repo=repo,
                     worktree_path=intervention_worktree,
-                    base_sha=base_sha,
-                    head_sha=head_sha,
+                    base_sha=inputs.base_sha,
+                    head_sha=inputs.head_sha,
                     matrix_report=matrix_report,
                     config=config,
-                    path_order=path_order,
-                    documentation_paths=documentation_paths,
-                    test_paths=test_paths,
+                    path_order=inputs.path_order,
+                    documentation_paths=inputs.documentation_paths,
+                    test_paths=inputs.test_paths,
                     mask=mask,
                     include_output=include_output,
                 )
@@ -597,7 +657,7 @@ def analyze_patch_influence(
     anchors = _build_anchors(
         coalitions=coalitions,
         matrix_report=matrix_report,
-        has_documentation_changes=bool(documentation_paths),
+        has_documentation_changes=bool(inputs.documentation_paths),
     )
     complete = all(coalition.complete for coalition in coalitions)
     anchors_consistent = all(bool(anchor["consistent"]) for anchor in anchors)
@@ -624,7 +684,7 @@ def analyze_patch_influence(
     metrics: dict[str, object] | None = None
     if attribution_available:
         metrics = compute_exact_influence_metrics(
-            path_order,
+            inputs.path_order,
             {coalition.mask: coalition.supported for coalition in coalitions},
         )
 
@@ -634,8 +694,8 @@ def analyze_patch_influence(
         tool_version=__version__,
         created_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         repository=repo.name,
-        base_sha=base_sha,
-        head_sha=head_sha,
+        base_sha=inputs.base_sha,
+        head_sha=inputs.head_sha,
         spec_path=spec_label,
         spec_external=spec_external,
         spec_sha256=config.digest_sha256,
@@ -648,15 +708,15 @@ def analyze_patch_influence(
             "enumeration": "exact-exhaustive",
             "maximum_code_paths": _MAX_EXACT_CODE_PATHS,
         },
-        classification=_serialize_classification(classification),
+        classification=_serialize_classification(inputs.classification),
         intervention={
             "unit": "changed-code-path",
-            "path_order": list(path_order),
-            "path_count": len(path_order),
-            "coalition_count": 1 << len(path_order),
+            "path_order": list(inputs.path_order),
+            "path_count": len(inputs.path_order),
+            "coalition_count": 1 << len(inputs.path_order),
             "bit_encoding": "path_order index is the least-significant-bit position",
             "documentation_policy": "candidate-held-constant",
-            "candidate_documentation_paths": list(documentation_paths),
+            "candidate_documentation_paths": list(inputs.documentation_paths),
             "test_worlds": ["base_tests", "candidate_tests"],
             "monotonicity_assumed": False,
         },
