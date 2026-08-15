@@ -235,8 +235,22 @@ def _path_mode_at_ref(repo: Path, ref: str, path: str) -> str | None:
     return fields[0].decode("ascii")
 
 
+def _ensure_nonoverlapping_paths(paths: Sequence[str]) -> tuple[str, ...]:
+    ordered_paths = tuple(sorted(paths))
+    for index, ancestor in enumerate(ordered_paths):
+        prefix = f"{ancestor}/"
+        for descendant in ordered_paths[index + 1 :]:
+            if descendant.startswith(prefix):
+                raise GitError(
+                    "Changed Git paths overlap through a file/directory transition and "
+                    "cannot be materialized independently: "
+                    f"{ancestor!r} is an ancestor of {descendant!r}"
+                )
+    return ordered_paths
+
+
 def ensure_supported_entries(repo: Path, base_sha: str, head_sha: str, paths: Sequence[str]) -> None:
-    for path in paths:
+    for path in _ensure_nonoverlapping_paths(paths):
         for ref in (base_sha, head_sha):
             mode = _path_mode_at_ref(repo, ref, path)
             if mode == "160000":
