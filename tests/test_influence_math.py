@@ -46,6 +46,8 @@ class ExactInfluenceMathTests(unittest.TestCase):
         self.assertEqual(exact(by_path["src/collateral.py"]["shapley"]), (0, 1))
         self.assertTrue(by_path["src/core.py"]["globally_necessary"])
         self.assertFalse(by_path["src/collateral.py"]["full_context_necessary"])
+        self.assertTrue(metrics["shapley_efficiency_verified"])
+        self.assertEqual(exact(metrics["shapley_efficiency_residual"]), (0, 1))
 
     def test_alternative_sufficient_paths_share_credit_and_are_redundant(self) -> None:
         metrics = compute_exact_influence_metrics(
@@ -114,6 +116,28 @@ class ExactInfluenceMathTests(unittest.TestCase):
             compute_exact_influence_metrics(
                 ["src/a.py", "src/b.py"],
                 {0: False, 1: True, 3: True},
+            )
+
+    def test_duplicate_or_empty_intervention_paths_are_rejected(self) -> None:
+        for paths in (["src/a.py", "src/a.py"], ["src/a.py", ""]):
+            with self.subTest(paths=paths), self.assertRaises(ValueError):
+                compute_exact_influence_metrics(
+                    paths,
+                    {0: False, 1: True, 2: False, 3: True},
+                )
+
+    def test_boolean_masks_and_non_boolean_values_are_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            compute_exact_influence_metrics(["src/a.py"], {False: False, True: True})
+        with self.assertRaises(ValueError):
+            compute_exact_influence_metrics(["src/a.py"], {0: False, 1: 1})  # type: ignore[dict-item]
+
+    def test_metric_api_refuses_more_than_the_exact_path_cap(self) -> None:
+        paths = [f"src/path_{index}.py" for index in range(9)]
+        with self.assertRaisesRegex(ValueError, "at most 8"):
+            compute_exact_influence_metrics(
+                paths,
+                {mask: bool(mask) for mask in range(1 << len(paths))},
             )
 
 
