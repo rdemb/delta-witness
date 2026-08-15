@@ -31,6 +31,7 @@ The initial model includes:
 - unclassified files that influence execution;
 - filenames that break line-delimited Git parsing;
 - changed submodule entries with unresolved external state;
+- changed symbolic-link entries whose targets do not preserve the declared path boundary;
 - commands that return success without meaningful assertions;
 - test runners that reuse the same nonzero exit code for assertion failures, collection errors, and setup failures;
 - nondeterministic tests and environment drift;
@@ -50,22 +51,25 @@ The initial model includes:
 5. Git paths are read through a NUL-delimited interface and unsafe cross-platform paths are rejected.
 6. Every changed path is classified exactly once.
 7. Changed Git submodule entries are rejected.
-8. Each matrix state has an exact tree ID and commit ID.
-9. Hybrid states use deterministic synthetic commits.
-10. Each claim begins from a reset and cleaned state commit.
-11. Commands execute without a shell.
-12. The full host environment is not inherited.
-13. Raw output is excluded unless explicitly requested.
-14. Absolute repository and specification paths are excluded from reports.
-15. Pass and fail exit-code classes are explicit and disjoint.
-16. Timeouts and unclassified return codes mark the run incomplete.
-17. The default report is stored in private Git metadata rather than the working tree.
-18. Ambiguous configuration and harness errors stop the run.
-19. Report and witness digests are independently verifiable.
+8. Changed symbolic-link entries are rejected before hybrid-state materialization.
+9. Each matrix state has an exact tree ID and commit ID.
+10. Hybrid states use deterministic synthetic commits.
+11. Each claim begins from a reset and cleaned state commit.
+12. Commands execute without a shell.
+13. The full host environment is not inherited.
+14. Raw output is excluded unless explicitly requested.
+15. Absolute repository and specification paths are excluded from reports.
+16. Pass and fail exit-code classes are explicit and disjoint.
+17. Timeouts and unclassified return codes mark the run incomplete.
+18. The default report is stored in private Git metadata rather than the working tree.
+19. Ambiguous configuration and harness errors stop the run.
+20. Report and witness digests are independently verifiable.
 
 ## Residual risks
 
-The current runner is not a security sandbox. Repository-local Git configuration, attributes, generic clean/smudge filters, platform checkout rules, and the shared object database can still influence materialization or execution.
+The current runner is not a security sandbox. Repository-local Git configuration, attributes, generic clean/smudge filters, platform checkout rules, unchanged symbolic-link entries, and the shared object database can still influence materialization or execution.
+
+Rejecting changed symbolic-link entries prevents the current prototype from constructing a counterfactual overlay across a modified link boundary. It does not prove that every unchanged path reachable by a command is a regular file, nor does it prevent commands from following links already present in the repository or elsewhere on the host filesystem.
 
 A command can still:
 

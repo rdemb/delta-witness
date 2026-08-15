@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Reject changed symbolic-link entries before counterfactual hybrid-state materialization.
+
 ## 0.0.1 - 2026-08-15
 
 - Added the initial four-state counterfactual matrix.

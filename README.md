@@ -56,7 +56,7 @@ Each run records:
 - a stable witness digest over the semantic outcome;
 - a report digest over the complete JSON document.
 
-The hybrid states are represented as synthetic commits rather than dirty worktrees. Commands that inspect `HEAD` therefore see the recorded commit identity. Git subprocesses use a reduced environment that rejects process-level repository redirection and replacement-object overrides. Repository-local attributes and filters remain a documented limitation of the current materialization layer.
+The hybrid states are represented as synthetic commits rather than dirty worktrees. Commands that inspect `HEAD` therefore see the recorded commit identity. Git subprocesses use a reduced environment that rejects process-level repository redirection and replacement-object overrides. Changed submodule and changed symbolic-link entries are rejected before hybrid-state materialization. Repository-local attributes and filters remain a documented limitation of the current materialization layer.
 
 Raw command output is excluded by default. Local absolute repository and specification paths are not written to the report. The command array, claim descriptions, environment-variable names, and output digests are recorded; treat a report as review-required before publication.
 
@@ -159,8 +159,8 @@ The first prototype intentionally supports a narrow case:
 
 - test changes must be separable by repository path;
 - candidate test changes are required;
-- changed submodule entries are rejected;
-- dependency, toolchain, generated-file, unchanged-submodule, and cross-repository state are not yet modeled or cryptographically bound;
+- changed submodule and changed symbolic-link entries are rejected;
+- dependency, toolchain, generated-file, unchanged-submodule, unchanged-symbolic-link, and cross-repository state are not yet modeled or cryptographically bound;
 - repository-local Git attributes, filters, checkout transformations, and the shared object database can still affect the materialized worktrees;
 - commands can still access the host filesystem and network;
 - nondeterministic tests are observed only once;
