@@ -1,12 +1,12 @@
 # DW-001 Protocol
 
-**Status:** DRAFT — NOT FROZEN — OWNED-SYNTHETIC DEVELOPMENT MECHANISM PILOT EXECUTED AND RETAINED — NO ECOLOGICAL OR HOLDOUT EXECUTION AUTHORIZED.
+**Status:** DRAFT — NOT FROZEN — OWNED-SYNTHETIC DEVELOPMENT MECHANISM PILOT EXECUTED AND RETAINED — CLAIM-SCOPED MUTATION DESIGN FROZEN BUT NOT EXECUTED — NO ECOLOGICAL OR HOLDOUT EXECUTION AUTHORIZED.
 
 **Study identifier:** `DW-001`.
 
-**Implementation lineage for this revision:** stable `main` at `6d34b77705c109f9251271728c95976b8f61caa7` plus the `weak-proxy-oracle` development control under review in PR #34. Exact future ecological protocol, implementation, generator, schema, baseline, environment, sampling, and analysis commits remain unpinned until freeze.
+**Implementation lineage for this revision:** stable `main` at `89455edce47c0d82517637dee8334adf3d3fa1c2` plus the claim-scoped mutation plan and deterministic catalog under review in PR #38. Exact future mutation-result, ecological protocol, implementation, generator, schema, baseline, environment, sampling, and analysis commits remain unpinned until their respective freeze gates.
 
-This document is a protocol candidate, not a preregistration. The sealed five-family owned-synthetic development mechanism pilot has been executed and retained. That execution does not freeze this broader protocol, authorize external repository execution, create a holdout, or permit ecological inference.
+This document is a protocol candidate, not a preregistration. The sealed five-family owned-synthetic development mechanism pilot has been executed and retained. The later weak-proxy challenge has been executed as development-only negative-control evidence. The claim-scoped mutation plan and catalog freeze pre-execution inputs only; no mutant has been executed under that plan. None of these steps freezes the broader protocol, authorizes external repository execution, creates a holdout, or permits ecological inference.
 
 No held-out command may execute until the complete protocol, target population, sampling frame, instance authorization, containment environment, ground-truth process, metrics, exclusions, versions, and commitment digest are immutably recorded before unblinding.
 
@@ -32,7 +32,11 @@ The primary incremental contrast is:
 
 > When the exact predeclared claim selector is itself a genuine typed fail-to-pass witness, can one fixed claim-violating mutant still pass that selector while failing a separately fixed development claim check?
 
-The final two questions are negative controls. A positive result means the current evidence has the predicted limitation. It is not evidence that a complete relevance or strength method has been solved.
+### 1.5 Mutation-design question
+
+> Can the first mutation calibration freeze one outcome-blind generic operator set, one exact source/AST target, one deterministic mutant catalog, and paired strong/weak selector profiles before any mutation-test outcome, while retaining duplicate, invalid, and not-applicable generation records and separating the known weak-proxy mutant from generic operator evidence?
+
+The oracle-relevance and oracle-strength questions are negative controls. The mutation-design question concerns pre-execution methodological integrity only. A positive result does not establish a complete relevance or strength method, a valid mutation score, or useful mutation evidence.
 
 ## 2. Claims not under test
 
@@ -40,11 +44,12 @@ DW-001 does not establish:
 
 - complete patch correctness, security, or semantic intent;
 - test-oracle relevance, adequacy, completeness, or mutation strength;
+- that any cataloged mutant is killed, survived, equivalent, covered, or relevant;
 - vulnerability removal or absence of untested regressions;
 - production safety or universal causality;
 - complete environment reproducibility;
 - producer, reviewer, agent, model, or organization authenticity;
-- authorization to merge, deploy, publish, execute an external repository, or inspect a holdout;
+- authorization to merge, deploy, publish, execute an external repository, execute the frozen mutation catalog, or inspect a holdout;
 - scientific novelty or general superiority.
 
 Exact path-level influence is outside the primary state-set acceptance rule and may appear only as exploratory secondary evidence where its own prerequisites hold.
@@ -469,7 +474,8 @@ Development material may be used to:
 - test baseline feasibility;
 - design a precision target without holdout inspection;
 - refine exclusions, deviations, review procedures, and containment requirements;
-- demonstrate known method limitations through explicit negative controls.
+- demonstrate known method limitations through explicit negative controls;
+- freeze experimental inputs before later development calibration.
 
 Development artifacts remain labeled `development`, outside the primary denominator, and permanently separate from holdout material.
 
@@ -485,7 +491,9 @@ It executed 40 matrix states, 12 selector states, and five controlled contrasts.
 
 That pilot establishes fixed-pipeline behavior only. The later weak-proxy family is a separate inspected development challenge and is not silently added to the historical pilot population.
 
-No effectiveness, superiority, prevalence, model-quality, or generalization claim may be made from these development fixtures.
+The claim-scoped mutation plan and catalog are also separate development artifacts. They freeze future calibration inputs but contain no mutation-test outcomes.
+
+No effectiveness, superiority, prevalence, model-quality, mutation-adequacy, or generalization claim may be made from these development fixtures or plans.
 
 ## 22. Ground-truth, selector, and mutation controls
 
@@ -504,13 +512,24 @@ Failure cause has separate evidence layers:
 
 A mechanism subtype must not be inferred post hoc from a generic runtime result.
 
-A genuine assertion failure does not establish claim relevance. A discriminating selector does not establish oracle strength. A killed or surviving single mutant does not establish mutation adequacy.
+A genuine assertion failure does not establish claim relevance. A discriminating selector does not establish oracle strength. A killed or surviving single mutant does not establish mutation adequacy. A compiled mutant catalog does not establish that any mutant is killed or survives.
 
-Any future mutation or coverage study must freeze before outcome inspection:
+The current claim-scoped mutation design freezes before outcome inspection:
 
-- mutation operators and scope;
-- mutant generation and deduplication rules;
-- equivalent/invalid mutant handling;
+- one exact source and AST target;
+- three ordered generic operators;
+- duplicate, invalid, and not-applicable generation controls;
+- mutant identity and deduplication rules;
+- paired strong and weak selector profiles;
+- reference development claim checks;
+- future killed/survived/invalid/equivalent-review-required/indeterminate taxonomy;
+- prohibitions on scores, thresholds, blockers, holdout selection, and denominator eligibility.
+
+Any future mutation or coverage study must additionally freeze before outcome inspection:
+
+- execution environment and command semantics;
+- mutant result aggregation and precedence;
+- equivalent-mutant review procedure;
 - coverage targets and collection semantics;
 - positive and negative controls;
 - thresholds, exclusions, and missingness;
@@ -544,20 +563,92 @@ Repository-level license metadata does not establish dataset-release, underlying
 
 A valid source-universe artifact does not authorize dataset download, instance admission, environment construction, repository execution, or ecological inference.
 
-## 24. Freeze checklist
+## 24. Claim-scoped mutation plan and mutant catalog
+
+Canonical pre-execution artifacts:
+
+```text
+research/DW-001/claim-scoped-mutation-plan.v1.json
+research/DW-001/claim-scoped-mutant-catalog.v1.json
+research/DW-001/schema/claim-scoped-mutation-plan.schema.json
+research/DW-001/schema/claim-scoped-mutant-catalog.schema.json
+research/DW-001/MUTATION_CALIBRATION_PLAN.md
+src/deltawitness/dw001_mutation_plan.py
+```
+
+Exact identities:
+
+```text
+plan_id         = DW-001-CLAIM-SCOPED-MUTATION-PLAN-V1
+operator_set_id = python-boolean-predicate-minimal-v1
+adapter_id      = python-stdlib-ast-return-v1
+plan_sha256     = 0ebf64e1de76849050c86d8a4d53d72d8067561ab48b4bd5a4083495dc99fe37
+catalog_sha256  = 7b3e405bd3893f532c0ccfa16e9cc208422bbdd20dfe82a002c99342a04201c0
+```
+
+The fixed source is the project-owned candidate authorization predicate used by the weak-proxy challenge. Public artifacts retain source SHA-256 and a versioned semantic-AST digest but do not publish source or mutant bodies.
+
+Target rules require exactly one top-level function named `is_admin` with one return-expression target. Target identity binds source digest, path, symbol, node kind, cardinality, and exact source positions.
+
+The semantic-AST compatibility rule records node kinds and non-empty declared fields while excluding source locations and empty optional fields. It is validated only for the fixed source and Python 3.11–3.14; it is not a universal AST canonicalization claim.
+
+The frozen generic operator order is:
+
+```text
+return-constant-false-v1
+return-constant-true-v1
+comparison-eq-to-ne-v1
+```
+
+Separate generation controls require one duplicate, one not-applicable, and one compile-invalid record. The complete catalog retains:
+
+```text
+3 generated
+1 duplicate
+1 not_applicable
+1 invalid
+```
+
+The known `nonempty-role-boolean-v1` weak-proxy mutant remains a historical challenge control and is explicitly excluded from generic operator evidence and generalization claims.
+
+The paired profiles use the same source and generic mutants:
+
+```text
+strong-authorization-oracle-v1
+weak-boolean-proxy-v1
+```
+
+No mutation test has executed under this plan. The current contract fixes:
+
+```text
+execution_authorized          = false
+execution_status              = not_implemented
+headline_score                = null
+universal_threshold           = null
+merge_blocker_authorized      = false
+holdout_selected              = false
+primary_denominator_eligible  = false
+```
+
+Plan and catalog verifiers reconstruct complete canonical artifacts from fixed source and constants. Recomputed unkeyed digests cannot hide source, target, operator, profile, generation-status, duplicate, invalid, summary, authorization, holdout, score, threshold, or denominator drift.
+
+The next mutation-execution layer requires a separate red-first result contract and cannot modify this plan after outcomes are visible.
+
+## 25. Freeze checklist
 
 No held-out command may execute until the complete protocol is frozen in one immutable commit. Required items include:
 
 - [ ] accepted scenario taxonomy and generator specification;
 - [ ] accepted descriptor, identity, binding, manifest, result, declaration, and localization contracts;
-- [ ] accepted mutation/coverage evidence contract if used in confirmatory analysis;
+- [x] frozen development-only claim-scoped mutation source, operator set, profiles, target identity, and deterministic generation catalog;
+- [ ] accepted mutation-result and coverage-evidence contracts if used in confirmatory analysis;
 - [ ] direct-baseline implementations or exact semantic contracts;
 - [ ] immutable dataset releases and exact instance manifest;
 - [ ] per-instance license, authorization, environment, and publication review;
 - [ ] accepted target population, unit of analysis, sampling frame, and duplicate/cluster handling;
 - [ ] accepted containment environment;
 - [ ] development/holdout split procedure;
-- [ ] independent ground-truth, failure-subtype, selector-relevance, and oracle-strength review procedures;
+- [ ] independent ground-truth, failure-subtype, selector-relevance, equivalent-mutant, and oracle-strength review procedures;
 - [ ] primary and secondary contrasts;
 - [ ] exact denominators;
 - [ ] frozen metrics, interval method, multiplicity handling, and precision target;
@@ -568,9 +659,9 @@ No held-out command may execute until the complete protocol is frozen in one imm
 - [ ] public commitment recorded before unblinding;
 - [ ] exact protocol, implementation, generator, schema, baseline, image, and dependency versions pinned.
 
-Passing tests or completing a synthetic challenge does not freeze a component. All required boxes remain open until the complete confirmatory protocol is accepted together.
+The checked mutation-design item applies only to the committed owned-synthetic development plan and catalog. It does not freeze a mutation-result method or confirmatory protocol. Passing tests or completing a synthetic challenge does not freeze the broader study.
 
-## 25. Holdout commitment
+## 26. Holdout commitment
 
 Before any held-out command:
 
@@ -580,9 +671,9 @@ Before any held-out command:
 4. retain sensitive material privately where required;
 5. preserve later deviations without rewriting the commitment.
 
-A commit containing only individual manifests, identities, source metadata, or challenge artifacts does not bind undisclosed holdout membership.
+A commit containing only individual manifests, identities, source metadata, mutation plans, catalogs, or challenge artifacts does not bind undisclosed holdout membership.
 
-## 26. Measurements under consideration
+## 27. Measurements under consideration
 
 The frozen ecological protocol is expected to report explicit all-scenario and applicable-scenario denominators for:
 
@@ -594,14 +685,16 @@ The frozen ecological protocol is expected to report explicit all-scenario and a
 - declared-selector localization outcomes;
 - failure-subtype accuracy only where independently labeled;
 - oracle-relevance and mutation-warning performance only after reviewed procedures exist;
+- per-mutant killed, survived, invalid, equivalent-review-required, and indeterminate outcomes;
+- duplicate and not-applicable generation records;
 - surviving claim-violating mutants and invalid/equivalent mutant handling;
 - executed-state and command multipliers;
 - wall-clock, CPU, resource, and review costs;
 - reviewer disagreement and adjudication.
 
-No aggregate accuracy or mutation score may replace paired tables, four-way outcome flow, per-selector evidence, and retained surviving-mutant records. Interval method, multiplicity handling, precision target, sampling frame, and primary endpoint remain unfrozen.
+No aggregate accuracy or mutation score may replace paired tables, four-way outcome flow, per-selector evidence, and the complete retained per-mutant table. Interval method, multiplicity handling, precision target, sampling frame, and primary endpoint remain unfrozen.
 
-## 27. Falsification and narrowing
+## 28. Falsification and narrowing
 
 Narrow, redesign, or abandon the four-state layer for the tested population if:
 
@@ -618,18 +711,28 @@ Narrow or redesign typed observation if it does not improve cause separation bey
 
 Narrow or redesign selector localization if unstable framework identities, changed discovery semantics, or over-refusal exceed its provenance value.
 
-Narrow or redesign any mutation/oracle-integrity layer if it:
+Narrow or redesign the frozen mutation design if:
 
-- cannot reject the weak-proxy negative control without materially rejecting valid controls;
+- Python 3.11–3.14 do not reproduce exact source, AST, target, mutant, and catalog identities;
+- AST round-tripping changes semantics outside the target;
+- duplicate, invalid, or not-applicable records cannot be retained deterministically;
+- generic operators merely restate the known PR #34 control;
+- operator choice dominates later outcomes;
+- established mutation tooling or a simpler fixed-mutant baseline offers the same evidence with lower complexity.
+
+Narrow or redesign any mutation/oracle-integrity result layer if it:
+
+- cannot expose the weak-proxy negative control without materially rejecting valid controls;
 - cannot preserve the unrelated-assertion distinction;
 - selects operators, mutants, thresholds, or exclusions after results are visible;
 - hides surviving claim-violating mutants behind one scalar score;
+- treats compile-invalid or execution-error mutants as killed;
 - treats an LLM explanation as an unverified decision authority;
 - becomes more complex than a stronger direct baseline without incremental evidence.
 
-Negative results are valid and must not trigger post-hoc benchmark repair.
+Negative results are valid and must not trigger post-hoc operator or benchmark repair.
 
-## 28. Independent reproduction
+## 29. Independent reproduction
 
 Issue #4 remains open. The maintainer's second run, another machine controlled by the same workflow, or another run by the same agent process is not independent.
 
@@ -640,25 +743,25 @@ Until qualifying external reproduction is accepted:
 - the roadmap gate remains unchecked;
 - reproduction must cite an exact commit or release.
 
-## 29. Safety and publication
+## 30. Safety and publication
 
 Only synthetic, owned, licensed, or explicitly authorized targets may be used.
 
 The runner and generator are not sandboxes. Execution requires a separately secured disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance, not containment.
 
-Current weak-oracle controls execute only fixed project-owned Python bytes in temporary directories. This does not authorize external repository execution.
+Current weak-oracle controls execute only fixed project-owned Python bytes in temporary directories. The mutation-plan adapter parses, transforms, unparses, reparses, and compiles only fixed project-owned bytes and executes no mutants or tests. Neither authorizes external repository execution.
 
-Artifacts may expose prompts, paths, commands, selectors, mutant IDs, Git IDs, digests, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, timings, and costs. Every export requires privacy and claim-boundary review.
+Artifacts may expose prompts, paths, commands, selectors, mutant IDs, AST/source digests, Git IDs, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, timings, and costs. Every export requires privacy and claim-boundary review.
 
-Raw tracebacks and command output remain excluded by default. Output digests can still reveal equality or support guessing of low-entropy values.
+Raw tracebacks and command output remain excluded by default. Source and mutant bodies are excluded from the mutation plan and catalog. Output digests can still reveal equality or support guessing of low-entropy values.
 
-## 30. Deviation policy
+## 31. Deviation policy
 
 Every post-freeze deviation records stable IDs, affected scenario or method, problem, action, result visibility, confirmatory impact, and approval when applied.
 
-A results-visible applied deviation cannot retain impact `none`. Frozen protocol, sampling frame, partition lock, commitment, mutation set, hidden checks, or original artifacts must never be rewritten to conceal a deviation.
+A results-visible applied deviation cannot retain impact `none`. Frozen protocol, sampling frame, partition lock, commitment, mutation source, operator set, profiles, target identities, mutant catalog, hidden checks, or original artifacts must never be rewritten to conceal a deviation.
 
-## 31. Current status
+## 32. Current status
 
 ### Implemented and synthetically tested
 
@@ -674,14 +777,21 @@ A results-visible applied deviation cannot retain impact `none`. Frozen protocol
 - deterministic integrity-bound weak-oracle challenge artifact;
 - sealed and retained five-family development mechanism pilot;
 - design-only ecological source universe with execution authorization false;
+- frozen outcome-blind minimal stdlib-AST mutation operator set;
+- exact source, semantic-AST, target, generated-mutant, duplicate, invalid, and not-applicable identities;
+- paired strong/weak selector profiles over identical source and generic mutant catalog;
+- known weak-proxy control excluded from generic operator evidence;
+- committed mutation plan and deterministic catalog with execution authorization false;
 - descriptor-derived specification verification;
 - malformed-object and recomputed-digest regressions;
 - editable and installed-wheel full-chain smoke validation on Python 3.11–3.14.
 
 ### Not implemented, authorized, accepted, or frozen
 
+- mutation execution under the frozen plan;
+- typed per-mutant killed/survived/equivalent-review/indeterminate result artifact;
+- calibrated mutation warning or mutation score;
 - assertion-delta weakening analysis;
-- predeclared mutation operator/set framework and calibrated mutation score;
 - claim-boundary coverage analysis;
 - over-mocking analysis;
 - broader setup/dependency, invalid-hybrid, no-op, and stochastic families;
@@ -696,7 +806,7 @@ A results-visible applied deviation cannot retain impact `none`. Frozen protocol
 - independent reproduction;
 - confirmatory result.
 
-## 32. Public wording rule
+## 33. Public wording rule
 
 Permitted:
 
@@ -708,6 +818,8 @@ Permitted:
 
 > A further development-only challenge shows one exact declared fail-to-pass selector that a fixed claim-violating mutant survives.
 
+> A pre-execution development plan now freezes one minimal generic AST operator set, exact mutant identities, and paired strong/weak selector profiles before any mutation-test outcome.
+
 Not permitted from this draft:
 
 > Typed receipts are generally superior or diagnose all failures.
@@ -715,6 +827,8 @@ Not permitted from this draft:
 > Selector localization proves semantic relevance.
 
 > The weak-proxy challenge validates mutation testing or oracle strength.
+
+> The frozen catalog establishes that mutants were killed, survived, covered, or mutation-adequate.
 
 > Four-state replay proves patch correctness.
 
