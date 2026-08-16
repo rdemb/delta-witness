@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
+from deltawitness import _dw001_projection as internal_projection
 from deltawitness.dw001 import (
     compute_projection_sha256,
     project_baselines,
@@ -14,6 +15,9 @@ from test_dw001 import _report
 class DW001ProjectionVerificationTests(unittest.TestCase):
     def _resign_projection(self, projection: dict[str, object]) -> None:
         projection["projection_sha256"] = compute_projection_sha256(projection)
+
+    def test_internal_producer_exposes_no_digest_only_verifier(self) -> None:
+        self.assertFalse(hasattr(internal_projection, "verify_projection_document"))
 
     def test_recomputed_digest_cannot_hide_semantically_inconsistent_method_decision(self) -> None:
         projection = project_baselines(_report(), scenario_id="semantic-verification-001")
