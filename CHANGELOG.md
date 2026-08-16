@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add versioned DW-001 scenario-manifest and result-record contracts for pre-execution ground truth and post-execution evidence.
+- Recompute method ground truth from ordered state applicability and expected outcomes instead of trusting stored labels.
+- Bind result records explicitly to the supplied scenario manifest and DW-001 projection, including scenario, partition, Git endpoints, observer arm, applicability, source digests, decisions, concordance, and denominator membership.
+- Add development and committed-holdout partition locks, public-safe provenance fields, reviewer independence disclosures, exclusions, protocol deviations, and explicit cost missingness.
+- Prevent partition relabeling, denominator drift, unapproved deviations, exclusion-with-eligibility, wrong manifest/projection links, and non-finite cost values from being hidden by recomputed unkeyed digests.
+- Add strict JSON Schemas for scenario manifests and result records while retaining the Python semantic verifier as authoritative for relational and cross-artifact invariants.
+- Document the study-contract integrity, privacy, authentication, protocol-freeze, and publication boundaries without authorizing a development pilot or held-out execution.
 - Add deterministic DW-001 projections for nested final-state, fail-to-pass, regression-preservation, and four-state method predicates from one integrity-verified matrix report.
 - Keep observer semantics as a separate controlled factor by rejecting mixed-observer source reports and recording explicit exit-code and typed-receipt arms.
 - Preserve `accept`, `reject`, `indeterminate`, and independently declared `not_applicable` outcomes without exposing hidden states to weaker projected methods.
