@@ -2,13 +2,19 @@
 
 ## Unreleased
 
-- Add `deltawitness.dw001-fixture-manifest-binding.v1` as a strict relation among one verified fixture descriptor, fixture identity, and scenario manifest without mutating any issued v1 source schema.
+- Add the fixed `wrong-reason-base-import-failure` DW-001 family as a paired observer probe with identical source/test mechanism and scenario identity across exit-code and typed-receipt arms.
+- Demonstrate one controlled case where `exit-code-v1` treats a pre-assertion import error as semantic `fail`, producing a complete accepted `M0`–`M3` witness, while `outcome-receipt-v1` preserves generic `test_error` evidence and makes `M1`–`M3` indeterminate.
+- Keep runtime and ground-truth layers explicit: receipt v1 reports generic `test_error`; `import_error` is fixed pre-execution ground truth for the exact owned-synthetic bytes and is not inferred from the receipt.
+- Require observer-pair tests to hold scenario ID and source/test bytes constant and allow only declared observer-derived descriptor fields to differ.
+- Extend pre-freeze fixture descriptor, identity, and binding family/cause enums while preserving existing artifact validity and digest meaning; exact verifier commits remain mandatory for reproduction.
+- Exercise the paired observer probe through descriptor, identity, materialized repository, manifest, fixture-manifest binding, strict matrix report, projection, editable install, and installed wheel.
+- Add `deltawitness.dw001-fixture-manifest-binding.v1` as a strict relation among one verified fixture descriptor, fixture identity, and scenario manifest without mutating any issued scenario-manifest v1 fields.
 - Derive fixture-manifest bindings only from independently verified source artifacts and recompute the complete relation before accepting `binding_sha256`.
 - Separate verified relations, manifest-owned governance fields, and fixture-only Git/specification fields in a machine-readable scope contract.
 - Reject mismatched commits, paths, observer arms, commands, state semantics, method decisions, family labels, malformed objects, private paths, and recomputed-digest relation substitutions.
 - Bind fixture identity specification SHA-256 to the exact descriptor-derived specification bytes instead of accepting a self-consistent substituted digest.
 - Exercise fixture binding construction and verification from editable and installed-wheel packages on Python 3.11–3.14.
-- Add a versioned DW-001 scenario taxonomy that separates three implemented deterministic mechanism probes from required but unsupported future families.
+- Add a versioned DW-001 scenario taxonomy that separates four implemented deterministic mechanism probes from required but unsupported future families.
 - Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
 - Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
 - Require equivalent descriptors to reproduce identical base/head commits and trees across clean directories under the supported Git object model.

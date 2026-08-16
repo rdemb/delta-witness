@@ -1,9 +1,11 @@
 """Public DW-001 synthetic-fixture API with fail-closed safety checks.
 
-The internal module defines deterministic descriptor, identity, and materializer
-semantics. This public boundary rejects symbolic-link destinations and
-independently binds the emitted specification digest to descriptor-derived
-bytes before accepting an identity.
+The original deterministic generator core remains responsible for the first
+three owned-synthetic families. A separate fixed observer-probe adapter adds the
+wrong-reason import-failure family without accepting free-form source or test
+bytes. This public boundary dispatches by verified family identifier, rejects
+symbolic-link destinations, and binds specification digests to descriptor-
+derived bytes.
 """
 
 from __future__ import annotations
@@ -13,17 +15,50 @@ from pathlib import Path
 from typing import Any
 
 from . import _dw001_scenarios as _core
+from . import _dw001_wrong_reason as _wrong_reason
 
 DW001ScenarioError = _core.DW001ScenarioError
 FIXTURE_DESCRIPTOR_SCHEMA_VERSION = _core.FIXTURE_DESCRIPTOR_SCHEMA_VERSION
 FIXTURE_IDENTITY_SCHEMA_VERSION = _core.FIXTURE_IDENTITY_SCHEMA_VERSION
 GENERATOR_ID = _core.GENERATOR_ID
 GENERATOR_VERSION = _core.GENERATOR_VERSION
-SUPPORTED_FAMILIES = _core.SUPPORTED_FAMILIES
-build_fixture_descriptor = _core.build_fixture_descriptor
+SUPPORTED_FAMILIES = (*_core.SUPPORTED_FAMILIES, _wrong_reason.FAMILY_ID)
 compute_fixture_descriptor_sha256 = _core.compute_fixture_descriptor_sha256
 compute_fixture_identity_sha256 = _core.compute_fixture_identity_sha256
-verify_fixture_descriptor_document = _core.verify_fixture_descriptor_document
+
+
+def _family(document: object) -> object:
+    return document.get("family_id") if isinstance(document, dict) else None
+
+
+def build_fixture_descriptor(
+    *,
+    scenario_id: str,
+    family_id: str,
+    observer: str = "outcome-receipt-v1",
+) -> dict[str, Any]:
+    """Build one canonical descriptor for a supported fixed family."""
+
+    if family_id == _wrong_reason.FAMILY_ID:
+        return _wrong_reason.build_descriptor(
+            scenario_id=scenario_id,
+            observer=observer,
+        )
+    return _core.build_fixture_descriptor(
+        scenario_id=scenario_id,
+        family_id=family_id,
+        observer=observer,
+    )
+
+
+def verify_fixture_descriptor_document(
+    document: object,
+) -> tuple[bool, tuple[str, ...]]:
+    """Verify a descriptor using the exact family implementation."""
+
+    if _family(document) == _wrong_reason.FAMILY_ID:
+        return _wrong_reason.verify_descriptor(document)
+    return _core.verify_fixture_descriptor_document(document)
 
 
 def compute_fixture_specification_sha256(document: object) -> str:
@@ -47,6 +82,9 @@ def verify_fixture_identity_document(
     descriptor: object,
 ) -> tuple[bool, tuple[str, ...]]:
     """Verify identity semantics plus descriptor-derived specification bytes."""
+
+    if _family(descriptor) == _wrong_reason.FAMILY_ID:
+        return _wrong_reason.verify_identity(identity, descriptor)
 
     valid, errors = _core.verify_fixture_identity_document(
         identity,
@@ -85,12 +123,16 @@ def materialize_synthetic_fixture(
     document: object,
     destination: Path,
 ) -> dict[str, Any]:
-    """Materialize only into a literal non-symlink destination path."""
+    """Materialize a verified fixed family into a literal destination."""
 
-    identity = _core.materialize_synthetic_fixture(
-        document,
-        _destination(destination),
-    )
+    normalized_destination = _destination(destination)
+    if _family(document) == _wrong_reason.FAMILY_ID:
+        identity = _wrong_reason.materialize(document, normalized_destination)
+    else:
+        identity = _core.materialize_synthetic_fixture(
+            document,
+            normalized_destination,
+        )
     valid, errors = verify_fixture_identity_document(identity, document)
     if not valid:
         detail = errors[0] if errors else "identity verification failed"
@@ -117,6 +159,12 @@ def verify_materialized_fixture(
     )
     if not identity_valid:
         return False, identity_errors
+    if _family(descriptor) == _wrong_reason.FAMILY_ID:
+        return _wrong_reason.verify_materialized(
+            identity,
+            descriptor,
+            normalized,
+        )
     return _core.verify_materialized_fixture(
         identity,
         descriptor,
