@@ -45,6 +45,7 @@ jobs:
           deltawitness-unittest --help >/dev/null
           python -c "from deltawitness.dw001 import project_baselines, verify_projection_document"
           python -c "from deltawitness.dw001_contracts import seal_scenario_manifest, seal_result_record, verify_scenario_manifest_document, verify_result_record_document, verify_result_against_sources"
+          python -c "from deltawitness.dw001_scenarios import build_fixture_descriptor, materialize_synthetic_fixture, verify_fixture_descriptor_document, verify_fixture_identity_document, verify_materialized_fixture"
 
       - name: Validate public tree
         run: python scripts/validate_public_tree.py
@@ -84,3 +85,4 @@ jobs:
           deltawitness-unittest --help >/dev/null
           python -c "from deltawitness.dw001 import project_baselines, verify_projection_document"
           python -c "from deltawitness.dw001_contracts import seal_scenario_manifest, seal_result_record, verify_scenario_manifest_document, verify_result_record_document, verify_result_against_sources"
+          python -c "from deltawitness.dw001_scenarios import build_fixture_descriptor, materialize_synthetic_fixture, verify_fixture_descriptor_document, verify_fixture_identity_document, verify_materialized_fixture"
