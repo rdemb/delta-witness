@@ -204,8 +204,21 @@ def verify_repository(
     )
 
 
+def _json_compatible(value: object) -> object:
+    """Convert dataclass containers to the exact shapes produced by JSON decoding."""
+
+    if isinstance(value, dict):
+        return {key: _json_compatible(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_compatible(item) for item in value]
+    return value
+
+
 def report_to_dict(report: VerificationReport) -> dict[str, object]:
-    return asdict(report)
+    document = _json_compatible(asdict(report))
+    if not isinstance(document, dict):
+        raise TypeError("Verification report did not serialize to an object")
+    return document
 
 
 def write_report(report: VerificationReport, output: Path) -> None:
