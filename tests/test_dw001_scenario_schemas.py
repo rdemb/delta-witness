@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from deltawitness.dw001 import METHOD_STATE_SETS, STATE_ORDER
 from deltawitness.dw001_scenarios import (
     SUPPORTED_FAMILIES,
     build_fixture_descriptor,
@@ -77,6 +78,31 @@ class DW001ScenarioSchemaTests(unittest.TestCase):
             with self.subTest(schema=name):
                 actual = document["properties"]["family_id"]["enum"]
                 self.assertEqual(actual, expected)
+
+    def test_schema_tuples_use_canonical_state_and_method_order(self) -> None:
+        expected_states = list(STATE_ORDER)
+        expected_methods = [method_id for method_id, _ in METHOD_STATE_SETS]
+        for name, document in self._schemas().items():
+            with self.subTest(schema=name):
+                properties = document["properties"]
+                state_schema = properties["expected_states"]
+                method_schema = properties["expected_methods"]
+                self.assertIs(state_schema["items"], False)
+                self.assertIs(method_schema["items"], False)
+                self.assertEqual(
+                    [
+                        item["properties"]["state"]["const"]
+                        for item in state_schema["prefixItems"]
+                    ],
+                    expected_states,
+                )
+                self.assertEqual(
+                    [
+                        item["properties"]["method_id"]["const"]
+                        for item in method_schema["prefixItems"]
+                    ],
+                    expected_methods,
+                )
 
     def test_schema_root_fields_match_emitted_artifacts(self) -> None:
         schemas = self._schemas()
