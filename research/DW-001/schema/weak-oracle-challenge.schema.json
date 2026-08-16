@@ -1,0 +1,699 @@
+{
+  "$id": "https://github.com/rdemb/delta-witness/research/DW-001/schema/weak-oracle-challenge.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeltaWitness DW-001 Weak-Proxy-Oracle Challenge v1",
+  "description": "Public-safe development-only evidence that a genuine typed and localized fail-to-pass selector can remain too weak to reject one fixed claim-violating mutant.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "challenge_id",
+    "scenario_id",
+    "family_id",
+    "partition",
+    "task",
+    "source",
+    "claim",
+    "mutation",
+    "current_evidence",
+    "controlled_executions",
+    "finding",
+    "limitations",
+    "challenge_sha256",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deltawitness.dw001-weak-oracle-challenge.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    },
+    "challenge_id": {
+      "const": "weak-proxy-oracle-v1"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "family_id": {
+      "const": "weak-proxy-oracle"
+    },
+    "partition": {
+      "const": "development"
+    },
+    "task": {
+      "$ref": "#/$defs/task"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "claim": {
+      "$ref": "#/$defs/claim"
+    },
+    "mutation": {
+      "$ref": "#/$defs/mutation"
+    },
+    "current_evidence": {
+      "$ref": "#/$defs/currentEvidence"
+    },
+    "controlled_executions": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/control"
+            },
+            {
+              "properties": {
+                "implementation": {
+                  "const": "base"
+                },
+                "test_role": {
+                  "const": "declared_selector"
+                },
+                "selector": {
+                  "const": "test_access.AccessTests.test_viewer_result_is_boolean"
+                },
+                "observed": {
+                  "const": "fail"
+                },
+                "return_code": {
+                  "const": 1
+                },
+                "receipt_outcome": {
+                  "const": "test_failure"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/control"
+            },
+            {
+              "properties": {
+                "implementation": {
+                  "const": "candidate"
+                },
+                "test_role": {
+                  "const": "declared_selector"
+                },
+                "selector": {
+                  "const": "test_access.AccessTests.test_viewer_result_is_boolean"
+                },
+                "observed": {
+                  "const": "pass"
+                },
+                "return_code": {
+                  "const": 0
+                },
+                "receipt_outcome": {
+                  "const": "passed"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/control"
+            },
+            {
+              "properties": {
+                "implementation": {
+                  "const": "mutant"
+                },
+                "test_role": {
+                  "const": "declared_selector"
+                },
+                "selector": {
+                  "const": "test_access.AccessTests.test_viewer_result_is_boolean"
+                },
+                "observed": {
+                  "const": "pass"
+                },
+                "return_code": {
+                  "const": 0
+                },
+                "receipt_outcome": {
+                  "const": "passed"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/control"
+            },
+            {
+              "properties": {
+                "implementation": {
+                  "const": "candidate"
+                },
+                "test_role": {
+                  "const": "hidden_claim"
+                },
+                "selector": {
+                  "const": "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+                },
+                "observed": {
+                  "const": "pass"
+                },
+                "return_code": {
+                  "const": 0
+                },
+                "receipt_outcome": {
+                  "const": "passed"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/control"
+            },
+            {
+              "properties": {
+                "implementation": {
+                  "const": "mutant"
+                },
+                "test_role": {
+                  "const": "hidden_claim"
+                },
+                "selector": {
+                  "const": "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+                },
+                "observed": {
+                  "const": "fail"
+                },
+                "return_code": {
+                  "const": 1
+                },
+                "receipt_outcome": {
+                  "const": "test_failure"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "finding": {
+      "$ref": "#/$defs/finding"
+    },
+    "limitations": {
+      "const": [
+        "The task is a fixed owned-synthetic agent-workflow surrogate, not an ecological agent sample.",
+        "The hidden claim check is development-only mechanism evidence, not a general oracle.",
+        "Survival of one fixed mutant does not define mutation adequacy or oracle strength.",
+        "The challenge does not authorize execution of external repositories or untrusted code.",
+        "All digests are unkeyed integrity fields and do not authenticate a producer."
+      ]
+    },
+    "challenge_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "report_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitObject": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "prompt",
+        "prompt_sha256",
+        "generation_mode",
+        "model_identity"
+      ],
+      "properties": {
+        "task_id": {
+          "const": "agent-surrogate-role-check-v1"
+        },
+        "prompt": {
+          "const": "Fix is_admin so only the admin role is authorized and add a regression test proving that a viewer is denied."
+        },
+        "prompt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generation_mode": {
+          "const": "fixed_owned_synthetic_agent_workflow_surrogate"
+        },
+        "model_identity": {
+          "type": "null"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "descriptor_sha256",
+        "identity_sha256",
+        "witness_sha256",
+        "projection_decisions_sha256",
+        "declaration_sha256",
+        "localization_evidence_sha256",
+        "base_sha",
+        "head_sha",
+        "spec_sha256",
+        "observer_id"
+      ],
+      "properties": {
+        "descriptor_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "identity_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "witness_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "projection_decisions_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "declaration_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "localization_evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "base_sha": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "head_sha": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "spec_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "observer_id": {
+          "enum": [
+            "O0_EXIT_CODE",
+            "O1_TYPED_RECEIPT"
+          ]
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "intended_behavior",
+        "declared_selector",
+        "hidden_claim_selector"
+      ],
+      "properties": {
+        "claim_id": {
+          "const": "role-check-regression"
+        },
+        "intended_behavior": {
+          "const": "A viewer is not authorized as an administrator."
+        },
+        "declared_selector": {
+          "const": "test_access.AccessTests.test_viewer_result_is_boolean"
+        },
+        "hidden_claim_selector": {
+          "const": "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+        }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mutant_id",
+        "operator_id",
+        "code_path",
+        "candidate_code_sha256",
+        "mutant_code_sha256",
+        "declared_test_sha256",
+        "hidden_test_sha256",
+        "caller_supplied"
+      ],
+      "properties": {
+        "mutant_id": {
+          "const": "nonempty-role-boolean-v1"
+        },
+        "operator_id": {
+          "const": "replace-candidate-predicate-with-nonempty-role-boolean-v1"
+        },
+        "code_path": {
+          "const": "src/access.py"
+        },
+        "candidate_code_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "mutant_code_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "declared_test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "hidden_test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "caller_supplied": {
+          "const": false
+        }
+      }
+    },
+    "methodDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method_id",
+        "decision"
+      ],
+      "properties": {
+        "method_id": {
+          "enum": [
+            "M0_FINAL",
+            "M1_F2P",
+            "M2_F2P_P2P",
+            "M3_FOUR_STATE"
+          ]
+        },
+        "decision": {
+          "const": "accept"
+        }
+      }
+    },
+    "currentEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matrix_complete",
+        "matrix_supported",
+        "method_decisions",
+        "localization_status"
+      ],
+      "properties": {
+        "matrix_complete": {
+          "const": true
+        },
+        "matrix_supported": {
+          "const": true
+        },
+        "method_decisions": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/methodDecision"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M0_FINAL"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/methodDecision"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M1_F2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/methodDecision"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M2_F2P_P2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/methodDecision"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M3_FOUR_STATE"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "localization_status": {
+          "const": "supported"
+        }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "deltawitness-unittest"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests_run",
+        "passed",
+        "failures",
+        "errors",
+        "skipped",
+        "expected_failures",
+        "unexpected_successes"
+      ],
+      "properties": {
+        "tests_run": {
+          "const": 1
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "errors": {
+          "const": 0
+        },
+        "skipped": {
+          "const": 0
+        },
+        "expected_failures": {
+          "const": 0
+        },
+        "unexpected_successes": {
+          "const": 0
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "implementation",
+        "test_role",
+        "selector",
+        "source_sha256",
+        "test_sha256",
+        "command",
+        "observed",
+        "return_code",
+        "timed_out",
+        "invocation_binding",
+        "receipt_sha256",
+        "receipt_outcome",
+        "receipt_producer",
+        "receipt_counts",
+        "observation_error"
+      ],
+      "properties": {
+        "implementation": {
+          "enum": [
+            "base",
+            "candidate",
+            "mutant"
+          ]
+        },
+        "test_role": {
+          "enum": [
+            "declared_selector",
+            "hidden_claim"
+          ]
+        },
+        "selector": {
+          "enum": [
+            "test_access.AccessTests.test_viewer_result_is_boolean",
+            "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+          ]
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "command": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "prefixItems": [
+            {
+              "const": "python"
+            },
+            {
+              "const": "-m"
+            },
+            {
+              "const": "deltawitness.unittest_probe"
+            },
+            {
+              "const": "--start-directory"
+            },
+            {
+              "const": "tests"
+            },
+            {
+              "const": "--verbosity"
+            },
+            {
+              "const": "0"
+            },
+            {
+              "const": "--test-name"
+            },
+            {
+              "enum": [
+                "test_access.AccessTests.test_viewer_result_is_boolean",
+                "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+              ]
+            }
+          ],
+          "items": false
+        },
+        "observed": {
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "return_code": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "timed_out": {
+          "const": false
+        },
+        "invocation_binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_outcome": {
+          "enum": [
+            "passed",
+            "test_failure"
+          ]
+        },
+        "receipt_producer": {
+          "$ref": "#/$defs/producer"
+        },
+        "receipt_counts": {
+          "$ref": "#/$defs/counts"
+        },
+        "observation_error": {
+          "type": "null"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declared_selector_discriminates_base_candidate",
+        "mutant_survives_declared_selector",
+        "mutant_violates_hidden_claim",
+        "weak_oracle_exposed",
+        "primary_denominator_eligible"
+      ],
+      "properties": {
+        "declared_selector_discriminates_base_candidate": {
+          "const": true
+        },
+        "mutant_survives_declared_selector": {
+          "const": true
+        },
+        "mutant_violates_hidden_claim": {
+          "const": true
+        },
+        "weak_oracle_exposed": {
+          "const": true
+        },
+        "primary_denominator_eligible": {
+          "const": false
+        }
+      }
+    }
+  }
+}
