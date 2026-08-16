@@ -1,104 +1,109 @@
 # DW-001 Canonical Archive Transport Review
 
-**Status:** approved for one-time use on the public-safe owned-synthetic development archive in draft PR #29. This approval does not apply to real repositories, private corpora, holdout material, credentials, raw logs, or future runs.
+**Status:** completed historical exception. The one-day artifact transport was used once for the public-safe owned-synthetic development archive, the downloaded bytes were independently checked, and the upload step was removed. No continuing upload capability remains.
+
+This approval did not and does not apply to real repositories, private corpora, holdout material, credentials, raw logs, or future runs.
 
 ## Decision
 
-Use one short-lived GitHub Actions artifact to transport exactly one already self-verified file:
+A short-lived GitHub Actions artifact transported one self-verified file:
 
 ```text
 dw001-development-pilot-archive.v1.json
 ```
 
-The artifact exists only to recover the canonical JSON archive from the GitHub-hosted runner and commit that exact archive into the repository. After the committed archive is independently verified, the upload step must be removed before PR merge.
+The artifact was used only to recover and independently inspect canonical JSON bytes from the GitHub-hosted runner while designing permanent repository retention.
 
-This is a narrow exception to the default no-external-upload boundary. It does not add a product feature, network API, telemetry path, remote execution capability, secret, or new repository permission.
+This was a narrow exception to the default no-external-upload boundary. It added no DeltaWitness product feature, network API, telemetry path, remote-execution capability, secret, or repository write permission.
 
-## Data boundary
+## Executed mechanism
 
-The uploaded file is produced exclusively from project-owned synthetic fixtures and contains:
-
-- versioned descriptor, identity, manifest, binding, report, projection, declaration, localization, result, plan, and index JSON documents;
-- repository-relative synthetic paths;
-- synthetic Git object identities;
-- commands, observer identifiers, aggregate counts, digests, and development-only costs;
-- no real repository source code or private corpus.
-
-The archive verifier and privacy tests reject or exclude:
-
-- absolute local paths;
-- usernames and home directories;
-- credentials, tokens, or secrets;
-- environment values;
-- private endpoints;
-- raw stdout, stderr, or traceback text;
-- arbitrary extra files;
-- non-JSON payloads;
-- holdout or primary-denominator eligibility.
-
-## Transport mechanism
-
-- action: `actions/upload-artifact`
-- pinned commit: `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (`v7.0.1`)
-- workflow permissions remain:
+- action: `actions/upload-artifact`;
+- pinned action commit: `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (`v7.0.1`);
+- workflow run: `31952593720`;
+- artifact ID: `9265084676`;
+- exact upload path: one JSON file in `RUNNER_TEMP`;
+- retention: one day;
+- workflow permissions:
 
 ```yaml
 permissions:
   contents: read
 ```
 
-- no OIDC, token, secret, write permission, or external endpoint is configured;
-- exact upload path is one file in `RUNNER_TEMP`, not a directory glob;
-- retention is one day;
-- missing file is a hard error;
-- the artifact ZIP is downloaded through the connected GitHub API and the embedded archive is verified before use.
+No OIDC token, secret, cloud credential, external endpoint, write permission, or directory glob was configured.
+
+## Data boundary
+
+The transported file was produced exclusively from project-owned synthetic fixtures and contained:
+
+- versioned descriptor, identity, manifest, binding, report, projection, declaration, localization, result, plan, and index JSON documents;
+- repository-relative synthetic paths;
+- synthetic Git object identities;
+- commands, observer identifiers, aggregate counts, digests, and development-only costs;
+- no real repository source or private corpus.
+
+The archive and privacy verifiers reject or exclude:
+
+- absolute local paths;
+- usernames and home directories;
+- credentials, tokens, secrets, and environment values;
+- private endpoints;
+- raw stdout, stderr, and tracebacks;
+- arbitrary extra files and non-JSON payloads;
+- holdout or primary-denominator eligibility.
 
 ## Threats and mitigations
 
 ### Accidental disclosure
 
-**Threat:** a broad path or directory glob uploads unrelated runner files.
+**Threat:** a broad path uploads unrelated runner files.
 
-**Mitigation:** upload one exact filename created by the reviewed renderer. The renderer emits only the canonical public-safe archive.
+**Mitigation:** one exact reviewed filename was uploaded; the source archive self-verified before transport.
 
 ### Action substitution
 
 **Threat:** a moving action tag changes behavior.
 
-**Mitigation:** pin the immutable action commit SHA and record the upstream release mapping in the PR evidence.
+**Mitigation:** the immutable action commit was pinned.
 
 ### Archive substitution or corruption
 
-**Threat:** transported bytes differ from the self-verified archive.
+**Threat:** transported bytes differ from the verified archive.
 
-**Mitigation:** the archive contains per-document digests, `archive_sha256`, `index_semantic_sha256`, the exact plan digest, and a verifier that reconstructs and re-verifies the complete directory bundle. The downloaded file is rejected before commit if any check fails.
+**Mitigation:** the archive contained per-document digests, `archive_sha256`, `index_semantic_sha256`, the exact plan digest, and a verifier that reconstructs and re-verifies the complete directory bundle. The downloaded ZIP and embedded archive were inspected outside the runner.
 
-### Retention or access ambiguity
+### Retention and access ambiguity
 
-**Threat:** GitHub retains a second copy longer than intended or account access exposes it.
+**Threat:** GitHub retains a second copy or account access exposes it.
 
-**Mitigation:** use one-day retention, public-safe synthetic content only, remove the workflow upload step after recovery, and treat GitHub storage as untrusted transport rather than canonical evidence.
+**Mitigation:** content was public-safe and synthetic, retention was one day, the workflow upload step was removed, and GitHub storage was treated as untrusted transport rather than canonical evidence.
 
 ### False provenance interpretation
 
 **Threat:** artifact hosting is mistaken for producer authentication, timestamp proof, or immutable transparency.
 
-**Mitigation:** the artifact is explicitly transport-only. GitHub hosting, run metadata, and unkeyed digests do not authenticate the producer, prove creation time, establish non-repudiation, or make the study confirmatory.
+**Mitigation:** the artifact was transport-only. GitHub hosting, run metadata, and unkeyed digests do not authenticate the producer, prove creation time, establish non-repudiation, or make the study confirmatory.
 
-## Acceptance gates
+## Completion record
 
-The temporary upload may be used only when all are true:
+- [x] source bundle self-verified before upload;
+- [x] file contained only owned-synthetic public-safe JSON evidence;
+- [x] action pinned to an exact commit;
+- [x] workflow permissions remained `contents: read`;
+- [x] retention limited to one day;
+- [x] downloaded artifact and embedded archive independently inspected;
+- [x] canonical archive subsequently committed and covered by regression tests;
+- [x] upload step removed;
+- [x] no continuing upload capability remains.
 
-- [x] the source bundle self-verifies before upload;
-- [x] the file contains only owned-synthetic public-safe JSON evidence;
-- [x] the action is pinned to an exact commit;
-- [x] workflow permissions remain `contents: read`;
-- [x] retention is limited to one day;
-- [x] the exact downloaded archive is verified before commit;
-- [ ] the exact archive is committed and covered by a committed-archive regression test;
-- [ ] the upload step is removed before PR merge;
-- [ ] final CI passes after removal.
+Final repository archive:
+
+```text
+research/DW-001/development-pilot-archive.v1.json
+archive_sha256 = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fcf4b06
+```
 
 ## Claim boundary
 
-This review authorizes only one transport operation for one public-safe development archive. It does not authorize network access from DeltaWitness, routine artifact uploads, real-repository evidence export, holdout publication, external telemetry, producer authentication, signed attestations, containment, or any empirical-effectiveness claim.
+This record documents one completed transport exception. It does not authorize network access from DeltaWitness, routine artifact uploads, real-repository evidence export, holdout publication, telemetry, producer authentication, signed attestations, containment, empirical-effectiveness claims, or reuse of this mechanism without a new review.
