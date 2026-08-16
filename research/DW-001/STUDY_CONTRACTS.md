@@ -8,6 +8,7 @@ DW-001 separates generated fixture identity, pre-execution ground truth, and pos
 fixture descriptor
     -> deterministic synthetic repository
     -> fixture identity
+    -> fixture-manifest binding
     -> scenario manifest
     -> strict source matrix report
     -> DW-001 nested-method projection
@@ -53,15 +54,60 @@ For the intentionally small supported family subset, the deterministic generator
 - exact path categories and expected state/method semantics;
 - `identity_sha256` over the complete identity with that field normalized to `null`.
 
-`verify_materialized_fixture` separately compares the identity with the supplied generated repository, including repository cleanliness, candidate `HEAD`, base ancestry, exact trees, and specification bytes.
+Public fixture-identity verification recomputes the exact specification bytes derived from the descriptor and requires their SHA-256 to equal the recorded value. A recomputed identity digest cannot hide a substituted specification digest.
 
-The current scenario-manifest schema predates the fixture identity and does not contain a dedicated `fixture_identity_sha256` field. A generated fixture can still populate the manifest's exact base/head, path, execution, and ground-truth fields, but that correspondence is not silently claimed as a new v1 manifest invariant. Until a versioned manifest amendment or separate binding record is accepted, the fixture identity and manifest must be retained and reviewed as adjacent pre-execution artifacts.
+`verify_materialized_fixture` separately compares the identity with the supplied generated repository, including repository cleanliness, candidate `HEAD`, base ancestry, exact trees, and specification bytes.
 
 Complete generator and taxonomy boundaries are documented in:
 
 ```text
 research/DW-001/SCENARIO_TAXONOMY.md
 research/DW-001/FIXTURE_GENERATOR.md
+```
+
+## Fixture-manifest binding
+
+Scenario-manifest v1 predates the fixture identity and has no dedicated `fixture_identity_sha256` field. Changing that schema in place would change an issued contract and its digest semantics.
+
+Binding schema:
+
+```text
+research/DW-001/schema/fixture-manifest-binding.schema.json
+```
+
+Semantic implementation:
+
+```text
+src/deltawitness/dw001_fixture_binding.py
+```
+
+The builder first verifies the descriptor, identity, and scenario manifest independently. It then derives a binding record from the supplied artifacts and verifies exact agreement for the fields they share, including:
+
+- study and scenario identity;
+- descriptor-to-identity family, generator, template, observer, path, state, and method semantics;
+- synthetic provenance and authorization basis;
+- exact base and candidate commits;
+- path categories;
+- command, observer arm, and timeout;
+- state applicability, expected outcomes, and failure causes;
+- expected nested-method decisions and reason codes;
+- false-assurance family;
+- specification path membership and descriptor-derived specification digest.
+
+The binding contains an explicit `relation_scope` separating:
+
+- relations verified across source artifacts;
+- partition, review, authorization, environment, and other manifest-owned fields;
+- tree IDs, specification digest, generator metadata, and other fixture-only fields absent from manifest v1.
+
+A valid binding cannot change the scenario partition, reviewer decision, or denominator eligibility. Development scenarios remain outside the primary denominator.
+
+The verifier independently re-verifies all source artifacts, checks strict binding structure, recomputes `binding_sha256`, derives the canonical relation again, and requires exact canonical equality. Malformed source and binding objects fail closed with typed diagnostics.
+
+Complete boundary details are documented in:
+
+```text
+research/DW-001/FIXTURE_MANIFEST_BINDING.md
 ```
 
 ## Scenario manifest
@@ -191,17 +237,11 @@ Cross-artifact verification additionally removes scenarios whose supplied manife
 
 ### Cost missingness
 
-A measured cost requires finite, nonnegative values for:
-
-- wall-clock seconds;
-- CPU seconds;
-- executed state count;
-- command count;
-- review seconds.
+A measured cost requires finite, nonnegative values for wall-clock time, CPU time, executed states, commands, and review time.
 
 A `not_run` or `unavailable` cost requires all quantitative fields to be `null` and a non-empty missing reason. Missing measurements are not silently encoded as zero.
 
-## Cross-artifact verification
+## Result cross-artifact verification
 
 `verify_result_against_sources` independently verifies:
 
@@ -224,58 +264,33 @@ The verifier does not possess source matrix-report bytes. The source report must
 
 The JSON Schemas define structural interoperability:
 
-- exact property names;
-- required fields;
-- primitive types;
-- enumerations;
-- tuple order for matrix states and methods;
+- exact property names and required fields;
+- primitive types and enumerations;
+- canonical tuple order for matrix states and methods;
 - strict `additionalProperties: false` boundaries;
 - digest and Git-object lexical forms.
 
-They do not express every relational invariant. The Python semantic verifier remains authoritative for:
+They do not express every relational invariant. The Python semantic verifiers remain authoritative for observer mappings, path relations, state/cause consistency, method recomputation, partition/review effects, exclusions, deviations, costs, generated repository identity, and cross-artifact correspondence.
 
-- observer-to-observer-ID mapping;
-- disjoint exit classes and path categories;
-- prefix-free paths;
-- state/cause consistency;
-- method-decision recomputation;
-- reviewer-derived status;
-- partition-lock meaning;
-- exclusion and deviation effects;
-- cost missingness;
-- generated-repository identity checks;
-- cross-artifact identity and decision consistency.
-
-Schema QA checks local references, strict object boundaries, supported family enums, and exact root fields against emitted descriptor and identity artifacts. No third-party schema dependency is added to the core package.
+No third-party schema dependency is added to the core package.
 
 ## Integrity and authentication
 
-`descriptor_sha256`, `identity_sha256`, `manifest_sha256`, and `result_sha256` are unkeyed integrity fields. They can detect modification only when compared with separately trusted expected values.
+`descriptor_sha256`, `identity_sha256`, `binding_sha256`, `manifest_sha256`, and `result_sha256` are unkeyed integrity fields. They can detect modification only when compared with separately trusted source artifacts or expected values.
 
-An attacker able to replace an artifact can recompute its digest. An attacker able to replace the fixture descriptor, identity, manifest, projection, result, and expected digests can replace the complete evidence chain.
+An attacker able to replace the complete descriptor, identity, binding, manifest, projection, result, and expected digest set can replace the complete evidence chain.
 
-Signing, producer identity, immutable timestamping, DSSE, in-toto, Sigstore, and environment provenance remain separate future layers.
+Signing, producer identity, immutable timestamping, DSSE, in-toto, Sigstore, SCITT, and environment provenance remain separate future layers.
 
 ## Privacy and publication
 
-Fixture, scenario, and result artifacts can expose:
+Fixture, binding, scenario, and result artifacts can expose scenario and family identifiers, repository-relative paths, commands, Git identities, generator and observer metadata, specification and artifact digests, authorization references, reviewer data, exclusions, deviations, and cost data.
 
-- scenario, family, generator, and template identifiers;
-- repository and Git identities;
-- changed paths and specification digests;
-- commands and environment-variable names;
-- license or authorization references;
-- reviewer identifiers and rationales;
-- false-assurance mechanisms;
-- exclusions, deviations, and cost data.
-
-Public artifacts must contain only public-safe identifiers and authorized material. Credentials, private endpoints, absolute local paths, confidential code, raw sensitive output, and unpublished vulnerability details remain prohibited.
-
-The synthetic generator identity intentionally excludes destination paths, usernames, environment values, and raw Git output. This is a privacy boundary, not producer authentication or complete environment provenance.
+Public artifacts must contain only public-safe identifiers and authorized material. Credentials, private endpoints, absolute local paths, environment values, confidential code, raw sensitive output, and unpublished vulnerability details remain prohibited.
 
 ## Non-claims
 
-A valid fixture, manifest, and result chain does not establish:
+A valid fixture, binding, manifest, and result chain does not establish:
 
 - patch correctness or security;
 - test-oracle relevance or strength;
@@ -284,8 +299,9 @@ A valid fixture, manifest, and result chain does not establish:
 - scientific novelty or superiority;
 - environment reproducibility;
 - producer authenticity;
+- timely preregistration;
 - independent reproduction;
 - authorization to execute a development pilot or holdout;
 - Gate 0 completion.
 
-The contracts prevent specific fixture, metadata, and denominator ambiguities. They do not substitute for protocol freeze, external review, holdout commitment, containment, or independent reproduction.
+The contracts prevent specific fixture, relation, metadata, and denominator ambiguities. They do not substitute for protocol freeze, external review, holdout commitment, containment, authentication, or independent reproduction.
