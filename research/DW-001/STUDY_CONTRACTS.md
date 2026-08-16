@@ -1,8 +1,8 @@
 # DW-001 Study Contracts v1
 
-**Status:** implementation note for development-pilot artifacts. The DW-001 protocol remains draft, unfrozen, and unauthorized for held-out execution.
+**Status:** implementation note for development artifacts. The fixed owned-synthetic development mechanism pilot has executed and is retained; the broader DW-001 protocol remains draft, unfrozen, and unauthorized for ecological or held-out execution.
 
-DW-001 separates generated fixture identity, pre-execution ground truth, and post-execution evidence through independently verified artifact classes:
+DW-001 separates generated fixture identity, pre-execution ground truth, execution evidence, post-execution results, and pilot-level retention through independently verified artifact classes:
 
 ```text
 fixture descriptor
@@ -12,10 +12,13 @@ fixture descriptor
     -> scenario manifest
     -> strict source matrix report
     -> DW-001 nested-method projection
+    -> claim-witness localization, when declared
     -> result record
+    -> development pilot index
+    -> canonical pilot archive
 ```
 
-A digest-valid object is not sufficient. Every artifact is accepted only after its deterministic semantic invariants are recomputed. A result is accepted for study use only after it is checked against the supplied manifest and projection.
+A digest-valid object is not sufficient. Every artifact is accepted only after deterministic semantic invariants and represented cross-artifact relations are recomputed.
 
 ## Synthetic fixture descriptor and identity
 
@@ -30,6 +33,7 @@ Semantic implementation:
 
 ```text
 src/deltawitness/_dw001_scenarios.py
+src/deltawitness/_dw001_wrong_reason.py
 src/deltawitness/dw001_scenarios.py
 ```
 
@@ -42,7 +46,7 @@ A fixture descriptor binds:
 - expected decision and reason code for every nested method;
 - `descriptor_sha256` over the complete descriptor with that field normalized to `null`.
 
-Stored expected method labels are not trusted. The descriptor verifier recomputes them from the ordered expected states.
+Stored expected method labels are not trusted. The descriptor verifier recomputes them from ordered expected states and fixed family/observer semantics.
 
 For the intentionally small supported family subset, the deterministic generator emits a public-safe fixture identity containing:
 
@@ -54,9 +58,9 @@ For the intentionally small supported family subset, the deterministic generator
 - exact path categories and expected state/method semantics;
 - `identity_sha256` over the complete identity with that field normalized to `null`.
 
-Public fixture-identity verification recomputes the exact specification bytes derived from the descriptor and requires their SHA-256 to equal the recorded value. A recomputed identity digest cannot hide a substituted specification digest.
+Public fixture-identity verification recomputes exact specification bytes derived from the descriptor and requires their SHA-256 to equal the recorded value. A recomputed identity digest cannot hide a substituted specification digest.
 
-`verify_materialized_fixture` separately compares the identity with the supplied generated repository, including repository cleanliness, candidate `HEAD`, base ancestry, exact trees, and specification bytes.
+`verify_materialized_fixture` separately compares identity with the supplied generated repository, including cleanliness, candidate `HEAD`, base ancestry, exact trees, and specification bytes.
 
 Complete generator and taxonomy boundaries are documented in:
 
@@ -67,7 +71,7 @@ research/DW-001/FIXTURE_GENERATOR.md
 
 ## Fixture-manifest binding
 
-Scenario-manifest v1 predates the fixture identity and has no dedicated `fixture_identity_sha256` field. Changing that schema in place would change an issued contract and its digest semantics.
+Scenario-manifest v1 predates fixture identity and has no dedicated `fixture_identity_sha256` field. Changing that schema in place would change an issued contract and its digest semantics.
 
 Binding schema:
 
@@ -81,7 +85,7 @@ Semantic implementation:
 src/deltawitness/dw001_fixture_binding.py
 ```
 
-The builder first verifies the descriptor, identity, and scenario manifest independently. It then derives a binding record from the supplied artifacts and verifies exact agreement for the fields they share, including:
+The builder first verifies descriptor, identity, and scenario manifest independently. It then derives a binding record and verifies exact agreement for fields represented by both sources, including:
 
 - study and scenario identity;
 - descriptor-to-identity family, generator, template, observer, path, state, and method semantics;
@@ -100,11 +104,11 @@ The binding contains an explicit `relation_scope` separating:
 - partition, review, authorization, environment, and other manifest-owned fields;
 - tree IDs, specification digest, generator metadata, and other fixture-only fields absent from manifest v1.
 
-A valid binding cannot change the scenario partition, reviewer decision, or denominator eligibility. Development scenarios remain outside the primary denominator.
+A valid binding cannot change partition, reviewer decision, or denominator eligibility. Development scenarios remain outside the primary denominator.
 
-The verifier independently re-verifies all source artifacts, checks strict binding structure, recomputes `binding_sha256`, derives the canonical relation again, and requires exact canonical equality. Malformed source and binding objects fail closed with typed diagnostics.
+The verifier independently re-verifies all sources, checks strict structure, recomputes `binding_sha256`, derives the canonical relation again, and requires exact canonical equality. Malformed objects fail closed with typed diagnostics.
 
-Complete boundary details are documented in:
+Complete boundary details:
 
 ```text
 research/DW-001/FIXTURE_MANIFEST_BINDING.md
@@ -140,7 +144,7 @@ The manifest is defined before scenario execution and records:
 
 ### Ground-truth recomputation
 
-Stored method labels are not trusted. The verifier derives each expected method decision from the ordered state ground truth:
+Stored method labels are not trusted. The verifier derives each expected method decision from ordered state ground truth:
 
 ```text
 non-applicable required state -> not_applicable
@@ -177,7 +181,7 @@ commitment_sha256 = <64 lowercase hex characters>
 commitment_scope = dw001-holdout-index-v1
 ```
 
-The manifest digest binds this declaration, but an unkeyed digest does not prove that the commitment predates execution. The frozen protocol must record the commitment in an independently timestamped immutable location before any held-out command runs.
+The manifest digest binds this declaration, but an unkeyed digest does not prove that commitment predates execution. The frozen protocol must record the commitment in an independently timestamped immutable location before any held-out command runs.
 
 ## Result record
 
@@ -205,7 +209,7 @@ A result records:
 
 An included result carries no exclusion metadata. An excluded result requires a code, reason, and decision reference.
 
-Exclusion never removes the record. It changes denominator eligibility while preserving the result and the decision trail.
+Exclusion never removes the record. It changes denominator eligibility while preserving the result and decision trail.
 
 ### Deviations
 
@@ -237,9 +241,9 @@ Cross-artifact verification additionally removes scenarios whose supplied manife
 
 ### Cost missingness
 
-A measured cost requires finite, nonnegative values for wall-clock time, CPU time, executed states, commands, and review time.
+A measured method cost requires finite, nonnegative values for wall-clock time, CPU time, executed states, commands, and review time.
 
-A `not_run` or `unavailable` cost requires all quantitative fields to be `null` and a non-empty missing reason. Missing measurements are not silently encoded as zero.
+A `not_run` or `unavailable` method cost requires quantitative fields to be `null` and a non-empty missing reason. Missing measurements are not silently encoded as zero.
 
 ## Result cross-artifact verification
 
@@ -256,9 +260,138 @@ A `not_run` or `unavailable` cost requires all quantitative fields to be `null` 
 9. observed decisions and reason codes from the projection;
 10. concordance and denominator membership across all supplied artifacts.
 
-The public verifier preflights each source artifact before relational checks. Malformed inputs return typed invalid diagnostics rather than being dereferenced after structural failure.
+The public verifier preflights each source before relational checks. Malformed inputs return typed invalid diagnostics rather than being dereferenced after structural failure.
 
-The verifier does not possess source matrix-report bytes. The source report must still be strict-decoded and verified separately, and its trusted digest must be compared with the projection and result.
+The verifier does not possess source matrix-report bytes. The source report must still be strict-decoded and verified separately, and its trusted digest compared with projection and result.
+
+## Development pilot plan contract
+
+Schema:
+
+```text
+research/DW-001/schema/development-pilot-plan.schema.json
+```
+
+Semantic implementation:
+
+```text
+src/deltawitness/_dw001_pilot_plan.py
+src/deltawitness/dw001_pilot.py
+```
+
+The sealed plan fixes:
+
+- study, pilot, protocol, and evidence-producing implementation identities;
+- exact ten-arm order and case/scenario IDs;
+- five fixed families under both observer arms;
+- control roles and development partition;
+- descriptor and specification digests;
+- expected state and `M0`–`M3` tables;
+- required declared-witness selectors and expected localization status;
+- analysis contrast IDs and release policy;
+- cost fields and missingness policy;
+- permanent primary-denominator ineligibility.
+
+All executable and expected case fields are derived from existing fixed generators and declaration builders. Callers provide only the two exact commit identities when constructing a plan.
+
+The semantic verifier reconstructs the complete canonical plan. Recomputing `plan_sha256` cannot hide a changed family, selector, order, expected label, cost policy, or denominator field.
+
+The executed plan is retained at:
+
+```text
+research/DW-001/development-pilot-plan.v1.json
+```
+
+## Development pilot runner and index
+
+Index schema:
+
+```text
+research/DW-001/schema/development-pilot-index.schema.json
+```
+
+Implementation:
+
+```text
+src/deltawitness/_dw001_pilot_execution.py
+src/deltawitness/dw001_pilot.py
+```
+
+The runner:
+
+1. verifies the complete plan before creating final output;
+2. materializes each fixed fixture in a disposable repository;
+3. verifies descriptor, identity, repository, manifest, binding, matrix report, projection, localization, and result artifacts;
+4. rejects any method or localization mismatch against the plan;
+5. records finite nonnegative automated cost fields and explicit unmeasured human review time;
+6. derives five controlled contrasts from verified case tables;
+7. withholds aggregate release when any case or contrast is invalid;
+8. emits no headline score and forbids ecological inference;
+9. stages the complete bundle, self-verifies it, and publishes only after success;
+10. removes staging output on failure.
+
+The public index contains:
+
+- exact plan and revision identities;
+- ten ordered case summaries;
+- stable semantic evidence and volatile complete-report evidence;
+- method decisions and denominator status;
+- localization result and concordance;
+- development diagnostics and explicit review-time missingness;
+- five machine-derived controlled contrasts;
+- `semantic_sha256` over non-volatile pilot meaning;
+- `index_sha256` over the complete index.
+
+The semantic digest is the repeated-run comparison field. Complete index digests can vary with timestamp and timing fields.
+
+## Development pilot archive
+
+Schema:
+
+```text
+research/DW-001/schema/development-pilot-archive.schema.json
+```
+
+Implementation:
+
+```text
+src/deltawitness/_dw001_pilot_archive.py
+src/deltawitness/dw001_pilot.py
+```
+
+The archive is a text-only retention format over one verified bundle. It contains:
+
+- sorted unique safe relative JSON paths;
+- every embedded object-valued JSON document;
+- one digest per embedded file record;
+- exact plan and pilot semantic digests;
+- `archive_sha256` over the complete archive with its own field normalized to `null`.
+
+Archive verification:
+
+1. verifies the supplied sealed plan;
+2. verifies archive structure, path safety, ordering, uniqueness, and per-file digests;
+3. materializes embedded documents into a temporary directory;
+4. reconstructs and verifies the complete pilot bundle;
+5. rematerializes fixed fixtures and requires exact identity equality;
+6. compares the embedded index semantic digest;
+7. rejects missing or substituted documents even after digest recomputation.
+
+The canonical archive is retained at:
+
+```text
+research/DW-001/development-pilot-archive.v1.json
+```
+
+Exact identities:
+
+```text
+plan_sha256            = 48a98f01c740862c91056841a7f96e6c98f1ae9641b7b364590a45d458ae3bcc
+archive_sha256         = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fcf4b06
+index_semantic_sha256  = bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
+```
+
+A complete archive digest is expected to vary across equivalent reruns when embedded timestamps, timings, or complete-report digests vary. The semantic index digest must remain stable under equivalent fixed inputs and outcomes.
 
 ## JSON Schema boundary
 
@@ -268,40 +401,47 @@ The JSON Schemas define structural interoperability:
 - primitive types and enumerations;
 - canonical tuple order for matrix states and methods;
 - strict `additionalProperties: false` boundaries;
-- digest and Git-object lexical forms.
+- digest and Git-object lexical forms;
+- pilot plan/index/archive root and nested structures.
 
-They do not express every relational invariant. The Python semantic verifiers remain authoritative for observer mappings, path relations, state/cause consistency, method recomputation, partition/review effects, exclusions, deviations, costs, generated repository identity, and cross-artifact correspondence.
+They do not express every relational invariant. Python semantic verifiers remain authoritative for observer mappings, path relations, state/cause consistency, method recomputation, partition/review effects, exclusions, deviations, costs, generated repository identity, pilot analysis, archive reconstruction, and cross-artifact correspondence.
 
 No third-party schema dependency is added to the core package.
 
 ## Integrity and authentication
 
-`descriptor_sha256`, `identity_sha256`, `binding_sha256`, `manifest_sha256`, and `result_sha256` are unkeyed integrity fields. They can detect modification only when compared with separately trusted source artifacts or expected values.
+`descriptor_sha256`, `identity_sha256`, `binding_sha256`, `manifest_sha256`, `result_sha256`, `plan_sha256`, `semantic_sha256`, `index_sha256`, and `archive_sha256` are unkeyed integrity fields. They detect modification only when compared with separately trusted sources or expected values.
 
-An attacker able to replace the complete descriptor, identity, binding, manifest, projection, result, and expected digest set can replace the complete evidence chain.
+An attacker able to replace a complete artifact chain and every expected digest can replace the complete evidence chain.
 
-Signing, producer identity, immutable timestamping, DSSE, in-toto, Sigstore, SCITT, and environment provenance remain separate future layers.
+Signing, producer identity, immutable timestamping, DSSE, in-toto, Sigstore, SCITT, and complete environment provenance remain separate future layers.
+
+GitHub workflow, artifact, and commit metadata used during the one-time archive transport are historical process evidence, not producer authentication or non-repudiation.
 
 ## Privacy and publication
 
-Fixture, binding, scenario, and result artifacts can expose scenario and family identifiers, repository-relative paths, commands, Git identities, generator and observer metadata, specification and artifact digests, authorization references, reviewer data, exclusions, deviations, and cost data.
+Fixture, binding, scenario, result, pilot-index, and archive artifacts can expose scenario and family identifiers, repository-relative paths, commands, test selectors, Git identities, generator and observer metadata, specification and artifact digests, authorization references, reviewer data, exclusions, deviations, counts, timings, and cost data.
 
 Public artifacts must contain only public-safe identifiers and authorized material. Credentials, private endpoints, absolute local paths, environment values, confidential code, raw sensitive output, and unpublished vulnerability details remain prohibited.
 
+The canonical pilot archive contains only fixed project-owned synthetic material. It does not authorize publication of analogous archives from real repositories.
+
 ## Non-claims
 
-A valid fixture, binding, manifest, and result chain does not establish:
+A valid fixture-to-result chain, complete pilot index, or verified pilot archive does not establish:
 
 - patch correctness or security;
 - test-oracle relevance or strength;
 - taxonomy completeness or representativeness;
-- empirical effectiveness of any method;
-- scientific novelty or superiority;
-- environment reproducibility;
-- producer authenticity;
-- timely preregistration;
+- ecological or held-out empirical effectiveness;
+- prevalence, precision, recall, superiority, or production utility;
+- native runtime cost for projected weaker methods;
+- measured human review burden;
+- scientific novelty;
+- complete environment reproducibility;
+- producer authenticity or timely preregistration;
 - independent reproduction;
-- authorization to execute a development pilot or holdout;
+- authorization to execute an ecological development corpus or holdout;
 - Gate 0 completion.
 
-The contracts prevent specific fixture, relation, metadata, and denominator ambiguities. They do not substitute for protocol freeze, external review, holdout commitment, containment, authentication, or independent reproduction.
+The contracts prevent specific fixture, relation, metadata, execution, retention, and denominator ambiguities. They do not substitute for protocol freeze, external review, sampling design, holdout commitment, containment, authentication, or independent reproduction.
