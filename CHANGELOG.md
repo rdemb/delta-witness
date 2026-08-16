@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Add a sealed `deltawitness.dw001-development-pilot-plan.v1` contract for exactly ten development-only arms derived from five fixed owned-synthetic families and both supported observer protocols.
+- Execute and retain one canonical synthetic mechanism pilot with 40 matrix states, 12 declared-selector states, 52 commands, complete case tables, five controlled contrasts, explicit cost fields, and no headline score or ecological inference.
+- Add a staging-to-self-verification-to-publication runner that rejects plan drift, unexpected method or localization outcomes, partial output, non-empty or linked destinations, malformed artifacts, and primary-denominator eligibility.
+- Add strict development-pilot index and canonical text-archive schemas, stable semantic and complete digests, reconstructed-bundle verification, and deterministic fixture rematerialization.
+- Require pilot directories and archives to equal the exact sealed file set: missing, duplicate, unsafe, symbolic-link, special, unexpected JSON, and unexpected non-JSON entries fail closed.
+- Commit the exact canonical plan and 84-file development archive with recorded plan, semantic, archive, workflow, commit, and Git-blob identities.
+- Normalize matrix report dataclass containers to strict-decoded JSON array shapes before projection without changing canonical JSON bytes or digest semantics.
+- Record and remove the separately reviewed one-time artifact transport and branch-scoped archive write; the final CI workflow retains `contents: read` only.
 - Add versioned declared logical-test witness localization for exact standard-library `unittest` selectors under the recorded `base_candidate` and `candidate_candidate` states, while leaving the canonical four-state matrix unchanged.
 - Add `deltawitness.claim-witness-declaration.v1` with ordered unique selectors, adapter-derived canonical commands, source specification and claim bindings, a fixed aggregate rule, and semantic digest verification.
 - Add `deltawitness.claim-witness-localization.v1` with exact Git state identities, invocation-bound typed receipts, per-selector `discriminating`, `non_discriminating`, `candidate_invalid`, and `indeterminate` outcomes, plus semantic and complete-report digests.
