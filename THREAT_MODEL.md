@@ -2,7 +2,7 @@
 
 ## Protected claims
 
-DeltaWitness currently supports eight narrow statement classes.
+DeltaWitness currently supports nine narrow statement classes.
 
 ### Canonical change witness
 
@@ -38,9 +38,13 @@ A typed observer further bounds that statement by a cooperating adapter's semant
 
 > Given one fixed owned-synthetic scenario with a non-discriminating claim-facing assertion and a collateral assertion as the sole `BC` failure source, both observer arms and all nested state-set methods accept the canonical matrix even though the failing assertion is unrelated to the declared authorization claim.
 
-The final two statements are controlled development probes. The import pair isolates one observer distinction. The unrelated-assertion case establishes a known limitation. Neither is a prevalence, accuracy, oracle-adequacy, or general-superiority claim.
+### DW-001 development mechanism pilot
 
-None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, oracle relevance, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy, run a pilot, or execute a holdout.
+> Given the exact committed ten-arm development plan, the runner derives fixed case inputs, executes and verifies every artifact chain, derives five controlled contrasts, refuses primary-denominator eligibility, and retains a canonical archive whose complete directory bundle can be reconstructed and reverified.
+
+The final three statements are controlled development evidence. The import pair isolates one observer distinction. The unrelated-assertion case establishes a known limitation. The development pilot establishes pipeline and artifact-chain behavior for five fixed synthetic families. None is a prevalence, accuracy, oracle-adequacy, ecological-effectiveness, or general-superiority claim.
+
+None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, oracle relevance, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy or execute a holdout.
 
 ## Assets
 
@@ -63,8 +67,12 @@ The design aims to protect:
 - correspondence between generated fixture and scenario manifest;
 - equality of source/test mechanism across paired observer arms;
 - direct negative-control evidence showing which assertion is the sole `BC` failure source;
+- exact development-pilot plan order, case IDs, expected decisions, selectors, and analysis contract;
+- refusal to publish a partial pilot bundle or aggregate an invalid case;
+- complete archive path set, embedded-document digests, semantic index digest, and reconstructed bundle relations;
+- permanent development-only and denominator-ineligible status for mechanism-pilot cases;
 - public artifacts from accidental disclosure of absolute paths, environment values, credentials, private output, or unauthorized material;
-- separation between consecutive claims, coalitions, scenarios, and study artifacts.
+- separation between consecutive claims, coalitions, scenarios, pilot cases, and study artifacts.
 
 ## Adversaries and failure sources
 
@@ -98,11 +106,22 @@ The model includes:
 - a descriptor relabeled to another family after outcomes are known;
 - a scenario pair that changes source/test bytes or scenario identity while claiming an observer-only contrast;
 - a negative control whose collateral assertion is not actually the sole discrimination source;
+- a modified, reordered, or partially executed development-pilot plan;
+- a runner that accepts free-form code, commands, selectors, expectations, exclusions, or denominator decisions after plan sealing;
+- one missing or invalid case hidden by an aggregate headline score;
+- a development case relabeled as holdout or primary-denominator eligible;
+- negative, NaN, infinite, or silently zero missing cost values;
+- partial output published before every case and relation verifies;
+- a pilot index whose stored labels or contrasts are trusted instead of recomputed;
+- an archive with duplicate, missing, unsafe, reordered, or substituted embedded paths;
+- coordinated replacement of embedded documents followed by recomputed file and archive digests;
+- a fixed synthetic mechanism pilot presented as an ecological effectiveness result;
+- temporary archive transport or branch-write capability accidentally retained as a permanent permission;
 - a substituted specification digest hidden by recomputed metadata;
-- a non-empty or symbolic-link destination redirecting or overwriting fixture output;
+- a non-empty or symbolic-link destination redirecting or overwriting fixture or pilot output;
 - malicious Python, Git, filesystem, dependency, kernel, or container behavior;
 - coordinated replacement of a complete artifact chain and all expected digests;
-- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, fixture identity, binding validity, or one controlled contrast as proof of correctness, oracle relevance, or safety;
+- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, valid fixture/binding, verified pilot, or one controlled contrast as proof of correctness, oracle relevance, effectiveness, or safety;
 - malicious repository content executed with operator privileges.
 
 ## Security and integrity invariants
@@ -254,7 +273,37 @@ The model includes:
 113. Ambiguous configuration and harness errors stop analysis.
 114. Editable-install and installed-wheel smoke execute complete fixture chains for supported development probes.
 115. Packaged smoke is not independent reproduction.
-116. Every exported fixture, binding, report, projection, manifest, and result requires privacy and boundary review.
+116. Every exported fixture, binding, report, projection, manifest, result, pilot index, and archive requires privacy and boundary review.
+
+### Development mechanism pilot plan and runner
+
+117. The plan contains exactly ten ordered development case arms derived from the five supported families and two observer arms.
+118. The plan pins exact protocol and evidence-producing implementation commits and records exact contract versions, case IDs, descriptors, specification digests, state/method expectations, selectors, analysis rules, and cost policy.
+119. The plan contains no holdout lock and every case is primary-denominator ineligible.
+120. Recomputing `plan_sha256` cannot hide a changed family, observer, selector, expectation, order, cost policy, or denominator field because the semantic verifier rebuilds the canonical plan.
+121. The runner verifies the complete plan before creating final output.
+122. The runner derives executable descriptors and declarations; it accepts no free-form executable fixture input or expected labels.
+123. Every required per-case artifact is independently verified before case acceptance.
+124. Unexpected method or localization results stop execution; they are not silently relabeled to match the plan.
+125. Aggregate analysis is derived from verified case tables and is withheld when any controlled contrast is unexpected.
+126. The index emits no headline score and forbids ecological inference.
+127. Per-case cost fields reject negative, non-finite, and silently zero missing values; human review missingness remains explicit.
+128. The runner stages output, self-verifies the complete bundle, and publishes only after success.
+129. Non-empty and symbolic-link final destinations are rejected; a failed run removes staging output.
+130. A development pilot cannot create holdout or confirmatory eligibility.
+
+### Development mechanism pilot archive
+
+131. The archive contains only sorted unique safe relative JSON paths and object-valued documents.
+132. Every embedded file record has a canonical digest over path and document.
+133. `archive_sha256` covers the complete archive with its own field normalized to `null`.
+134. Archive verification requires the committed plan digest and the embedded index semantic digest.
+135. The archive verifier reconstructs the complete directory bundle and reruns all artifact-specific and cross-artifact verifiers.
+136. The verifier rematerializes every retained synthetic fixture from its descriptor and requires exact identity equality.
+137. Duplicate, missing, unsafe, reordered, or substituted paths are rejected even after digest recomputation.
+138. A complete archive digest is not stable when volatile timestamps or costs change; the semantic index digest is the repeated-run comparison field.
+139. The canonical archive remains development-only and contains no raw output or absolute local paths.
+140. Historical temporary artifact-upload and branch-write mechanisms are removed from the final workflow and are not product capabilities.
 
 ## Residual risks
 
@@ -288,6 +337,24 @@ A future oracle-integrity layer must have independent ground truth, positive and
 
 A fixed synthetic `import_error` or `unrelated_assertion` label is auditable from owned bytes and direct controls. Real-corpus failure subtypes and claim relevance may be ambiguous and susceptible to post-result relabeling. The frozen protocol needs an independent pre-execution review procedure or must retain generic/unknown labels.
 
+### Fixed synthetic pilot is not ecological evidence
+
+The ten arms are designed mechanism probes, not independent or representative samples. Successful execution and expected contrasts establish pipeline behavior only.
+
+The pilot cannot support prevalence, accuracy, precision, recall, superiority, or production-utility claims. Its exact cases are permanently development-only and cannot later become a holdout.
+
+### Pilot plan and execution provenance are not authenticated
+
+The plan pins protocol and evidence-producing implementation commits. Later archive packaging, workflow, and transport revisions are recorded separately in GitHub history and the pilot result document. Current unkeyed records do not prove who executed the plan, that the run occurred at a claimed time, or that GitHub workflow metadata is complete.
+
+### Costs are diagnostics, not native-method or population estimates
+
+Per-case timings and byte counts are environment-sensitive. Full-matrix projection does not measure native `M0`, `M1`, or `M2` runtime. Human review time is unmeasured. The archive preserves these limitations rather than imputing zero.
+
+### Historical transport capability
+
+The canonical archive required separately reviewed one-time GitHub artifact transport and an exact branch-scoped write. Both mechanisms were removed before final validation. Their historical use expands the trusted process for that run but does not create a continuing DeltaWitness upload or write capability.
+
 ### Path interventions are coarse
 
 One path may contain multiple changes and one change may span paths. Rename or grouping choices alter the coalition game. Influence values are not correctness, severity, ownership, blame, or oracle relevance.
@@ -318,9 +385,11 @@ Signing, DSSE, in-toto, Sigstore, SCITT, immutable timestamping, delegation iden
 
 At eight paths and one claim, influence can execute 512 coalition commands plus the canonical matrix. Per-command timeouts do not bound total CPU, memory, storage, process count, or network use.
 
+The development pilot executes 40 matrix states and 12 selector states. Its fixed command count does not establish a safe resource bound for ecological repositories.
+
 ### Publication metadata can remain sensitive
 
-Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, reviewer records, authorization references, exclusions, deviations, digests, counts, and costs. Low-entropy digests can reveal equality or permit guessing.
+Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, test selectors, reviewer records, authorization references, exclusions, deviations, digests, counts, timings, and costs. Low-entropy digests can reveal equality or permit guessing.
 
 ## Safe operation
 
@@ -332,10 +401,14 @@ Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, 
 - Treat execution-sensitive configuration and generated inputs as code.
 - Review every incomplete state, invalid hybrid, endpoint anchor, and coalition before interpretation.
 - Treat exact influence as enumeration over declared units, not complete causality.
-- Strict-decode and verify every report, projection, descriptor, identity, binding, manifest, and result separately.
+- Strict-decode and verify every report, projection, descriptor, identity, binding, manifest, result, pilot plan, pilot index, and pilot archive separately.
 - Verify generated identity against its repository before using its commits.
 - Require paired observer probes to hold mechanism and scenario identity constant.
 - Require oracle negative controls to prove directly which assertion is the sole failure source.
-- Preserve exclusions, disputes, negative results, and deviations rather than deleting them.
-- Do not run a DW-001 pilot or holdout while protocol and authorization gates are incomplete.
-- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, valid fixture/binding, or one controlled contrast as full correctness, oracle relevance, general effectiveness, production readiness, or deployment authorization.
+- Run only an exact sealed pilot plan and reject any runtime free-form case or expectation input.
+- Require complete staged-bundle and reconstructed-archive verification before interpreting a pilot result.
+- Keep every mechanism-pilot case development-only and outside the primary denominator.
+- Preserve exclusions, disputes, negative results, missing costs, and deviations rather than deleting or imputing them.
+- Do not interpret the fixed synthetic pilot as ecological effectiveness or holdout evidence.
+- Do not run a DW-001 holdout while protocol and authorization gates are incomplete.
+- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, valid fixture/binding, verified synthetic pilot, or one controlled contrast as full correctness, oracle relevance, general effectiveness, production readiness, or deployment authorization.
