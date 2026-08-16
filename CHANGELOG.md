@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add `deltawitness.dw001-claim-scoped-mutation-result.v1` as a strict development-only result contract over the exact frozen mutation plan and catalog.
+- Execute only the candidate baseline, three generic generated mutants, and the separately labeled historical PR #34 control through two strong selectors, one weak selector, and two reference selectors each, for 25 shell-free typed commands.
+- Retain duplicate, invalid, and not-applicable generation records with explicit zero-command non-execution reasons and exclude them from killed/survived denominators.
+- Store preregistered `expected_observed` and actual `observed` evidence separately for every selector, plus expected/observed profile and reference outcomes and recomputed concordance at selector, profile, reference, and record levels.
+- Preserve complete invocation-bound preregistration-divergent observations as valid negative results with `analysis.status = unexpected` instead of converting them into harness errors.
+- Continue to reject malformed, source-substituted, selector-substituted, command-substituted, binding-substituted, receipt-contradictory, aggregate-inconsistent, non-finite, or digest-tampered evidence even when it is labeled unexpected.
+- Recompute candidate validity, generic killed/survived/indeterminate counts, claim-violation counts, unexpected-observation counts, and affected record IDs from the complete table.
+- Separate stable mutation-result semantics from runtime diagnostics through `semantic_sha256` and complete `report_sha256` digests.
+- Keep mutation score, headline score, universal threshold, merge-blocker authorization, ecological inference, holdout selection, primary-denominator eligibility, and generic-operator generalization null or false.
+- Exercise the complete mutation-result path from editable and force-reinstalled wheel packages on Python 3.11–3.14 and document its architecture, threat, protocol, privacy, falsification, and claim boundaries.
 - Add `deltawitness.dw001-claim-scoped-mutation-plan.v1` as a deterministic pre-execution contract that freezes one fixed Python source scope, one exact AST return-expression target, three outcome-blind generic mutation operators, paired strong/weak selector profiles, and future outcome semantics before any mutation test result is observed.
 - Add `deltawitness.dw001-claim-scoped-mutant-catalog.v1` with exact target and mutant identities plus explicit `generated`, `duplicate`, `not_applicable`, and `invalid` records; duplicate, unsupported, and compile-invalid mutations remain visible instead of being silently dropped or counted.
 - Bind semantic AST identities through a versioned canonical representation that omits empty optional fields and source locations while retaining source-byte and exact target-position identities, and pin the resulting plan, target, mutant, and catalog digests across Python 3.11–3.14.
