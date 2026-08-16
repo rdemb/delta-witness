@@ -1,19 +1,19 @@
 """Public DW-001 development mechanism-pilot API.
 
-The plan contract is deterministic and development-only. The runner stages and
-self-verifies the exact ten-arm bundle before publication, and the supported
-public execution boundary requires an absent output path so publication is one
-same-filesystem rename rather than a sequence of partially visible moves. A
-canonical text archive can retain every verified JSON artifact without adding
-an external upload mechanism. Public bundle and archive operations require the
-complete sealed file set with no additional entries. None of these contracts
-authorizes a holdout, creates a confirmatory denominator, authenticates
-producers, or provides containment.
+The plan contract is deterministic and development-only. The public runner
+executes into a private intermediate bundle, verifies the exact sealed file set
+and every semantic relation, then publishes through one same-filesystem rename
+to an absent final path. A canonical text archive can retain every verified
+JSON artifact without adding an external upload mechanism. Public bundle and
+archive operations require the complete sealed file set with no additional
+entries. None of these contracts authorizes a holdout, creates a confirmatory
+denominator, authenticates producers, or provides containment.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+import tempfile
 from typing import Any
 
 from ._dw001_pilot_archive import (
@@ -60,14 +60,40 @@ def run_development_pilot(
     plan: object,
     output_directory: Path,
 ) -> dict[str, Any]:
-    """Execute the sealed plan and atomically publish to an absent final path."""
+    """Execute, verify privately, and atomically publish the sealed pilot."""
 
     output = Path(output_directory)
     if output.is_symlink() or output.exists():
         raise DW001PilotError(
             "development pilot output directory: must be absent for atomic publication"
         )
-    return run_pilot(plan, output)
+    parent = output.parent
+    if parent.is_symlink() or not parent.is_dir():
+        raise DW001PilotError(
+            "development pilot output directory parent: must be a trusted literal directory"
+        )
+
+    with tempfile.TemporaryDirectory(
+        prefix=".deltawitness-pilot-publication-",
+        dir=parent,
+    ) as private_directory:
+        intermediate = Path(private_directory) / "bundle"
+        index = run_pilot(plan, intermediate)
+
+        exact_valid, exact_errors = verify_exact_bundle_tree(intermediate, plan)
+        if not exact_valid:
+            raise DW001PilotError("; ".join(exact_errors))
+        bundle_valid, bundle_errors = verify_bundle(intermediate, plan)
+        if not bundle_valid:
+            raise DW001PilotError("; ".join(bundle_errors))
+
+        try:
+            intermediate.replace(output)
+        except OSError as exc:
+            raise DW001PilotError(
+                "development pilot publication: final atomic rename failed"
+            ) from exc
+        return index
 
 
 def verify_development_pilot_index_document(
