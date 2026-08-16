@@ -1,24 +1,43 @@
-# DW-001 Development Mechanism Pilot v1 — Readiness Boundary
+# DW-001 Development Mechanism Pilot v1 — Readiness and Completion Boundary
 
-**Status:** planning and pre-execution contract design only. The development pilot is not yet authorized to execute. The DW-001 protocol remains draft and unfrozen. No holdout material exists in this workstream.
+**Status:** the fixed owned-synthetic development mechanism pilot has executed and its canonical archive is retained and verified. This document does not authorize an ecological development corpus, protocol freeze, holdout, or confirmatory interpretation.
+
+Canonical result:
+
+```text
+research/DW-001/DEVELOPMENT_PILOT_V1.md
+```
+
+Canonical artifacts:
+
+```text
+research/DW-001/development-pilot-plan.v1.json
+research/DW-001/development-pilot-archive.v1.json
+```
+
+Exact digests:
+
+```text
+plan_sha256            = 48a98f01c740862c91056841a7f96e6c98f1ae9641b7b364590a45d458ae3bcc
+archive_sha256         = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fcf4b06
+index_semantic_sha256  = bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
+```
 
 ## Purpose
 
-DeltaWitness now has enough deterministic study infrastructure to stop adding assurance layers temporarily and test whether the complete evidence chain can be executed, retained, verified, and analyzed as one controlled development corpus.
+The mechanism pilot tested whether the complete DeltaWitness study-evidence chain could execute, retain, verify, and analyze five fixed positive and negative mechanisms under both observer arms without manual artifact repair, post-result relabeling, or denominator drift.
 
-The first pilot is deliberately a **mechanism pilot**, not an effectiveness study.
+It asked:
 
-It asks:
+> Can the current fixed owned-synthetic cases produce one complete, public-safe, internally consistent development bundle and machine-derived controlled-contrast analysis?
 
-> Can the current five fixed owned-synthetic families and both observer arms produce one complete, public-safe, internally consistent development bundle and machine-derived contrast analysis without manual artifact repair or post-result relabeling?
+It did not ask how frequently these mechanisms occur in real coding-agent patches.
 
-It does not ask how frequently these mechanisms occur in real coding-agent patches.
+## Fixed population
 
-## Fixed population boundary
+The executed plan contains exactly ten ordered case arms:
 
-The executable plan must contain exactly ten ordered case-arms:
-
-| Order | Case-arm ID | Family | Observer |
+| Order | Case arm | Family | Observer |
 |---:|---|---|---|
 | 1 | `dev-v1-valid-o0` | `valid-discriminating-regression` | `O0_EXIT_CODE` |
 | 2 | `dev-v1-valid-o1` | `valid-discriminating-regression` | `O1_TYPED_RECEIPT` |
@@ -31,47 +50,42 @@ The executable plan must contain exactly ten ordered case-arms:
 | 9 | `dev-v1-unrelated-assertion-o0` | `wrong-reason-unrelated-assertion` | `O0_EXIT_CODE` |
 | 10 | `dev-v1-unrelated-assertion-o1` | `wrong-reason-unrelated-assertion` | `O1_TYPED_RECEIPT` |
 
-Every case-arm is permanently:
+Every arm is permanently:
 
 ```text
 partition = development
 primary_denominator_eligible = false
 ```
 
-These exact generated cases and all inspected derivatives are prohibited from any later confirmatory holdout.
+The cases and all inspected derivatives are prohibited from a later confirmatory holdout.
 
-## Execution authorization gate
+## Completed pre-execution gates
 
-No pilot command may execute until one strict machine-readable plan fixes:
+Before the canonical run, the branch fixed and verified:
 
-- exact protocol and implementation commit;
-- exact generator and all artifact schema commits;
-- the ten ordered case-arm IDs above;
-- deterministic scenario IDs;
-- family, observer, control role, and partition;
-- expected matrix states and failure causes;
-- expected `M0`–`M3` decisions and reasons;
-- exact claim-witness selector declarations where localization is required;
-- explicit `localization_required` or `not_applicable` status for every arm;
-- the fixed aggregate localization rule;
-- artifact retention and public-safe output rules;
-- cost fields, timing boundary, command-count definition, and missingness policy;
-- exclusions and deviations allowed during the development pilot;
-- canonical plan digest.
+- exact protocol and evidence-producing implementation commits;
+- one strict machine-readable ten-arm plan;
+- exact family, observer, control-role, scenario, state, method, and localization expectations;
+- exact claim-witness selectors where localization was required;
+- a fixed localization aggregate rule;
+- development-only denominator semantics;
+- cost fields and missingness policy;
+- strict plan, index, and archive schemas;
+- semantic plan, index, archive, and full-bundle verifiers;
+- staging → self-verification → publication runner semantics;
+- red-first failure for the missing plan, runner, and archive capabilities;
+- public-tree, compile, suite, demo, wheel, installed-package, privacy, and threat-boundary checks.
 
-No runtime argument may introduce free-form fixture code, tests, commands, selectors, expected labels, or denominator decisions.
+No runtime argument introduced free-form fixture code, tests, commands, selectors, expected labels, exclusions, or denominator decisions.
 
-The selector table is not yet frozen by this readiness note. In particular, every family-specific selector must be verified against the fixed generated candidate-test bytes and committed in the executable plan before authorization.
+## Retained artifact chain
 
-## Required artifact chain
-
-For every case-arm, the runner must construct and independently verify:
+For each case arm, the archive retains and re-verifies:
 
 ```text
 pilot plan entry
     -> fixture descriptor
-    -> materialized synthetic repository
-    -> fixture identity
+    -> synthetic Git identity
     -> development scenario manifest
     -> fixture-manifest binding
     -> strict matrix report
@@ -82,62 +96,31 @@ pilot plan entry
     -> public-safe pilot index entry
 ```
 
-A digest-valid object is insufficient. Every existing semantic and cross-artifact verifier remains mandatory.
+The archive contains 84 JSON documents. A digest-valid object is insufficient: every existing semantic and cross-artifact verifier remains mandatory.
 
-Aggregate analysis must not be released when one required artifact is missing, malformed, relation-invalid, or inconsistent with the plan.
+## Controlled contrasts
 
-## Required controlled contrasts
+All five sealed contrasts were observed as expected:
 
-The machine-derived analysis must preserve at least these contrasts:
+| Contrast | Result |
+|---|---|
+| Candidate-test discrimination | Non-discriminating family changes `M0 accept` to `M1 reject` under both observers |
+| Original-test preservation | Candidate-regression family changes `M1 accept` to `M2 reject` under both observers |
+| Outcome-semantics contrast | Import-error family has `M1 accept` under O0 and `M1 indeterminate` under O1 |
+| Broad-suite versus declared witness | Unrelated-assertion family has `M3 accept` but localization `unsupported` under both observers |
+| Positive control | Valid family has all methods accept and localization `supported` under both observers |
 
-### Candidate-test discrimination
-
-```text
-non-discriminating family:
-M1 versus M0
-```
-
-### Original-test preservation
-
-```text
-candidate-regression family:
-M2 versus M1
-```
-
-### Outcome-semantics contrast
+The analysis retains the full per-case tables and fixes:
 
 ```text
-import-error family:
-O1 versus O0
+headline_score                = null
+ecological_inference_allowed  = false
+retain_case_tables             = true
 ```
-
-### Broad-suite versus declared-witness localization
-
-```text
-unrelated-assertion family:
-broad canonical witness versus claim-facing selector
-```
-
-### Positive control
-
-```text
-valid-discriminating family:
-all methods under both observer arms
-```
-
-The analysis must retain full per-case method and selector tables. It may not replace them with one headline score.
 
 ## Cost boundary
 
-The pilot must distinguish:
-
-- full four-state decision-equivalence execution;
-- selector-localization execution;
-- artifact construction and verification;
-- native state counts for any separately measured weaker method;
-- human review time, or explicit unmeasured status.
-
-Required machine fields include, where support exists:
+The archive records per-case:
 
 - wall-clock seconds;
 - CPU seconds;
@@ -146,101 +129,89 @@ Required machine fields include, where support exists:
 - command count;
 - artifact count;
 - public bundle byte count;
-- review time or missingness reason.
+- human review time or missingness.
 
-NaN, infinity, negative values, and silent zero-for-missing are invalid.
+The canonical plan executes:
 
-Projected `M0`, `M1`, and `M2` decisions from one full matrix must not be presented as their native runtime cost.
+```text
+40 matrix states
+12 selector states
+52 commands
+```
 
-## Analysis boundary
+Human review time is explicitly unmeasured. Projected `M0`, `M1`, and `M2` decisions from one full matrix are not their native runtime cost.
 
-The ten case-arms are designed mechanism probes, not independent ecological samples.
+The values are implementation diagnostics for fixed synthetic cases, not population estimates.
 
-The development pilot may establish:
+## Reproducibility result
 
-- whether the complete artifact pipeline executes without manual repair;
-- whether expected positive and negative controls remain distinguishable;
-- whether analysis can be regenerated from retained artifacts alone;
-- approximate execution and artifact-management cost in the tested environment;
-- implementation defects, missing contracts, and review burden.
-
-It may not establish:
-
-- real-world prevalence;
-- general accuracy, precision, recall, or superiority;
-- statistically meaningful confidence intervals for coding-agent populations;
-- a confirmatory primary endpoint;
-- a holdout precision target derived as though the ten arms were random samples.
-
-## Negative-result policy
-
-The pilot must retain and report:
-
-- typed import-error indeterminacy;
-- non-discriminating declared selector evidence;
-- broad-suite/selector disagreement;
-- unexpected exclusions or deviations;
-- incomplete artifacts or verifier disagreements;
-- failed hypotheses and runner failures.
-
-A known negative control becoming unexpectedly green or a positive control becoming unexpectedly incomplete is a pilot failure requiring diagnosis. It is not repaired by relabeling the expected result.
-
-## Reproducibility boundary
-
-Repeated execution in equivalent fresh directories must preserve:
+Repeated clean executions preserve:
 
 - plan digest;
 - ordered case IDs;
 - fixture descriptors and identities;
 - exact Git trees and commits;
-- stable matrix witness semantics;
-- projection, declaration, binding, localization, result, and pilot-index semantic digests where their contracts exclude volatile fields.
+- matrix witness semantics;
+- expected method and localization tables;
+- pilot semantic digest:
 
-Timestamps, durations, and complete artifact digests may differ only where their schemas explicitly classify those fields as volatile.
+```text
+bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
+```
 
-This requirement does not bind the complete Python, Git, operating-system, dependency, kernel, hardware, filesystem, locale, network, or container environment.
+Timestamps, durations, complete report digests, result digests, index digests, and complete archive digests may vary where their contracts include volatile fields.
 
-## Safety and publication
+This does not bind the complete Python, Git, operating-system, dependency, kernel, hardware, filesystem, locale, network, or container environment.
 
-The pilot runner remains unsandboxed and may execute repository tests repeatedly. It must run only fixed project-owned synthetic material in a disposable, non-sensitive environment without credentials or unrelated data.
+## Safety and publication record
 
-The public bundle must exclude:
+The pilot used only fixed project-owned synthetic material in disposable GitHub-hosted directories. The runner remains unsandboxed.
+
+The public archive excludes:
 
 - absolute paths;
 - raw stdout, stderr, and tracebacks;
 - usernames, credentials, and environment values;
 - private endpoints;
-- arbitrary source or test content outside the fixed public fixtures;
-- prohibited extra fields.
+- arbitrary source or test content outside fixed public fixtures;
+- holdout and primary-denominator eligibility.
 
-Git identities, relative paths, commands, test IDs, producer metadata, counts, timings, and digests remain publication metadata requiring review.
+Git identities, relative paths, commands, test IDs, producer metadata, counts, timings, and digests remain publication metadata.
 
-No CI artifact upload, external storage, telemetry, or network publication is authorized by this note.
+One-time archive transport and branch write capabilities were separately reviewed, used only for public-safe synthetic evidence, and removed before final validation. They are not continuing DeltaWitness capabilities.
 
-## Prior-art boundary
+## Completion decision
 
-Benchmark harnesses, experiment manifests, preregistration, reproducible research bundles, SWE-bench and TDD-Bench evaluation pipelines, structured test reports, content-addressed artifacts, and study-data lineage are established.
+The following statement is now supported:
 
-No novelty claim is made for executing a benchmark plan or indexing a result bundle.
+> The fixed DW-001 owned-synthetic development mechanism plan executed and produced an internally consistent, public-safe archive whose complete evidence chain and controlled contrasts can be regenerated and reverified.
 
-The narrow question is whether DeltaWitness can apply its complete multi-artifact evidence chain to controlled positive and negative mechanisms without hidden state, post-hoc relabeling, manual artifact repair, or denominator drift.
+The following statements remain unsupported:
 
-## Readiness decision
+- DeltaWitness is more effective than final-state or fail-to-pass validation on real patches;
+- the five families represent coding-agent failure prevalence;
+- the observer or localization layers have measured accuracy on an ecological corpus;
+- `M3_FOUR_STATE` provides a justified operational benefit over `M2_F2P_P2P`;
+- the protocol is frozen or holdout-ready;
+- Gate 0 is complete;
+- the result is independently reproduced, production-ready, scientifically novel, or award-level.
 
-The development mechanism pilot is **not authorized** by this document alone.
+## Next readiness boundary
 
-Authorization requires all of the following on one reviewed branch:
+The next phase is **not another synthetic assurance feature**.
 
-- strict plan and index schemas;
-- semantic plan verifier;
-- exact committed ten-arm plan;
-- red-first runner and analysis contracts;
-- public-tree, compile, full-suite, demo, wheel, installed-package, privacy, and threat-boundary validation;
-- no unresolved review comments;
-- an explicit PR statement that the execution remains development-only and non-confirmatory.
+Before any ecological development execution, DW-001 needs a separate reviewed design for:
 
-## Claim boundary
+- corpus source and authorization;
+- inclusion and exclusion rules;
+- unit of analysis;
+- sampling and partition procedure;
+- independent ground-truth and oracle-relevance review;
+- adjudication and disagreement retention;
+- metric definitions and denominators;
+- stochastic repetition and environment policy;
+- pilot-informed precision target;
+- privacy/publication review;
+- immutable holdout commitment procedure.
 
-Completion of the future pilot would establish only that the fixed owned-synthetic development mechanism plan executed and produced an internally consistent, public-safe, reproducible artifact bundle and analysis.
-
-It would not establish real-world effectiveness, superiority, oracle adequacy, protocol freeze, confirmatory holdout readiness, independent reproduction, producer authentication, containment, production readiness, scientific novelty, or award-level significance.
+Completion of the fixed mechanism pilot does not authorize those steps automatically.
