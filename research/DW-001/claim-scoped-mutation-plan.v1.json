@@ -1,0 +1,144 @@
+{
+  "adapter": {
+    "id": "python-stdlib-ast-return-v1",
+    "parser": "stdlib-ast",
+    "round_trip": "ast-unparse-v1",
+    "runtime_dependency": false,
+    "version": "1"
+  },
+  "calibration_profiles": [
+    {
+      "operator_set_id": "python-boolean-predicate-minimal-v1",
+      "order": 1,
+      "primary_denominator_eligible": false,
+      "profile_id": "strong-authorization-oracle-v1",
+      "profile_role": "positive_control",
+      "selectors": [
+        "test_access.AccessTests.test_admin_is_allowed",
+        "test_access.AccessTests.test_viewer_is_denied"
+      ],
+      "source_id": "authorization-predicate-candidate-v1"
+    },
+    {
+      "operator_set_id": "python-boolean-predicate-minimal-v1",
+      "order": 2,
+      "primary_denominator_eligible": false,
+      "profile_id": "weak-boolean-proxy-v1",
+      "profile_role": "negative_control",
+      "selectors": [
+        "test_access.AccessTests.test_viewer_result_is_boolean"
+      ],
+      "source_id": "authorization-predicate-candidate-v1"
+    }
+  ],
+  "execution_authorized": false,
+  "future_execution_contract": {
+    "execution_status": "not_implemented",
+    "headline_score": null,
+    "merge_blocker_authorized": false,
+    "outcome_taxonomy": [
+      "killed",
+      "survived",
+      "invalid",
+      "equivalent_review_required",
+      "indeterminate"
+    ],
+    "retain_complete_mutant_table": true,
+    "universal_threshold": null
+  },
+  "generation_contract": {
+    "compile_required_for_generated": true,
+    "duplicate_key": "mutated_source_sha256",
+    "generation_statuses": [
+      "generated",
+      "duplicate",
+      "invalid",
+      "not_applicable"
+    ],
+    "mutant_identity_schema": "deltawitness.dw001-python-mutant.v1",
+    "retain_all_records": true,
+    "source_body_published": false,
+    "target_identity_schema": "deltawitness.dw001-python-ast-target.v1"
+  },
+  "generation_controls": [
+    {
+      "control_purpose": "duplicate_retention",
+      "included_in_generic_operator_set": false,
+      "operator_id": "duplicate-false-control-v1",
+      "order": 4
+    },
+    {
+      "control_purpose": "not_applicable_retention",
+      "included_in_generic_operator_set": false,
+      "operator_id": "not-applicable-addition-control-v1",
+      "order": 5
+    },
+    {
+      "control_purpose": "invalid_retention",
+      "included_in_generic_operator_set": false,
+      "operator_id": "invalid-render-control-v1",
+      "order": 6
+    }
+  ],
+  "holdout_selected": false,
+  "known_challenge_control": {
+    "counts_toward_operator_generalization": false,
+    "included_in_generic_operator_set": false,
+    "mutant_id": "nonempty-role-boolean-v1",
+    "mutated_ast_sha256": "4c1e9f756c07ddf7c2f4a91a545cb2ecb342d7f9d33f179561fff1ef4761f70e",
+    "mutated_source_sha256": "2a9f03b752f56a8c0f5ec6258430ca19ba06bb027835be481f6653685ef21c02",
+    "origin": "PR-34-fixed-control",
+    "source_body_published": false,
+    "source_sha256": "7bfbd2d0a642c6d7f7da05ece2f4464d31df53a28d1ffed12c5752bc492d8965"
+  },
+  "operator_set": {
+    "id": "python-boolean-predicate-minimal-v1",
+    "operators": [
+      {
+        "operator_class": "boolean_constant_replacement",
+        "operator_id": "return-constant-false-v1",
+        "order": 1,
+        "outcome_blind_selection": true,
+        "target_kind": "return_expression"
+      },
+      {
+        "operator_class": "boolean_constant_replacement",
+        "operator_id": "return-constant-true-v1",
+        "order": 2,
+        "outcome_blind_selection": true,
+        "target_kind": "return_expression"
+      },
+      {
+        "operator_class": "relational_operator_replacement",
+        "operator_id": "comparison-eq-to-ne-v1",
+        "order": 3,
+        "outcome_blind_selection": true,
+        "target_kind": "single_eq_comparison"
+      }
+    ],
+    "selection_basis": "minimal_boolean_constant_and_relational_replacement",
+    "selection_status": "frozen_before_calibration_execution"
+  },
+  "partition": "development",
+  "plan_id": "DW-001-CLAIM-SCOPED-MUTATION-PLAN-V1",
+  "plan_sha256": "0ebf64e1de76849050c86d8a4d53d72d8067561ab48b4bd5a4083495dc99fe37",
+  "primary_denominator_eligible": false,
+  "reference_claim_checks": [
+    "test_hidden_claim.HiddenClaimTests.test_admin_is_allowed",
+    "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+  ],
+  "schema_version": "deltawitness.dw001-claim-scoped-mutation-plan.v1",
+  "source_scope": {
+    "ast_sha256": "7c5be603e703a4893ead7ccc09fc76b88e3cd9d5603703d591d2ca80f439349b",
+    "language": "python",
+    "parser": "stdlib-ast",
+    "path": "src/access.py",
+    "source_body_published": false,
+    "source_id": "authorization-predicate-candidate-v1",
+    "source_sha256": "7bfbd2d0a642c6d7f7da05ece2f4464d31df53a28d1ffed12c5752bc492d8965",
+    "symbol": "is_admin",
+    "target_cardinality": 1
+  },
+  "status": "pre_execution_frozen_design",
+  "study_id": "DW-001"
+}
