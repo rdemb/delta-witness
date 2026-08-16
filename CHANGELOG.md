@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add versioned declared logical-test witness localization for exact standard-library `unittest` selectors under the recorded `base_candidate` and `candidate_candidate` states, while leaving the canonical four-state matrix unchanged.
+- Add `deltawitness.claim-witness-declaration.v1` with ordered unique selectors, adapter-derived canonical commands, source specification and claim bindings, a fixed aggregate rule, and semantic digest verification.
+- Add `deltawitness.claim-witness-localization.v1` with exact Git state identities, invocation-bound typed receipts, per-selector `discriminating`, `non_discriminating`, `candidate_invalid`, and `indeterminate` outcomes, plus semantic and complete-report digests.
+- Extend the built-in unittest receipt producer with exact repeated `--test-name` selection through framework APIs; missing selectors remain typed errors and normal selector receipts must represent exactly one logical test.
+- Require the `unittest-test-id-v1` adapter to derive selector commands, use producer `deltawitness-unittest`, bind producer version to the report tool version, and reject selector, command, claim, specification, observer, receipt, tree, commit, and source-report substitutions after digest recomputation.
+- Deterministically reconstruct exact synthetic `BB`, `BC`, `CB`, and `CC` Git objects from base/head commits and current path classification before localization, allowing equivalent fresh checkouts with different directory names to verify the same source report without weakening commit checks.
+- Add direct positive, negative, import-error, missing-selector, candidate-invalid, malformed-input, NaN, receipt-cardinality, producer-substitution, Git-state, invocation-binding, schema, privacy, and fresh-checkout regressions.
+- Exercise the complete declaration, source matrix, state reconstruction, selector execution, receipt verification, localization, and report verification path from editable and force-reinstalled wheel packages on Python 3.11–3.14.
+- Document that a valid localization report proves only which operator-declared selectors were requested and their exact `BC`/`CC` typed outcomes; it does not prove selector relevance, oracle adequacy, mutation strength, or merge authorization.
 - Add the fixed `wrong-reason-unrelated-assertion` DW-001 family as an oracle-relevance negative control with identical scenario identity and source/test mechanism across exit-code and typed-receipt arms.
 - Prove directly that the claim-facing viewer assertion passes on both base and candidate implementations while a separate collateral `version_label == "v2"` assertion is the sole source of `BC = fail`.
 - Demonstrate one controlled limitation where `O0_EXIT_CODE` records `test_failure_untyped`, `O1_TYPED_RECEIPT` records a genuine `test_failure` with assertion failures and zero errors, and both observers still yield a complete accepted `M0`–`M3` witness.
