@@ -2,15 +2,21 @@
 """Exercise the packaged sealed DW-001 development-pilot plan contract.
 
 This smoke constructs and verifies only the pre-execution ten-arm plan. It does
-not materialize fixtures, execute tests, create pilot results, or authorize a
-development pilot or holdout.
+not materialize fixtures, execute valid pilot cases, create pilot results, or
+authorize a development pilot or holdout. It verifies that a tampered plan is
+rejected before any output path is created.
 """
 
 from __future__ import annotations
 
+from copy import deepcopy
+from pathlib import Path
+import tempfile
+
 from deltawitness.dw001_pilot import (
     PILOT_ID,
     build_development_pilot_plan,
+    compute_development_pilot_plan_sha256,
     run_development_pilot,
     verify_development_pilot_plan_document,
 )
@@ -43,12 +49,19 @@ def main() -> int:
     if plan["analysis_contract"]["ecological_inference_allowed"]:
         raise AssertionError("development mechanism pilot enabled ecological inference")
 
-    try:
-        run_development_pilot(plan, __import__("pathlib").Path("unused-output"))
-    except Exception:
-        pass
-    else:
-        raise AssertionError("unimplemented pilot runner did not refuse execution")
+    tampered = deepcopy(plan)
+    tampered["case_arms"][0]["family_id"] = "non-discriminating-candidate-test"
+    tampered["plan_sha256"] = compute_development_pilot_plan_sha256(tampered)
+    with tempfile.TemporaryDirectory() as directory:
+        output = Path(directory) / "output"
+        try:
+            run_development_pilot(tampered, output)
+        except Exception:
+            pass
+        else:
+            raise AssertionError("tampered pilot plan was executed")
+        if output.exists():
+            raise AssertionError("runner created output before plan verification")
 
     print("DW-001 development pilot sealed-plan smoke passed")
     return 0
