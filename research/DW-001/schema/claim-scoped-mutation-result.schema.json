@@ -1,0 +1,789 @@
+{
+  "$id": "https://github.com/rdemb/delta-witness/research/DW-001/schema/claim-scoped-mutation-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeltaWitness DW-001 Claim-Scoped Mutation Result v1",
+  "description": "Development-only complete typed result table for the exact frozen mutation plan and catalog. Python semantic verification remains authoritative for all source, outcome, concordance, denominator, and digest relations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "result_id",
+    "partition",
+    "plan_sha256",
+    "catalog_sha256",
+    "created_at",
+    "runtime",
+    "source",
+    "candidate_baseline",
+    "records",
+    "summary",
+    "analysis",
+    "policy",
+    "cost",
+    "semantic_sha256",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deltawitness.dw001-claim-scoped-mutation-result.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    },
+    "result_id": {
+      "const": "DW-001-CLAIM-SCOPED-MUTATION-RESULT-V1"
+    },
+    "partition": {
+      "const": "development"
+    },
+    "plan_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "catalog_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "candidate_baseline": {
+      "$ref": "#/$defs/record"
+    },
+    "records": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "analysis": {
+      "$ref": "#/$defs/analysis"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "cost": {
+      "$ref": "#/$defs/rootCost"
+    },
+    "semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "report_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableSha256": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableInteger": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_version",
+        "python_implementation",
+        "python_version",
+        "platform_system"
+      ],
+      "properties": {
+        "tool_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_implementation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform_system": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_sha256",
+        "source_ast_sha256",
+        "target_id"
+      ],
+      "properties": {
+        "source_id": {
+          "const": "authorization-predicate-candidate-v1"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_ast_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_id": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "deltawitness-unittest"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests_run",
+        "passed",
+        "failures",
+        "errors",
+        "skipped",
+        "expected_failures",
+        "unexpected_successes"
+      ],
+      "properties": {
+        "tests_run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_successes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "implementation_id",
+        "profile_id",
+        "selector",
+        "source_sha256",
+        "test_sha256",
+        "command",
+        "expected_observed",
+        "observed",
+        "concordant",
+        "return_code",
+        "timed_out",
+        "duration_seconds",
+        "stdout_sha256",
+        "stderr_sha256",
+        "invocation_binding",
+        "receipt_sha256",
+        "receipt_outcome",
+        "receipt_producer",
+        "receipt_counts",
+        "observation_error"
+      ],
+      "properties": {
+        "implementation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_id": {
+          "enum": [
+            "strong-authorization-oracle-v1",
+            "weak-boolean-proxy-v1",
+            "reference-claim-checks-v1"
+          ]
+        },
+        "selector": {
+          "enum": [
+            "test_access.AccessTests.test_admin_is_allowed",
+            "test_access.AccessTests.test_viewer_is_denied",
+            "test_access.AccessTests.test_viewer_result_is_boolean",
+            "test_hidden_claim.HiddenClaimTests.test_admin_is_allowed",
+            "test_hidden_claim.HiddenClaimTests.test_viewer_is_denied"
+          ]
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "command": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expected_observed": {
+          "enum": [
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ]
+        },
+        "observed": {
+          "enum": [
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "return_code": {
+          "$ref": "#/$defs/nullableInteger"
+        },
+        "timed_out": {
+          "type": "boolean"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stdout_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stderr_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "invocation_binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/nullableSha256"
+        },
+        "receipt_outcome": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "receipt_producer": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/producer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt_counts": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/counts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_error": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_role",
+        "selectors",
+        "expected_outcome",
+        "outcome",
+        "concordant"
+      ],
+      "properties": {
+        "profile_id": {
+          "enum": [
+            "strong-authorization-oracle-v1",
+            "weak-boolean-proxy-v1"
+          ]
+        },
+        "profile_role": {
+          "enum": [
+            "positive_control",
+            "negative_control"
+          ]
+        },
+        "selectors": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "expected_outcome": {
+          "enum": [
+            "baseline_passed",
+            "baseline_failed",
+            "killed",
+            "survived",
+            "indeterminate"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "baseline_passed",
+            "baseline_failed",
+            "killed",
+            "survived",
+            "indeterminate"
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "selectors",
+        "expected_outcome",
+        "outcome",
+        "concordant"
+      ],
+      "properties": {
+        "profile_id": {
+          "const": "reference-claim-checks-v1"
+        },
+        "selectors": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "expected_outcome": {
+          "enum": [
+            "reference_passed",
+            "claim_violation_observed",
+            "indeterminate"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "reference_passed",
+            "claim_violation_observed",
+            "indeterminate"
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "recordCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command_count",
+        "selector_count",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "measured",
+            "not_executed"
+          ]
+        },
+        "command_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selector_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_clock_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "missing_reason": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "implementation_id",
+        "record_role",
+        "operator_id",
+        "mutant_id",
+        "catalog_status",
+        "source_sha256",
+        "source_ast_sha256",
+        "execution_status",
+        "counts_toward_generic_generalization",
+        "profiles",
+        "reference",
+        "concordant",
+        "cost"
+      ],
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "implementation_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "record_role": {
+          "enum": [
+            "candidate_baseline",
+            "generic_operator",
+            "historical_challenge_control",
+            "generation_control"
+          ]
+        },
+        "operator_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "mutant_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "catalog_status": {
+          "enum": [
+            "candidate",
+            "generated",
+            "historical_control",
+            "duplicate",
+            "not_applicable",
+            "invalid"
+          ]
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/nullableSha256"
+        },
+        "source_ast_sha256": {
+          "$ref": "#/$defs/nullableSha256"
+        },
+        "execution_status": {
+          "enum": [
+            "executed",
+            "not_executed_duplicate",
+            "not_executed_not_applicable",
+            "not_executed_invalid"
+          ]
+        },
+        "counts_toward_generic_generalization": {
+          "type": "boolean"
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/profile"
+          }
+        },
+        "reference": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/reference"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/recordCost"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_baseline_valid",
+        "catalog_records",
+        "generic_mutants_executed",
+        "historical_controls_executed",
+        "generation_records_not_executed",
+        "generic_strong_killed",
+        "generic_strong_survived",
+        "generic_strong_indeterminate",
+        "generic_weak_killed",
+        "generic_weak_survived",
+        "generic_weak_indeterminate",
+        "generic_claim_violations_observed",
+        "mutation_score"
+      ],
+      "properties": {
+        "candidate_baseline_valid": {
+          "type": "boolean"
+        },
+        "catalog_records": {
+          "const": 6
+        },
+        "generic_mutants_executed": {
+          "const": 3
+        },
+        "historical_controls_executed": {
+          "const": 1
+        },
+        "generation_records_not_executed": {
+          "const": 3
+        },
+        "generic_strong_killed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_strong_survived": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_strong_indeterminate": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_weak_killed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_weak_survived": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_weak_indeterminate": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "generic_claim_violations_observed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "mutation_score": {
+          "type": "null"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "candidate_baseline_concordant",
+        "unexpected_observation_count",
+        "unexpected_profile_count",
+        "unexpected_reference_count",
+        "unexpected_record_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "expected",
+            "unexpected"
+          ]
+        },
+        "candidate_baseline_concordant": {
+          "type": "boolean"
+        },
+        "unexpected_observation_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_profile_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_reference_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_record_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retain_complete_mutant_table",
+        "headline_score",
+        "universal_threshold",
+        "merge_blocker_authorized",
+        "ecological_inference_allowed",
+        "holdout_selected",
+        "primary_denominator_eligible",
+        "generic_operator_generalization_allowed"
+      ],
+      "properties": {
+        "retain_complete_mutant_table": {
+          "const": true
+        },
+        "headline_score": {
+          "type": "null"
+        },
+        "universal_threshold": {
+          "type": "null"
+        },
+        "merge_blocker_authorized": {
+          "const": false
+        },
+        "ecological_inference_allowed": {
+          "const": false
+        },
+        "holdout_selected": {
+          "const": false
+        },
+        "primary_denominator_eligible": {
+          "const": false
+        },
+        "generic_operator_generalization_allowed": {
+          "const": false
+        }
+      }
+    },
+    "rootCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "implementation_count",
+        "command_count",
+        "selector_count",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "measured"
+        },
+        "implementation_count": {
+          "const": 5
+        },
+        "command_count": {
+          "const": 25
+        },
+        "selector_count": {
+          "const": 25
+        },
+        "wall_clock_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "missing_reason": {
+          "type": "null"
+        }
+      }
+    }
+  }
+}

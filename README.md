@@ -4,7 +4,7 @@
 
 **Counterfactual verification and exact patch influence for AI-generated code changes.**
 
-DeltaWitness is an open research prototype for checking whether a software patch produced the behavioral change claimed by its tests, for localizing exact declared witness-test transitions, and for measuring how each changed code path influences that declared witness. It does not trust a green final-state run, a raw nonzero exit, a test-suite aggregate, a compiled mutation catalog, or an agent's narrative by itself.
+DeltaWitness is an open research prototype for checking whether a software patch produced the behavioral change claimed by its tests, for localizing exact declared witness-test transitions, for retaining complete typed mutation evidence under frozen development controls, and for measuring how each changed code path influences the declared witness. It does not trust a green final-state run, a raw nonzero exit, a test-suite aggregate, a compiled mutation catalog, a preregistration-concordant result, or an agent's narrative by itself.
 
 **Current status:** pre-alpha research software (`v0.0.3` plus unreleased DW-001 research infrastructure). It is not a formal proof system, a security certification product, a code-review replacement, a complete oracle analyzer, a validated mutation system, or a sandbox for untrusted code.
 
@@ -21,10 +21,12 @@ A coding agent can modify production code, modify tests, run the resulting suite
 - an exact declared fail-to-pass test is strong enough to reject plausible incorrect implementations;
 - a mutation operator set or score was fixed before its outcomes were observed;
 - duplicate, invalid, not-applicable, equivalent, or incomplete mutants were retained honestly;
+- a complete outcome that contradicted the preregistered expectation was retained rather than suppressed as a harness error;
+- summary counts and policy fields were recomputed from the complete result table;
 - every implementation file changed by the patch contributed to the declared result;
 - two changes are alternatives, jointly necessary, redundant, or mutually compensating.
 
-DeltaWitness moves the first layers of this decision out of the agent's narrative and into deterministic Git replay, typed execution evidence, exact selector provenance, bounded negative controls, frozen experimental inputs, and exhaustive path-level intervention analysis.
+DeltaWitness moves the first layers of this decision out of the agent's narrative and into deterministic Git replay, typed execution evidence, exact selector provenance, bounded negative controls, frozen experimental inputs, complete expected-or-unexpected result tables, and exhaustive path-level intervention analysis.
 
 ## Layer 1: four-state change witness
 
@@ -134,19 +136,19 @@ The integrity-bound challenge executes five fixed typed controls and reconstruct
 
 Read [DW-001 Weak-Proxy-Oracle Challenge v1](research/DW-001/WEAK_ORACLE_CHALLENGE.md).
 
-## Pre-execution claim-scoped mutation design
+## Claim-scoped mutation design and typed result
 
-The next Gate 1 experiment is deliberately split into two stages:
+The current Gate 1 experiment is deliberately split into three stages:
 
 ```text
-freeze operator/scope/profile identities
-    before
-execute and calibrate mutation outcomes
+freeze source/operator/profile identities
+    -> execute one bounded typed result table
+    -> broader calibration and direct baselines
 ```
 
-The first stage is implemented. The second is not.
+The first two stages are implemented for one owned-synthetic source. Broader calibration is not.
 
-Canonical artifacts:
+Canonical design artifacts:
 
 ```text
 research/DW-001/claim-scoped-mutation-plan.v1.json
@@ -187,31 +189,88 @@ strong-authorization-oracle-v1
 weak-boolean-proxy-v1
 ```
 
-The adapter uses only the standard-library `ast` module. It parses, transforms, unparses, reparses, and compiles fixed project-owned bytes. It does **not** execute mutants or tests against mutants.
+The adapter uses only the standard-library `ast` module. It parses, transforms, unparses, reparses, and compiles fixed project-owned bytes. Exact plan, AST-target, mutant, and catalog identities are reconstructed from editable and installed-wheel packages on Python 3.11–3.14.
 
-The committed plan fixes:
+Read [DW-001 Claim-Scoped Mutation Calibration Plan v1](research/DW-001/MUTATION_CALIBRATION_PLAN.md).
+
+### Typed bounded result
+
+The result runner verifies the exact plan and catalog and then executes only:
 
 ```text
-execution_authorized          = false
-execution_status              = not_implemented
-headline_score                = null
-universal_threshold           = null
-merge_blocker_authorized      = false
-holdout_selected              = false
-primary_denominator_eligible  = false
+candidate baseline
+3 frozen generic generated mutants
+1 separately labeled historical control
 ```
 
-Exact plan, AST-target, mutant, and catalog identities are reconstructed from editable and installed-wheel packages on Python 3.11–3.14. This establishes deterministic pre-execution inputs only.
+Each implementation runs:
 
 ```text
-compiled deterministic mutant catalog
-    != killed/survived outcomes
-    != mutation evidence
+2 strong selectors
+1 weak selector
+2 reference selectors
+```
+
+Total fixed workload:
+
+```text
+5 implementations × 5 selectors = 25 typed commands
+```
+
+Generation-only duplicate, invalid, and not-applicable records remain in the complete table with zero commands and explicit non-execution reasons.
+
+Every selector stores:
+
+```text
+expected_observed
+observed
+concordant
+```
+
+Profiles and reference checks store expected outcome, observed outcome, and concordance. Record-level concordance, summary counts, and top-level analysis are recomputed.
+
+A complete invocation-bound observation that contradicts preregistration remains a valid negative result:
+
+```text
+complete unexpected observation
+    != malformed evidence
+    != harness failure
+```
+
+Malformed structure, source or selector substitution, wrong commands or bindings, receipt contradiction, impossible aggregates, non-finite costs, or digest tampering still fail closed.
+
+For the current exact owned-synthetic table, the preregistered contrast is:
+
+```text
+all 3 generic mutants:
+    strong profile -> killed
+    weak profile   -> survived
+    reference      -> claim_violation_observed
+```
+
+Agreement with this table validates only the bounded mechanism. The historical control is excluded from generic evidence.
+
+The result fixes:
+
+```text
+mutation_score                           = null
+headline_score                           = null
+universal_threshold                      = null
+merge_blocker_authorized                 = false
+ecological_inference_allowed             = false
+holdout_selected                         = false
+primary_denominator_eligible             = false
+generic_operator_generalization_allowed  = false
+```
+
+```text
+complete typed mutation result
     != mutation adequacy
+    != ecological effectiveness
     != merge policy
 ```
 
-Read [DW-001 Claim-Scoped Mutation Calibration Plan v1](research/DW-001/MUTATION_CALIBRATION_PLAN.md).
+Read [DW-001 Claim-Scoped Mutation Result v1](research/DW-001/MUTATION_RESULT_V1.md).
 
 ## Layer 4: exact patch influence
 
@@ -307,7 +366,17 @@ The mutation plan and catalog additionally record:
 - future outcome taxonomy and explicit non-authorization fields;
 - plan and catalog digests.
 
-They record no mutation-test outcomes.
+The mutation result additionally records:
+
+- exact candidate and mutant identities;
+- 25 selector commands with source/test digests and invocation bindings;
+- typed receipts and process outcomes;
+- expected and observed selector outcomes;
+- expected and observed profile/reference outcomes;
+- selector, profile, reference, and record concordance;
+- generation-only non-execution records;
+- observed summary, unexpected-result analysis, policy, and costs;
+- stable semantic and complete-report digests.
 
 An influence report additionally records:
 
@@ -321,7 +390,7 @@ An influence report additionally records:
 
 Hybrid and intervention states are represented as synthetic commits rather than dirty worktrees. Commands that inspect `HEAD` therefore see a recorded commit identity. Git subprocesses use a reduced environment that rejects process-level repository redirection and replacement-object overrides. Changed submodule and changed symbolic-link entries are rejected before hybrid-state materialization. Repository-local attributes and filters remain a documented limitation.
 
-Raw command output is excluded by default. Local absolute repository and specification paths are not written to reports. Command arrays, claim descriptions, selectors, public-safe fixed prompts, environment-variable names, output digests, repository paths, mutant IDs, AST/source digests, and receipt metadata can be recorded; every exported artifact remains review-required before publication.
+Raw command output is excluded by default. Local absolute repository and specification paths are not written to reports. Command arrays, claim descriptions, selectors, public-safe fixed prompts, environment-variable names, output digests, repository paths, mutant IDs, AST/source/test digests, invocation bindings, and receipt metadata can be recorded; every exported artifact remains review-required before publication.
 
 ## Quick start
 
@@ -391,7 +460,7 @@ deltawitness verify-report "$(git rev-parse --git-path deltawitness/influence.js
 
 Use `--output /reviewed/path/report.json` only when a report must be exported deliberately.
 
-The mutation-plan and weak-oracle APIs are development research contracts, not general CLI policy or authorization to execute external repositories.
+The selector-localization, weak-oracle, mutation-plan, and mutation-result APIs are development research contracts, not general CLI policy or authorization to execute external repositories.
 
 ## Specification
 
@@ -448,7 +517,7 @@ DeltaWitness does not silently approximate larger patches. Future work may add e
 
 Selector localization and the weak-oracle challenge are separate development APIs rather than implicit additions to the core CLI policy. The weak-oracle challenge uses exactly five fixed controls and does not define a general mutation workload.
 
-The claim-scoped mutation plan currently performs three generic AST transformations and three generation controls over one fixed source. It compiles generated bytes but executes no mutant or selector. Future execution costs are unknown and require a separate resource and result contract.
+The mutation plan performs three generic AST transformations and three generation controls over one fixed source. The bounded mutation result executes 25 typed selector commands across five fixed implementation identities. Neither cost profile can be extrapolated to ecological repositories or general mutation engines.
 
 ## Safety model
 
@@ -460,7 +529,7 @@ A receipt binding prevents accidental cross-state reuse; it does not authenticat
 
 Exact coalition enumeration multiplies command execution. Run influence analysis only in a separately secured, disposable, resource-bounded environment when the repository or command is not fully trusted.
 
-The weak-oracle challenge executes only fixed project-owned bytes in temporary directories. The mutation-plan adapter only parses and compiles fixed project-owned bytes. Neither makes DeltaWitness safe for external or untrusted patches. No VPS or credential-bearing environment should be used as an ad hoc sandbox.
+The weak-oracle challenge and mutation-result runner execute only fixed project-owned bytes in temporary directories. The mutation-plan adapter parses and compiles the same fixed bytes. None makes DeltaWitness safe for external or untrusted patches. No VPS or credential-bearing environment should be used as an ad hoc sandbox.
 
 Read [THREAT_MODEL.md](THREAT_MODEL.md) before use.
 
@@ -468,9 +537,9 @@ Read [THREAT_MODEL.md](THREAT_MODEL.md) before use.
 
 Fail-to-pass validation, selector execution, delta debugging, patch minimization, automated patch assessment, program slicing, mutation testing, selective mutation, equivalent-mutant analysis, cooperative-game attribution, test-code co-evolution, weak or partial oracles, hidden tests, coverage, and assertion-quality analysis are established areas. DeltaWitness does not currently claim scientific novelty.
 
-The provisional contribution under evaluation is narrower: a Git-native four-state replay, exact hybrid-state identities, typed invocation-bound outcomes, exact declared-selector provenance, integrity-bound negative controls for oracle interpretation, a pre-execution outcome-blind mutation design with exact identities, exhaustive dual-test-world path interventions, endpoint consistency, exact non-monotonic attribution, and portable verifiable artifacts.
+The provisional contribution under evaluation is narrower: a Git-native four-state replay, exact hybrid-state identities, typed invocation-bound outcomes, exact declared-selector provenance, integrity-bound negative controls for oracle interpretation, a pre-execution outcome-blind mutation design with exact identities, a complete expected-or-unexpected typed mutation result table, exhaustive dual-test-world path interventions, endpoint consistency, exact non-monotonic attribution, and portable verifiable artifacts.
 
-The project must still demonstrate through systematic literature review, fair direct tooling baselines, execution of the frozen mutation design, calibrated error rates, authorized ecological data, held-out evaluation, external reproduction, and technical review that this combination adds useful evidence beyond existing methods.
+The project must still demonstrate through systematic literature review, fair direct tooling baselines, broader frozen calibration, equivalent-mutant review, calibrated error rates, authorized ecological data, held-out evaluation, external reproduction, and technical review that this combination adds useful evidence beyond existing methods.
 
 See:
 
@@ -480,6 +549,7 @@ See:
 - [DW-001 protocol](research/DW-001/PROTOCOL.md)
 - [DW-001 Weak-Proxy-Oracle Challenge](research/DW-001/WEAK_ORACLE_CHALLENGE.md)
 - [DW-001 Claim-Scoped Mutation Calibration Plan](research/DW-001/MUTATION_CALIBRATION_PLAN.md)
+- [DW-001 Claim-Scoped Mutation Result](research/DW-001/MUTATION_RESULT_V1.md)
 
 ## Current limitations
 
@@ -498,8 +568,9 @@ The prototype intentionally supports a narrow case:
 - typed outcomes do not establish oracle relevance or strength;
 - selector localization proves exact declared transition, not semantic intent;
 - the weak-oracle challenge uses one fixed mutant and hidden check, not a calibrated mutation set or score;
-- the frozen mutation catalog contains no killed, survived, equivalent, coverage, or timing outcomes;
 - the minimal AST operator set covers one fixed Boolean predicate and is not a complete Python mutation model;
+- the typed mutation result covers only three generic mutants and one historical control under two owned-synthetic profiles;
+- equivalent-mutant adjudication, coverage, false-warning rates, missed-warning rates, and population uncertainty remain unresolved;
 - the semantic-AST compatibility rule is validated only for one fixed source across Python 3.11–3.14;
 - exact influence uses whole changed paths as intervention units, so results depend on path grouping;
 - documentation changes are held at candidate state and must pass endpoint consistency checks;
@@ -508,8 +579,8 @@ The prototype intentionally supports a narrow case:
 - Shapley and Banzhaf values describe the declared Boolean witness game, not universal semantic importance;
 - weak assertions, excessive mocking, semantic overfitting, environment drift, and production behavior remain outside the current validated boundary;
 - synthetic commits are local Git objects and are not pushed automatically;
-- a matching matrix, discriminating selector, compiled mutant catalog, and stable influence map can still support a misleading or incomplete claim;
-- the fixed synthetic development pilot, mutation plan, and challenges are not ecological agent evidence;
+- a matching matrix, discriminating selector, compiled mutant catalog, matching mutation result, and stable influence map can still support a misleading or incomplete claim;
+- the fixed synthetic development pilot, mutation plan/result, and challenges are not ecological agent evidence;
 - independent reproduction remains incomplete.
 
 ## Project principles
@@ -518,7 +589,7 @@ The prototype intentionally supports a narrow case:
 2. Ambiguous trust boundaries fail closed.
 3. Public claims remain narrower than the evidence.
 4. Incomplete execution is not negative evidence.
-5. Negative results and failed hypotheses are publishable outcomes.
+5. Negative and preregistration-divergent results are publishable outcomes.
 6. Exact and approximate results must never be conflated.
 7. Reproduction matters more than branding.
 8. Material AI assistance is disclosed, while responsibility remains human.

@@ -32,7 +32,7 @@ The roadmap is gated by evidence rather than dates. A checked implementation ite
 
 ## Gate 1: Test-integrity analysis
 
-Implemented mechanism and pre-execution controls:
+Implemented mechanism, design, and owned-synthetic result controls:
 
 - [x] Exact predeclared unittest selector localization under bound `BC` and `CC` states
 - [x] Controlled suite-level unrelated-assertion negative control
@@ -44,22 +44,29 @@ Implemented mechanism and pre-execution controls:
 - [x] Explicit duplicate, invalid, and not-applicable generation records
 - [x] Paired strong-oracle and weak-proxy profiles over identical source and generic mutants
 - [x] Historical weak-proxy mutant excluded from generic-operator generalization
+- [x] Exact frozen catalog executed under both frozen selector profiles
+- [x] Complete typed per-selector, per-profile, reference, and per-mutant result table
+- [x] Generation-only duplicate, invalid, and not-applicable records retained without execution
+- [x] Complete preregistration-divergent observations retained as negative results rather than harness errors
+- [x] Stable semantic result digest separated from complete runtime and cost digest
+- [x] Editable and installed-wheel mutation-result smoke on Python 3.11–3.14
 
 Unresolved analysis layers:
 
-- [ ] Execute the frozen claim-scoped mutation catalog under both frozen profiles
-- [ ] Retain typed killed, survived, invalid, equivalent-review-required, and indeterminate outcomes
-- [ ] Calibrate mutation evidence against valid, weak, and ambiguous controls
+- [ ] Expand calibration beyond one fixed source and three generic operators
+- [ ] Calibrate mutation evidence against a broader set of valid, weak, ambiguous, invalid, and equivalent-review controls
 - [ ] Detect empty and assertion-free test deltas
 - [ ] Detect skipped, disabled, and weakened assertions
 - [ ] Measure patch coverage around the claimed behavior
-- [ ] Compare mutation evidence with fixed-mutant, coverage-only, and established mutation-tool baselines
+- [ ] Compare fixed-mutant evidence with coverage-only and changed-symbol mutation sets on the same frozen controls
+- [ ] Compare against pinned mutmut and Cosmic Ray configurations where semantics are directly comparable
+- [ ] Define an independent equivalent-mutant review procedure
 - [ ] Identify excessive mocking around the claimed boundary
 - [ ] Repeat flaky tests and report uncertainty
 - [ ] Support framework-specific selector and result adapters beyond stdlib unittest
 - [ ] Quantify false positives, false negatives, applicability, and cost before any blocker or score
 
-A checked negative control or pre-execution plan documents one limitation or freezes one experimental input. It does not complete Gate 1, validate oracle adequacy, establish mutation adequacy, or authorize a merge policy.
+A checked negative control, pre-execution plan, or owned-synthetic result documents one limitation or validates one bounded evidence path. It does not complete Gate 1, validate oracle adequacy, establish mutation adequacy, or authorize a merge policy.
 
 ## Gate 2: Bounded intervention analysis
 
