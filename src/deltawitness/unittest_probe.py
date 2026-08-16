@@ -120,12 +120,15 @@ class _ReceiptTestResult(unittest.TextTestResult):
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="deltawitness-unittest",
-        description="Run unittest discovery and emit a DeltaWitness outcome receipt.",
+        description=(
+            "Run unittest discovery or exact dotted logical-test selectors and "
+            "emit a DeltaWitness outcome receipt."
+        ),
     )
     parser.add_argument(
         "--start-directory",
         default="tests",
-        help="Directory in which discovery starts (default: tests)",
+        help="Directory in which discovery or dotted-name loading starts (default: tests)",
     )
     parser.add_argument(
         "--pattern",
@@ -136,6 +139,15 @@ def _parser() -> argparse.ArgumentParser:
         "--top-level-directory",
         default=None,
         help="Optional project top-level directory passed to unittest discovery",
+    )
+    parser.add_argument(
+        "--test-name",
+        action="append",
+        default=None,
+        help=(
+            "Exact dotted unittest logical-test name. May be repeated; when "
+            "present, discovery pattern and top-level directory are not used."
+        ),
     )
     parser.add_argument(
         "--verbosity",
@@ -190,15 +202,35 @@ def _write(
     write_outcome_receipt(destination, document, expected_binding=binding)
 
 
+def _load_suite(args: argparse.Namespace) -> unittest.TestSuite:
+    loader = unittest.TestLoader()
+    if args.test_name:
+        start_directory = Path(args.start_directory)
+        try:
+            resolved_start = start_directory.resolve(strict=True)
+        except OSError as exc:
+            raise ReceiptError(
+                "invalid_start_directory",
+                "The unittest selector start directory cannot be resolved",
+            ) from exc
+        if not resolved_start.is_dir():
+            raise ReceiptError(
+                "invalid_start_directory",
+                "The unittest selector start directory must be a directory",
+            )
+        sys.path.insert(0, str(resolved_start))
+        return loader.loadTestsFromNames(args.test_name)
+    return loader.discover(
+        start_dir=args.start_directory,
+        pattern=args.pattern,
+        top_level_dir=args.top_level_directory,
+    )
+
+
 def run_probe(args: argparse.Namespace) -> int:
     destination, binding = _destination_from_environment()
     try:
-        loader = unittest.TestLoader()
-        suite = loader.discover(
-            start_dir=args.start_directory,
-            pattern=args.pattern,
-            top_level_dir=args.top_level_directory,
-        )
+        suite = _load_suite(args)
         stream = io.StringIO()
         runner = unittest.TextTestRunner(
             stream=stream,
