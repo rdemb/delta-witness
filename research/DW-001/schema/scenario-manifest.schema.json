@@ -1,0 +1,701 @@
+{
+  "$defs": {
+    "decision": {
+      "enum": [
+        "accept",
+        "reject",
+        "indeterminate",
+        "not_applicable"
+      ],
+      "type": "string"
+    },
+    "gitObject": {
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$",
+      "type": "string"
+    },
+    "groundTruthMethod": {
+      "additionalProperties": false,
+      "properties": {
+        "combined_method_id": {
+          "pattern": "^M[0-3]_[A-Z0-9_]+__O[01]_[A-Z0-9_]+$",
+          "type": "string"
+        },
+        "expected_decision": {
+          "enum": [
+            "accept",
+            "reject",
+            "indeterminate",
+            "not_applicable"
+          ],
+          "type": "string"
+        },
+        "method_id": {
+          "enum": [
+            "M0_FINAL",
+            "M1_F2P",
+            "M2_F2P_P2P",
+            "M3_FOUR_STATE"
+          ],
+          "type": "string"
+        },
+        "observer_id": {
+          "enum": [
+            "O0_EXIT_CODE",
+            "O1_TYPED_RECEIPT"
+          ],
+          "type": "string"
+        },
+        "primary_denominator_eligible": {
+          "type": "boolean"
+        },
+        "reason_code": {
+          "enum": [
+            "predicate_satisfied",
+            "predicate_contradicted",
+            "required_state_indeterminate",
+            "required_state_not_applicable"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "method_id",
+        "observer_id",
+        "combined_method_id",
+        "expected_decision",
+        "reason_code",
+        "primary_denominator_eligible"
+      ],
+      "type": "object"
+    },
+    "groundTruthState": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability_reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minLength": 1,
+              "type": "string"
+            }
+          ]
+        },
+        "applicable": {
+          "type": "boolean"
+        },
+        "expected_observed": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "pass",
+                "fail",
+                "error",
+                "timeout"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "failure_cause": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "none",
+                "assertion_failure",
+                "test_failure_untyped",
+                "collection_error",
+                "import_error",
+                "setup_error",
+                "teardown_error",
+                "no_tests",
+                "no_effective_tests",
+                "unexpected_success",
+                "producer_error",
+                "infrastructure_error",
+                "unknown_error",
+                "timeout"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "base_base",
+            "base_candidate",
+            "candidate_base",
+            "candidate_candidate"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "applicable",
+        "applicability_reason",
+        "expected_observed",
+        "failure_cause"
+      ],
+      "type": "object"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "nullableNonEmpty": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      ]
+    },
+    "observer": {
+      "enum": [
+        "exit-code-v1",
+        "outcome-receipt-v1"
+      ],
+      "type": "string"
+    },
+    "observerId": {
+      "enum": [
+        "O0_EXIT_CODE",
+        "O1_TYPED_RECEIPT"
+      ],
+      "type": "string"
+    },
+    "reason": {
+      "enum": [
+        "predicate_satisfied",
+        "predicate_contradicted",
+        "required_state_indeterminate",
+        "required_state_not_applicable"
+      ],
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/rdemb/delta-witness/raw/main/research/DW-001/schema/scenario-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "partition": {
+            "const": "development"
+          }
+        },
+        "required": [
+          "partition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "partition_lock": {
+            "properties": {
+              "commitment_scope": {
+                "type": "null"
+              },
+              "commitment_sha256": {
+                "type": "null"
+              },
+              "status": {
+                "const": "development_uncommitted"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "partition": {
+            "const": "holdout"
+          }
+        },
+        "required": [
+          "partition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "partition_lock": {
+            "properties": {
+              "commitment_scope": {
+                "const": "dw001-holdout-index-v1"
+              },
+              "commitment_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "status": {
+                "const": "holdout_committed"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "description": "Structural schema for a sealed pre-execution DW-001 scenario manifest. Cross-field semantics are enforced by deltawitness.dw001_contracts.",
+  "properties": {
+    "execution": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "environment_requirements": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "fail_exit_codes": {
+          "items": {
+            "maximum": 255,
+            "minimum": -255,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "observer": {
+          "$ref": "#/$defs/observer"
+        },
+        "observer_id": {
+          "$ref": "#/$defs/observerId"
+        },
+        "pass_env": {
+          "items": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "pass_exit_codes": {
+          "items": {
+            "maximum": 255,
+            "minimum": -255,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "timeout_seconds": {
+          "maximum": 86400,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "command",
+        "observer",
+        "observer_id",
+        "timeout_seconds",
+        "pass_exit_codes",
+        "fail_exit_codes",
+        "pass_env",
+        "environment_requirements"
+      ],
+      "type": "object"
+    },
+    "git": {
+      "additionalProperties": false,
+      "properties": {
+        "base_sha": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "head_sha": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "repository_id": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "repository_id",
+        "base_sha",
+        "head_sha"
+      ],
+      "type": "object"
+    },
+    "ground_truth": {
+      "additionalProperties": false,
+      "properties": {
+        "environment_assumptions": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "false_assurance_mechanism": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "methods": {
+          "items": false,
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthMethod"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M0_FINAL"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthMethod"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M1_F2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthMethod"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M2_F2P_P2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthMethod"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M3_FOUR_STATE"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "type": "array"
+        },
+        "states": {
+          "items": false,
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthState"
+                },
+                {
+                  "properties": {
+                    "state": {
+                      "const": "base_base"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthState"
+                },
+                {
+                  "properties": {
+                    "state": {
+                      "const": "base_candidate"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthState"
+                },
+                {
+                  "properties": {
+                    "state": {
+                      "const": "candidate_base"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/groundTruthState"
+                },
+                {
+                  "properties": {
+                    "state": {
+                      "const": "candidate_candidate"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "type": "array"
+        }
+      },
+      "required": [
+        "states",
+        "methods",
+        "false_assurance_mechanism",
+        "environment_assumptions"
+      ],
+      "type": "object"
+    },
+    "manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "partition": {
+      "enum": [
+        "development",
+        "holdout"
+      ],
+      "type": "string"
+    },
+    "partition_lock": {
+      "additionalProperties": false,
+      "properties": {
+        "commitment_scope": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "const": "dw001-holdout-index-v1"
+            }
+          ]
+        },
+        "commitment_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "development_uncommitted",
+            "holdout_committed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "commitment_sha256",
+        "commitment_scope"
+      ],
+      "type": "object"
+    },
+    "paths": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "documentation": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "tests": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "code",
+        "tests",
+        "documentation"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization_basis": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "authorization_reference": {
+          "$ref": "#/$defs/nullableNonEmpty"
+        },
+        "license_expression": {
+          "$ref": "#/$defs/nullableNonEmpty"
+        },
+        "public_release_allowed": {
+          "type": "boolean"
+        },
+        "source_id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "source_type": {
+          "enum": [
+            "synthetic",
+            "owned",
+            "licensed",
+            "authorized"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_type",
+        "source_id",
+        "license_expression",
+        "authorization_basis",
+        "authorization_reference",
+        "public_release_allowed"
+      ],
+      "type": "object"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "reviewers": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "decision": {
+                "enum": [
+                  "approve",
+                  "reject"
+                ],
+                "type": "string"
+              },
+              "independent_of_implementation": {
+                "type": "boolean"
+              },
+              "independent_of_scenario_author": {
+                "type": "boolean"
+              },
+              "rationale": {
+                "$ref": "#/$defs/nonEmpty"
+              },
+              "reviewer_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/+:-]{0,127}$",
+                "type": "string"
+              },
+              "role": {
+                "$ref": "#/$defs/nonEmpty"
+              }
+            },
+            "required": [
+              "reviewer_id",
+              "role",
+              "independent_of_scenario_author",
+              "independent_of_implementation",
+              "decision",
+              "rationale"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reviewers"
+      ],
+      "type": "object"
+    },
+    "scenario_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "deltawitness.dw001-scenario-manifest.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    }
+  },
+  "required": [
+    "schema_version",
+    "study_id",
+    "scenario_id",
+    "partition",
+    "partition_lock",
+    "provenance",
+    "git",
+    "paths",
+    "execution",
+    "ground_truth",
+    "review",
+    "manifest_sha256"
+  ],
+  "title": "DeltaWitness DW-001 Scenario Manifest v1",
+  "type": "object"
+}
