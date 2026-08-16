@@ -34,6 +34,17 @@ def _safe_component(value: object, *, context: str) -> str:
     return value
 
 
+def _safe_relative_path(value: object, *, context: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise _error(context, "must be a non-empty string")
+    if value.startswith("/") or "\\" in value or "\x00" in value:
+        raise _error(context, "must be a safe repository-relative POSIX path")
+    parts = PurePosixPath(value).parts
+    if not parts or any(part in {".", ".."} for part in parts):
+        raise _error(context, "must be a safe repository-relative POSIX path")
+    return value
+
+
 def expected_bundle_file_paths(plan: object) -> tuple[str, ...]:
     """Derive the exact retained file set from one sealed-plan-shaped object."""
 
@@ -94,6 +105,30 @@ def expected_bundle_directory_paths(plan: object) -> tuple[str, ...]:
     return tuple(sorted(directories))
 
 
+_ARTIFACT_LABELS = {
+    "plan.json": "plan",
+    "index.json": "index",
+    "descriptor.json": "descriptor",
+    "identity.json": "identity",
+    "manifest.json": "manifest",
+    "binding.json": "binding",
+    "matrix-report.json": "matrix_report",
+    "projection.json": "projection",
+    "claim-witness-declaration.json": "declaration",
+    "claim-witness-localization.json": "localization",
+    "result.json": "result",
+}
+
+
+def _artifact_labels(paths: list[str]) -> list[str]:
+    return sorted(
+        {
+            _ARTIFACT_LABELS.get(PurePosixPath(path).name, "unknown")
+            for path in paths
+        }
+    )
+
+
 def _compare_paths(
     *,
     expected: set[str],
@@ -104,7 +139,10 @@ def _compare_paths(
     missing = sorted(expected - observed)
     unexpected = sorted(observed - expected)
     if missing:
-        errors.append(f"{context}: missing paths={missing}")
+        errors.append(
+            f"{context}: missing paths={missing}; "
+            f"missing artifacts={_artifact_labels(missing)}"
+        )
     if unexpected:
         errors.append(f"{context}: unexpected paths={unexpected}")
     return errors
@@ -203,9 +241,7 @@ def verify_exact_archive_paths(
             context = f"development pilot archive exact file set.files[{index}]"
             if not isinstance(item, Mapping):
                 raise _error(context, "must be an object")
-            path = item.get("path")
-            if not isinstance(path, str) or not path:
-                raise _error(f"{context}.path", "must be a non-empty string")
+            path = _safe_relative_path(item.get("path"), context=f"{context}.path")
             observed.append(path)
 
         errors: list[str] = []
