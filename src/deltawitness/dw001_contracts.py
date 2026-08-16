@@ -1,15 +1,17 @@
-"""Public DW-001 study-contract API with a fail-closed post-unblinding guard.
+"""Public DW-001 study-contract API with fail-closed policy verification.
 
 The internal module implements the versioned manifest/result contracts. This
-public boundary adds an independent policy check: an applied deviation made
-after results were visible cannot retain confirmatory eligibility.
+public boundary adds independent post-unblinding policy checks and prevents
+cross-artifact binding from running on malformed source documents.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from . import _dw001_contracts as _core
+from .dw001 import verify_projection_document
+from .errors import DeltaWitnessError
 
 DW001ContractError = _core.DW001ContractError
 RESULT_SCHEMA_VERSION = _core.RESULT_SCHEMA_VERSION
@@ -51,6 +53,26 @@ def _require_no_post_unblinding_confirmatory_deviation(document: object) -> None
         raise DW001ContractError(errors[0])
 
 
+def _deduplicate(errors: list[str] | tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(errors))
+
+
+def _verify_safely(
+    label: str,
+    verifier: Callable[[object], tuple[bool, tuple[str, ...]]],
+    document: object,
+) -> tuple[bool, tuple[str, ...]]:
+    """Convert expected structural verifier failures into typed diagnostics."""
+
+    try:
+        return verifier(document)
+    except (DeltaWitnessError, KeyError, TypeError, IndexError) as exc:
+        return False, (
+            f"{label} verification could not complete safely: "
+            f"{type(exc).__name__}: {exc}",
+        )
+
+
 def seal_result_record(document: object) -> dict[str, Any]:
     """Seal only records that respect the post-unblinding deviation boundary."""
 
@@ -62,8 +84,8 @@ def verify_result_record_document(document: object) -> tuple[bool, tuple[str, ..
     """Verify core semantics, digest integrity, and post-unblinding policy."""
 
     valid, errors = _core.verify_result_record_document(document)
-    combined = tuple(
-        dict.fromkeys((*errors, *_post_unblinding_deviation_errors(document)))
+    combined = _deduplicate(
+        [*errors, *_post_unblinding_deviation_errors(document)]
     )
     return valid and not combined, combined
 
@@ -73,12 +95,53 @@ def verify_result_against_sources(
     manifest: object,
     projection: object,
 ) -> tuple[bool, tuple[str, ...]]:
-    """Verify all source bindings plus the post-unblinding deviation policy."""
+    """Verify source documents before evaluating their relational bindings."""
 
-    valid, errors = _core.verify_result_against_sources(result, manifest, projection)
-    combined = tuple(
-        dict.fromkeys((*errors, *_post_unblinding_deviation_errors(result)))
+    manifest_valid, manifest_errors = _verify_safely(
+        "scenario manifest",
+        _core.verify_scenario_manifest_document,
+        manifest,
     )
+    result_valid, result_errors = _verify_safely(
+        "result record",
+        _core.verify_result_record_document,
+        result,
+    )
+    projection_valid, projection_errors = _verify_safely(
+        "projection",
+        verify_projection_document,
+        projection,
+    )
+    policy_errors = _post_unblinding_deviation_errors(result)
+
+    preflight_errors = _deduplicate(
+        [
+            *manifest_errors,
+            *result_errors,
+            *projection_errors,
+            *policy_errors,
+        ]
+    )
+    if not (manifest_valid and result_valid and projection_valid) or policy_errors:
+        return False, preflight_errors
+
+    try:
+        valid, errors = _core.verify_result_against_sources(
+            result,
+            manifest,
+            projection,
+        )
+    except (DeltaWitnessError, KeyError, TypeError, IndexError) as exc:
+        combined = _deduplicate(
+            [
+                *preflight_errors,
+                "cross-artifact verification could not complete safely: "
+                f"{type(exc).__name__}: {exc}",
+            ]
+        )
+        return False, combined
+
+    combined = _deduplicate([*preflight_errors, *errors])
     return valid and not combined, combined
 
 
