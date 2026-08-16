@@ -263,13 +263,92 @@ The projection exposes each nested method only to its declared state slice while
 
 These are research controls, not empirical results.
 
+## DW-001 development mechanism pilot lifecycle
+
+The fixed synthetic development pilot extends the per-case artifact path with one sealed population plan and one retained corpus index/archive:
+
+```text
+committed ten-arm plan
+    -> derive exact descriptors and declarations
+    -> execute each case in a disposable repository
+    -> verify every per-case artifact and relation
+    -> derive method/localization summaries
+    -> derive controlled contrasts
+    -> construct complete development index
+    -> self-verify staged bundle
+    -> publish only after complete success
+    -> pack canonical JSON archive
+    -> reconstruct and reverify archive before acceptance
+```
+
+### Sealed plan
+
+The plan fixes:
+
+- protocol and evidence-producing implementation commits;
+- exact ordered case IDs;
+- family, observer, scenario, role, partition, and denominator fields;
+- descriptor and specification digests;
+- expected states and `M0`–`M3` decisions;
+- declared logical-test selectors and expected localization status;
+- analysis contrast IDs;
+- cost fields and missingness policy;
+- prohibition of headline scoring and ecological inference.
+
+The runner accepts no free-form fixture code, tests, commands, selectors, expected labels, exclusions, or denominator decisions.
+
+### Staging and publication
+
+The runner uses a staging directory adjacent to the requested destination. It:
+
+1. verifies the plan before creating final output;
+2. executes and verifies every case;
+3. refuses aggregate analysis when any case or relation is invalid;
+4. writes only strict public-safe JSON documents;
+5. verifies the complete staged bundle;
+6. publishes the final directory only after self-verification;
+7. removes staging output on failure.
+
+A non-empty or symbolic-link destination is rejected. This does not establish trust in destination ancestors, mounts, the operating system, Python, Git, or the GitHub runner.
+
+### Canonical archive
+
+The archive is a text-only transport and retention format. It records:
+
+- sorted unique relative JSON paths;
+- every embedded JSON object;
+- a digest for every embedded file record;
+- plan and pilot semantic digests;
+- a complete archive digest.
+
+Archive verification reconstructs the directory bundle and reruns all per-artifact and cross-artifact checks. A recomputed archive digest cannot make a substituted path, document, plan, or relation valid.
+
+The canonical fixed-pilot archive is retained at:
+
+```text
+research/DW-001/development-pilot-archive.v1.json
+```
+
+Its semantic index is stable across equivalent clean runs, while timestamps, durations, complete report/result/index digests, and complete archive digests may vary where contracts include volatile fields.
+
+### Analysis boundary
+
+The mechanism-pilot index retains full case tables and five exact controlled contrasts. It emits:
+
+```text
+headline_score                = null
+ecological_inference_allowed  = false
+```
+
+All method records remain development-only and primary-denominator ineligible. The fixed mechanism pilot validates the evidence pipeline; it does not estimate method effectiveness on real patches.
+
 ## Report and artifact schemas
 
 Matrix schema `0.3` records observer protocol, invocation binding, receipt digest/outcome, producer, counts, stable observer error, exact state objects, witness digest, and report digest.
 
 Influence schema records path order, canonical matrix reference, anchors, every coalition, exact Git objects, observations, statuses, and exact metrics where release conditions hold.
 
-DW-001 adds strict schemas and semantic verifiers for projection, fixture descriptor, fixture identity, fixture-manifest binding, scenario manifest, and result record.
+DW-001 adds strict schemas and semantic verifiers for projection, fixture descriptor, fixture identity, fixture-manifest binding, scenario manifest, result record, development-pilot plan, development-pilot index, and development-pilot archive.
 
 Schemas define structural interoperability. Python verifiers remain authoritative for semantic recomputation and cross-artifact relations.
 
@@ -279,7 +358,7 @@ Current artifacts use unkeyed canonical digests:
 
 - `witness_sha256` and matrix `report_sha256`;
 - `influence_sha256` and influence `report_sha256`;
-- descriptor, identity, binding, projection, manifest, and result digests.
+- descriptor, identity, binding, projection, manifest, result, pilot-plan, pilot-index, and pilot-archive digests.
 
 They detect modification only against separately trusted sources or expected values. An actor able to replace an entire chain can recompute every digest.
 
@@ -296,6 +375,7 @@ DeltaWitness intentionally refuses substitution among evidence layers:
 - exact coalition enumeration does not prove complete causality;
 - a fixture identity does not prove environment reproducibility;
 - a fixture-manifest binding does not validate governance declarations;
+- a verified synthetic pilot does not establish ecological effectiveness;
 - an unkeyed digest does not authenticate a producer;
 - a matching witness does not authorize deployment;
 - controlled synthetic pairs do not establish general observer or method superiority.
