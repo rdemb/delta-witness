@@ -12,6 +12,8 @@ state identity
     -> declared witness-test provenance
     -> oracle relevance
     -> oracle strength
+    -> frozen mutation design
+    -> calibrated mutation evidence
     -> bounded intervention influence
     -> broader patch causality
     -> environment provenance
@@ -19,9 +21,9 @@ state identity
     -> policy decision
 ```
 
-Version `0.0.3` advances through bounded path-level intervention influence. Unreleased DW-001 infrastructure adds deterministic study contracts, declared-selector localization, and development-only negative controls for oracle relevance and strength. None of these layers establishes complete patch correctness, environment reproducibility, producer authentication, ecological effectiveness, or deployment authorization.
+Version `0.0.3` advances through bounded path-level intervention influence. Unreleased DW-001 infrastructure adds deterministic study contracts, declared-selector localization, development-only negative controls for oracle relevance and strength, and a frozen pre-execution mutation plan/catalog. The mutation plan currently generates and compiles fixed project-owned mutants but executes none of them. None of these layers establishes complete patch correctness, mutation adequacy, environment reproducibility, producer authentication, ecological effectiveness, or deployment authorization.
 
-No LLM judge appears in the trust path. Models may help design claims or fixtures outside that path, but current decisions are derived from explicit configuration, immutable Git objects, process observations, strict receipts, deterministic state projections, declared selectors, fixed mutation controls, exact coalition enumeration, and versioned contracts.
+No LLM judge appears in the trust path. Models may help design claims or fixtures outside that path, but current decisions are derived from explicit configuration, immutable Git objects, process observations, strict receipts, deterministic state projections, declared selectors, fixed negative controls, frozen mutation identities, exact coalition enumeration, and versioned contracts.
 
 ## Canonical four-state trust path
 
@@ -207,6 +209,123 @@ research/DW-001/schema/weak-oracle-challenge.schema.json
 src/deltawitness/dw001_oracle_challenge.py
 ```
 
+## Frozen claim-scoped mutation design
+
+The next Gate 1 layer is split deliberately into **design/generation** and **execution/calibration**. The current implementation completes only the first half.
+
+```text
+fixed owned-synthetic candidate source
+    -> semantic AST identity
+    -> exact return-expression target
+    -> frozen outcome-blind operator set
+    -> deterministic generated/duplicate/invalid/not-applicable records
+    -> paired selector profiles
+    -> future result contract (not implemented)
+```
+
+Canonical artifacts:
+
+```text
+research/DW-001/claim-scoped-mutation-plan.v1.json
+research/DW-001/claim-scoped-mutant-catalog.v1.json
+research/DW-001/schema/claim-scoped-mutation-plan.schema.json
+research/DW-001/schema/claim-scoped-mutant-catalog.schema.json
+src/deltawitness/dw001_mutation_plan.py
+```
+
+### Fixed source and target
+
+The plan binds one project-owned candidate source by SHA-256 and a versioned semantic-AST digest. The adapter requires exactly one top-level function named `is_admin` and exactly one return-expression target.
+
+Source identity and target identity remain distinct:
+
+- source identity binds exact UTF-8 source bytes;
+- semantic AST identity binds node kinds and non-empty declared fields while excluding source locations and empty optional fields;
+- target identity binds source digest, path, symbol, node kind, cardinality, and exact source positions.
+
+This compatibility rule is intentionally narrow. It is tested across Python 3.11–3.14 for the fixed source and is not a universal cross-version Python AST canonicalization claim.
+
+### Frozen generic operators
+
+The exact order is:
+
+```text
+return-constant-false-v1
+return-constant-true-v1
+comparison-eq-to-ne-v1
+```
+
+These operators are selected before mutation outcomes. They represent only a minimal Boolean/relational design and do not claim completeness or ecological realism.
+
+Three separate generation controls require the catalog to retain:
+
+```text
+duplicate-false-control-v1          -> duplicate
+not-applicable-addition-control-v1  -> not_applicable
+invalid-render-control-v1           -> invalid
+```
+
+Duplicate, invalid, and not-applicable records cannot be silently discarded or counted as generated generic mutants.
+
+### Historical challenge-control separation
+
+The known `nonempty-role-boolean-v1` mutant from the weak-proxy challenge is retained as a separate historical control:
+
+```text
+included_in_generic_operator_set      = false
+counts_toward_operator_generalization = false
+```
+
+This prevents a later calibration from claiming generic operator success by reusing the exact mutant that motivated the experiment.
+
+### Paired profiles
+
+The plan freezes two selector profiles over the same source and generic mutant catalog:
+
+```text
+strong-authorization-oracle-v1
+weak-boolean-proxy-v1
+```
+
+Reference development claim checks are declared separately before execution. The paired design isolates selector-profile differences, but the reference checks are not assumed complete or independent.
+
+### No execution semantics yet
+
+The current adapter parses, transforms, unparses, reparses, and compiles fixed project-owned bytes. It does not run mutants or tests against mutants.
+
+The future taxonomy is frozen as:
+
+```text
+killed
+survived
+invalid
+equivalent_review_required
+indeterminate
+```
+
+but no record currently carries one of those execution outcomes. The plan fixes:
+
+```text
+execution_authorized       = false
+headline_score             = null
+universal_threshold        = null
+merge_blocker_authorized   = false
+holdout_selected           = false
+primary_denominator_eligible = false
+```
+
+A later result layer requires a separate red-first contract and cannot rewrite this plan after outcomes are visible.
+
+Architecturally:
+
+```text
+frozen operator and mutant identity
+    != mutant execution
+    != mutation evidence
+    != mutation adequacy
+    != merge policy
+```
+
 ## Exact patch-influence trust path
 
 `deltawitness influence` first runs the canonical matrix and proceeds only from a complete supported canonical witness.
@@ -276,6 +395,14 @@ claim-witness declaration
     -> fixed weak-oracle mutation challenge
 ```
 
+A separate pre-execution research path freezes future mutation inputs:
+
+```text
+claim-scoped mutation plan
+    -> deterministic mutant catalog
+    -> future typed result table (not implemented)
+```
+
 ### Fixture descriptor and identity
 
 The descriptor fixes supported family, control role, observer arm, command, timeout, paths, expected states, failure causes, and expected `M0`–`M3` decisions. Method labels are recomputed from states.
@@ -294,13 +421,15 @@ Because manifest v1 predates fixture identity, the separate binding verifies com
 
 A valid binding cannot authenticate sources, prove creation time, validate reviewer claims, establish oracle relevance or strength, or make development material confirmatory.
 
-### Projection, localization, challenge, and result
+### Projection, localization, challenge, mutation design, and result
 
 The projection exposes each nested method only to its declared state slice while retaining verified source identities.
 
 Localization exposes exact selector outcomes under `BC` and `CC`, but not semantic intent.
 
 The weak-oracle challenge adds one fixed mutation counterexample over verified current evidence, but not a calibrated mutation analysis.
+
+The mutation plan/catalog freeze one source, target, operator set, selector-profile design, and deterministic generation table. They contain no mutation-test outcomes.
 
 The result binds expected/observed method decisions, source digests, exclusions, deviations, denominator membership, and explicit cost or missingness.
 
@@ -367,6 +496,7 @@ DW-001 adds strict schemas and semantic verifiers for:
 - scenario manifest and result;
 - claim-witness declaration and localization;
 - weak-oracle challenge;
+- claim-scoped mutation plan and deterministic mutant catalog;
 - development-pilot plan, index, and archive;
 - design-only ecological source universe.
 
@@ -379,9 +509,12 @@ Current artifacts use unkeyed canonical digests, including:
 - matrix witness and report digests;
 - influence semantic and report digests;
 - descriptor, identity, binding, projection, manifest, result, declaration, localization, and weak-oracle challenge digests;
+- mutation-plan and mutant-catalog digests;
 - pilot-plan, pilot-index, pilot-archive, and ecological source-universe digests.
 
-They detect modification only against separately trusted sources or expected values. An actor able to replace an entire chain can recompute every digest.
+The mutation adapter also derives exact source, semantic-AST, target, mutated-source, mutated-AST, and mutant identities. These identify one frozen design; they do not authenticate who selected it or prove its adequacy.
+
+All current digests detect modification only against separately trusted sources or expected values. An actor able to replace an entire chain can recompute every digest.
 
 Signing, producer identity, DSSE, in-toto, Sigstore, SCITT, immutable timestamping, and transparency registration remain separate future layers. A signature authenticates bytes, not semantic truth.
 
@@ -394,6 +527,8 @@ DeltaWitness intentionally refuses substitution among evidence layers:
 - typed assertion failure does not imply claim relevance;
 - exact selector provenance does not imply oracle strength;
 - one surviving mutant does not define mutation adequacy;
+- a frozen or compiled mutant catalog does not establish mutation outcomes;
+- duplicate, invalid, or not-applicable records cannot be silently discarded;
 - a canonical four-state matrix does not prove patch correctness;
 - exact coalition enumeration does not prove complete causality;
 - a fixture identity does not prove environment reproducibility;
@@ -403,4 +538,4 @@ DeltaWitness intentionally refuses substitution among evidence layers:
 - a matching witness does not authorize deployment;
 - controlled synthetic cases do not establish general observer or method superiority.
 
-Future work may add calibrated mutation and coverage evidence, assertion-delta analysis, over-mocking controls, repeated stochastic execution, reproducible containment, signed provenance, ecological baselines, external policy evaluation, and independent reproduction. Each layer must retain its own claim boundary and explicit positive and negative controls.
+Future work may add a separate typed mutation-result table over the frozen plan, calibrated mutation and coverage evidence, assertion-delta analysis, over-mocking controls, repeated stochastic execution, reproducible containment, signed provenance, ecological baselines, external policy evaluation, and independent reproduction. Each layer must retain its own claim boundary and explicit positive and negative controls.
