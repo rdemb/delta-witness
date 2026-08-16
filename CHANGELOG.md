@@ -2,11 +2,19 @@
 
 ## Unreleased
 
+- Add a versioned DW-001 scenario taxonomy that separates three implemented deterministic mechanism probes from required but unsupported future families.
+- Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
+- Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
+- Require equivalent descriptors to reproduce identical base/head commits and trees across clean directories under the supported Git object model.
+- Reject unsupported descriptors, non-empty destinations, and symbolic-link destination paths before synthetic fixture materialization.
+- Verify generated repositories against recorded commit, tree, ancestry, cleanliness, and specification identities, and exercise the strict matrix-report-to-projection artifact chain.
+- Exclude absolute destinations, usernames, environment values, and raw Git output from public fixture identities while retaining explicit residual trust boundaries.
 - Add versioned DW-001 scenario-manifest and result-record contracts for pre-execution ground truth and post-execution evidence.
 - Recompute method ground truth from ordered state applicability and expected outcomes instead of trusting stored labels.
 - Bind result records explicitly to the supplied scenario manifest and DW-001 projection, including scenario, partition, Git endpoints, observer arm, applicability, source digests, decisions, concordance, and denominator membership.
 - Add development and committed-holdout partition locks, public-safe provenance fields, reviewer independence disclosures, exclusions, protocol deviations, and explicit cost missingness.
 - Prevent partition relabeling, denominator drift, unapproved deviations, exclusion-with-eligibility, wrong manifest/projection links, and non-finite cost values from being hidden by recomputed unkeyed digests.
+- Reject results-visible applied deviations that attempt to retain confirmatory eligibility, and preflight malformed source artifacts before cross-artifact dereferencing.
 - Add strict JSON Schemas for scenario manifests and result records while retaining the Python semantic verifier as authoritative for relational and cross-artifact invariants.
 - Document the study-contract integrity, privacy, authentication, protocol-freeze, and publication boundaries without authorizing a development pilot or held-out execution.
 - Add deterministic DW-001 projections for nested final-state, fail-to-pass, regression-preservation, and four-state method predicates from one integrity-verified matrix report.
