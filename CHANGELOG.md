@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add the fixed `wrong-reason-unrelated-assertion` DW-001 family as an oracle-relevance negative control with identical scenario identity and source/test mechanism across exit-code and typed-receipt arms.
+- Prove directly that the claim-facing viewer assertion passes on both base and candidate implementations while a separate collateral `version_label == "v2"` assertion is the sole source of `BC = fail`.
+- Demonstrate one controlled limitation where `O0_EXIT_CODE` records `test_failure_untyped`, `O1_TYPED_RECEIPT` records a genuine `test_failure` with assertion failures and zero errors, and both observers still yield a complete accepted `M0`–`M3` witness.
+- Keep outcome semantics and oracle relevance as separate layers: typed assertion failure does not identify which assertion witnessed the declared claim or establish oracle adequacy.
+- Extend the pre-freeze fixture descriptor, identity, and binding family enums without rewriting existing artifacts; exact verifier and schema commits remain required until protocol freeze.
+- Exercise the unrelated-assertion control through descriptor, identity, materialized repository, manifest, fixture-manifest binding, strict report, projection, editable install, and installed wheel.
 - Add the fixed `wrong-reason-base-import-failure` DW-001 family as a paired observer probe with identical source/test mechanism and scenario identity across exit-code and typed-receipt arms.
 - Demonstrate one controlled case where `exit-code-v1` treats a pre-assertion import error as semantic `fail`, producing a complete accepted `M0`–`M3` witness, while `outcome-receipt-v1` preserves generic `test_error` evidence and makes `M1`–`M3` indeterminate.
 - Keep runtime and ground-truth layers explicit: receipt v1 reports generic `test_error`; `import_error` is fixed pre-execution ground truth for the exact owned-synthetic bytes and is not inferred from the receipt.
@@ -14,7 +20,7 @@
 - Reject mismatched commits, paths, observer arms, commands, state semantics, method decisions, family labels, malformed objects, private paths, and recomputed-digest relation substitutions.
 - Bind fixture identity specification SHA-256 to the exact descriptor-derived specification bytes instead of accepting a self-consistent substituted digest.
 - Exercise fixture binding construction and verification from editable and installed-wheel packages on Python 3.11–3.14.
-- Add a versioned DW-001 scenario taxonomy that separates four implemented deterministic mechanism probes from required but unsupported future families.
+- Add a versioned DW-001 scenario taxonomy that separates five implemented deterministic mechanism probes from required but unsupported future families.
 - Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
 - Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
 - Require equivalent descriptors to reproduce identical base/head commits and trees across clean directories under the supported Git object model.
