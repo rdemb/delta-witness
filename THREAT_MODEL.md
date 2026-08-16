@@ -2,7 +2,7 @@
 
 ## Protected claims
 
-DeltaWitness currently supports three narrow classes of statement.
+DeltaWitness currently supports four narrow classes of statement.
 
 ### Canonical change witness
 
@@ -18,7 +18,11 @@ When a typed observer is enabled, the statement is further bounded by the semant
 
 > Given one integrity-verified schema `0.3` matrix report, one homogeneous observer arm, a scenario identifier, and an independently declared applicability annotation, the projection records deterministic decisions for the nested `M0_FINAL`, `M1_F2P`, `M2_F2P_P2P`, and `M3_FOUR_STATE` predicates without exposing undeclared state observations to weaker methods.
 
-None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, empirical superiority, or authorization to deploy.
+### DW-001 study contracts
+
+> Given one pre-execution scenario manifest, one verified DW-001 projection, and one post-execution result record, the contract verifiers recompute ground-truth method labels, partition and review eligibility, exclusions, deviations, cost missingness, method outcomes, denominator membership, and explicit manifest–projection–result bindings.
+
+None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, empirical superiority, scientific novelty, or authorization to deploy or execute a held-out study.
 
 ## Assets
 
@@ -32,11 +36,17 @@ The current design aims to protect:
 - deterministic path ordering and coalition identities;
 - endpoint consistency between canonical and influence analyses;
 - exactness of released coalition metrics;
-- integrity and semantic consistency of matrix, influence, and DW-001 projection artifacts;
+- integrity and semantic consistency of matrix, influence, projection, scenario-manifest, and result-record artifacts;
 - hidden-state isolation between nested DW-001 methods;
-- homogeneous observer-arm separation in DW-001 projections;
-- explicit separation between independently declared non-applicability and observed execution failure;
-- source-report identities recorded by each projection;
+- homogeneous observer-arm separation in DW-001 projections and results;
+- explicit separation between pre-execution non-applicability and observed execution failure;
+- source-report identities recorded by projections and results;
+- pre-execution ground truth from post-execution evidence;
+- development and committed-holdout partition declarations;
+- public-safe ownership, licensing, and authorization provenance;
+- reviewer identity, independence disclosure, decision, and rationale;
+- exclusion and deviation records from silent denominator removal;
+- exact denominator membership and missing-cost semantics;
 - host environment variables from accidental inheritance;
 - raw command output from accidental publication by default;
 - separation between consecutive claims and coalitions.
@@ -66,14 +76,23 @@ The model includes:
 - background processes or persistent external effects that survive worktree resets;
 - one claim or coalition contaminating a later execution through generated files or shared services;
 - command output containing credentials or private data;
-- tampering with generated reports, attribution metrics, or projected method decisions;
-- recomputing an unkeyed projection digest after changing applicability, a claim decision, a method decision, or a shared state slice;
+- tampering with generated reports, attribution metrics, projected method decisions, scenario ground truth, or result records;
+- recomputing an unkeyed digest after changing applicability, partition, review status, method labels, exclusions, deviations, cost data, or denominator membership;
 - leaking a hidden matrix state into a weaker projected method;
 - mixing exit-code and typed-receipt observers inside one projected comparison arm;
 - labeling an execution error as `not_applicable` after observing the result;
-- replacing both a source report and its projection while recomputing all unkeyed digests;
-- misuse of Shapley, Banzhaf, interaction, or projected baseline decisions as proof of correctness, blame, or business value;
-- sensitive command arguments, repository paths, scenario identifiers, applicability reasons, or low-entropy output being exposed through an artifact;
+- relabeling a holdout scenario as development or changing holdout membership after unblinding;
+- constructing a holdout manifest with a digest that was not externally committed before execution;
+- omitting or falsifying ownership, license, or authorization provenance;
+- approving ground truth without a reviewer independent of the implementation;
+- changing stored method ground truth without changing its constituent state labels;
+- linking a result to the wrong manifest, projection, matrix report, or witness digest;
+- excluding an unfavorable result while leaving it eligible for the primary denominator;
+- applying an unapproved protocol deviation or preserving confirmatory eligibility after an exploratory-only deviation;
+- encoding missing execution or review costs as zero;
+- replacing the complete source report, projection, manifest, result, and expected digest set;
+- misuse of Shapley, Banzhaf, interaction, projected baseline decisions, or study-contract concordance as proof of correctness, blame, or business value;
+- sensitive command arguments, repository paths, reviewer identifiers, authorization references, scenario labels, or low-entropy output being exposed through an artifact;
 - unrecorded toolchain, dependency, operating-system, or external-service drift;
 - malicious repository content executed with the operator's privileges.
 
@@ -138,17 +157,36 @@ The model includes:
 43. The verifier independently recomputes claim decisions, method decisions, reason codes, contradicted states, indeterminate states, and applicability partitions before accepting the projection digest.
 44. A state shared by multiple nested methods must have an identical serialized observation in every method that exposes it.
 45. `projection_sha256` covers the complete projection with its own field normalized to `null`.
-46. A standalone projection cannot prove correspondence to source-report bytes; the retained source report must be strict-decoded, verified separately, and compared with the projection's recorded source identity.
+46. A standalone projection cannot establish correspondence to source-report bytes; the retained source report must be strict-decoded, verified separately, and compared with the projection's recorded source identity.
+
+### DW-001 study contracts
+
+47. Scenario manifests and result records use exact root and nested field sets with deterministic method and state ordering.
+48. A scenario manifest is sealed only after its semantic invariants pass.
+49. Development manifests require an uncommitted development partition lock; holdout manifests require a 64-character commitment digest and `dw001-holdout-index-v1` scope.
+50. The manifest verifier recomputes provenance conditions, distinct Git endpoints, disjoint prefix-free paths, observer IDs, disjoint exit classes, state applicability, expected observations, and failure-cause consistency.
+51. Stored method ground-truth labels and reason codes are recomputed from ordered state ground truth and are never trusted as free-form labels.
+52. An approved manifest requires an approving reviewer independent of both the scenario author and the implementation; a rejection takes precedence.
+53. Manifest-level denominator eligibility is recomputed from holdout partition, approved review, and method applicability.
+54. A result record is sealed only after its semantic invariants pass.
+55. Included results carry no exclusion metadata; excluded results require a code, reason, and decision reference.
+56. Applied deviations require approval references. Rejected deviations carry no approval or confirmatory impact. Exploratory-only and excluded deviations remove primary-denominator eligibility.
+57. Expected and observed four-way decisions, reason codes, concordance, denominator eligibility, and denominator reason codes are recomputed before accepting the result digest.
+58. Measured costs require finite nonnegative values. `not_run` and `unavailable` require null quantitative values and an explicit missing reason.
+59. Cross-artifact verification independently validates the manifest, projection, and result and then compares scenario, partition, Git endpoints, observer arm, applicability, method decisions, concordance, source digests, and denominator membership.
+60. `manifest_sha256` and `result_sha256` cover their complete artifacts with their own fields normalized to `null`.
+61. The schemas define structural interoperability; the Python verifier remains authoritative for relational and cross-artifact invariants.
+62. A scenario commitment recorded inside a manifest does not establish that the commitment predates execution; externally timestamped immutable recording remains required before a holdout.
 
 ### Execution and publication
 
-47. Commands execute without a shell.
-48. The full host environment is not inherited.
-49. Raw output is excluded unless explicitly requested.
-50. Absolute repository and specification paths are excluded from reports.
-51. Default reports are stored in private Git metadata rather than the working tree.
-52. Ambiguous configuration and harness errors stop the analysis.
-53. Semantic and complete-artifact digests are independently verifiable within their documented boundaries.
+63. Commands execute without a shell.
+64. The full host environment is not inherited.
+65. Raw output is excluded unless explicitly requested.
+66. Absolute repository and specification paths are excluded from reports.
+67. Default reports are stored in private Git metadata rather than the working tree.
+68. Ambiguous configuration and harness errors stop the analysis.
+69. Semantic and complete-artifact digests are independently verifiable within their documented boundaries.
 
 ## Residual risks
 
@@ -179,13 +217,13 @@ Repository-local filters and generated artifacts can also create worktree conten
 
 ### Changed-link rejection is narrow
 
-Rejecting changed symbolic-link entries prevents overlays across modified link boundaries. It does not prove that every unchanged path reachable by a command is a regular file or repository-contained, and it does not prevent commands from following existing links elsewhere on the filesystem.
+Rejecting changed symbolic-link entries prevents overlays across modified link boundaries. It does not establish that every unchanged path reachable by a command is a regular file or repository-contained, and it does not prevent commands from following existing links elsewhere on the filesystem.
 
 ### Typed receipts are cooperating-producer evidence
 
 `exit-code-v1` remains coarse and may confuse assertion failure with other failure classes.
 
-`outcome-receipt-v1` improves semantic precision for a cooperating adapter, but the binding is visible and the receipt is unsigned. It prevents accidental reuse and detects malformed or contradictory evidence; it does not authenticate the producer, establish adapter integrity, or prove oracle relevance.
+`outcome-receipt-v1` improves semantic precision for a cooperating adapter, but the binding is visible and the receipt is unsigned. It prevents accidental reuse and detects malformed or contradictory evidence; it does not authenticate the producer, establish adapter integrity, or establish oracle relevance.
 
 The built-in `unittest` producer executes inside the tested Python environment and can be influenced by import resolution or malicious repository code.
 
@@ -195,9 +233,9 @@ A path can contain multiple semantic changes, and one semantic change can span m
 
 The current materializer additionally refuses file-to-directory and directory-to-file transitions when Git reports both an ancestor and descendant changed path. Supporting those transitions would require a different intervention-unit model or explicit grouping semantics; silently treating both paths as independent would make coalition membership diverge from the materialized tree.
 
-A zero influence value means only that a path did not change the declared witness across the recorded coalitions. It does not prove that the path is unnecessary in production or irrelevant to untested behavior.
+A zero influence value means only that a path did not change the declared witness across the recorded coalitions. It does not establish that the path is unnecessary in production or irrelevant to untested behavior.
 
-A high value means only that the path changes the witness frequently or necessarily under the chosen units. It does not prove correctness, desirability, severity, ownership, or blame.
+A high value means only that the path changes the witness frequently or necessarily under the chosen units. It does not establish correctness, desirability, severity, ownership, or blame.
 
 ### Invalid hybrid states
 
@@ -213,13 +251,29 @@ Execution-sensitive configuration should be classified as code. Classification p
 
 ### DW-001 projections are controlled ablations, not source attestations
 
-A projection intentionally copies only the state slices needed by each nested method. Its semantic verifier can prove internal consistency of the serialized projection, but it cannot reconstruct omitted source-report fields or prove that the recorded source digests correspond to retained source bytes.
+A projection intentionally copies only the state slices needed by each nested method. Its semantic verifier can establish internal consistency of the serialized projection, but it cannot reconstruct omitted source-report fields or establish that the recorded source digests correspond to retained source bytes.
 
 The source matrix report and projection must therefore be verified separately and linked through a trusted comparison of their recorded digests. An attacker able to replace both artifacts can recompute all current unkeyed digests.
 
-Scenario identifiers and non-applicability reasons also require a separately governed manifest. A projection verifier cannot determine whether ground truth was frozen independently, relabeled after observing results, or authorized for use in a held-out study.
+Scenario identifiers and non-applicability reasons require a separately governed manifest. A projection verifier cannot determine whether ground truth was fixed independently, relabeled after observing results, or authorized for use in a held-out study.
 
-The current protocol is a development-pilot draft. Projection conformance does not authorize held-out execution or establish empirical effectiveness.
+### Study contracts are not preregistration or authentication
+
+The scenario-manifest verifier can establish internal consistency of the recorded ground truth, partition lock, provenance fields, and reviewer declarations. It cannot establish that:
+
+- the ground truth was authored before execution;
+- the reviewer is the claimed person;
+- the reviewer was organizationally independent;
+- the license or authorization reference is genuine or sufficient;
+- the holdout commitment was publicly recorded before unblinding;
+- an omitted scenario never existed;
+- the complete holdout index matches a privately retained corpus.
+
+The result verifier and cross-artifact verifier can identify inconsistent links among supplied artifacts. They cannot detect coordinated replacement of the complete artifact chain and all expected unkeyed digests.
+
+A development or holdout executor can still violate an external protocol rule without recording a deviation. Detection depends on execution logs, independent review, and immutable workflow evidence outside these artifacts.
+
+The current protocol remains a development-pilot draft. Contract conformance does not authorize pilot or holdout execution and does not establish empirical effectiveness.
 
 ### Nondeterminism
 
@@ -233,15 +287,17 @@ At eight code paths and one claim, influence analysis can invoke 512 coalition c
 
 The current implementation has per-command timeouts but does not impose complete CPU, memory, process-count, storage, or network limits.
 
-### Report and projection integrity are not authentication
+### Artifact integrity is not authentication
 
-`witness_sha256`, `influence_sha256`, `report_sha256`, and `projection_sha256` are unkeyed. They detect modification only when compared with separately trusted values. An attacker who can replace an artifact can recompute its digests.
+`witness_sha256`, `influence_sha256`, `report_sha256`, `projection_sha256`, `manifest_sha256`, and `result_sha256` are unkeyed. They detect modification only when compared with separately trusted values. An attacker who can replace an artifact can recompute its digests.
 
-Signing, DSSE, in-toto statements, Sigstore, environment provenance, and producer identity remain future layers.
+Signing, DSSE, in-toto statements, Sigstore, immutable timestamping, environment provenance, and producer identity remain future layers.
 
 ### Publication metadata can still be sensitive
 
-Reports and projections can record declared commands, changed paths, claim descriptions, Git object IDs, observer metadata, selected path coalitions, scenario identifiers, applicability reasons, output digests, and aggregate counts. Command arguments and scenario metadata must not contain secrets. Output and receipt digests can reveal equality and can be brute-forced when the underlying value has low entropy.
+Reports, projections, manifests, and results can record declared commands, changed paths, claim descriptions, Git object IDs, observer metadata, scenario identifiers, applicability reasons, reviewer identifiers and rationales, license or authorization references, exclusions, deviations, output digests, aggregate counts, and cost data.
+
+Command arguments, reviewer records, authorization references, and scenario metadata must not contain secrets or private infrastructure details. Output and receipt digests can reveal equality and can be brute-forced when the underlying value has low entropy.
 
 Every exported artifact requires human review.
 
@@ -253,8 +309,11 @@ Every exported artifact requires human review.
 - Classify every execution-sensitive manifest, configuration file, generated-code input, and build script as code.
 - Review endpoint anchors and every indeterminate coalition before interpreting influence.
 - Treat exact influence as exact enumeration over declared path units, not proof of full causality.
-- Strict-decode and verify the source matrix report and DW-001 projection separately; compare the retained source report digest with the projection's recorded source identity.
-- Treat scenario applicability as externally governed ground truth, not a value inferred from a failed command.
-- Do not execute a DW-001 holdout while the protocol is marked draft or before the frozen commitment procedure is complete.
-- Review every report and projection before publication, especially artifacts generated with `--include-output` or containing non-public scenario metadata.
-- Never interpret `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, or a projected `accept` decision as proof that a patch is correct, secure, complete, minimal, empirically superior, production-ready, or authorized for deployment.
+- Strict-decode and verify the source matrix report, projection, scenario manifest, and result separately; then verify explicit cross-artifact bindings.
+- Treat scenario applicability and expected outcomes as pre-execution ground truth, not values inferred from failed commands.
+- Independently review license and authorization references before using external material.
+- Do not interpret a manifest's internal commitment field as proof of a timely holdout commitment; record the complete commitment externally before execution.
+- Preserve excluded results and deviations rather than deleting them from the evidence chain.
+- Do not execute a DW-001 development pilot or holdout while the protocol is marked draft or before the corresponding authorization and freeze gates are complete.
+- Review every report, projection, manifest, and result before publication, especially artifacts containing non-public scenario or reviewer metadata.
+- Never interpret `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, a projected `accept`, or a concordant result as proof that a patch is correct, secure, complete, minimal, empirically superior, production-ready, or authorized for deployment.
