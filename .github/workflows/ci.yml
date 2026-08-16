@@ -48,10 +48,12 @@ jobs:
           python -c "from deltawitness.dw001_scenarios import compute_fixture_specification_sha256, materialize_synthetic_fixture, verify_fixture_identity_document"
           python -c "from deltawitness.dw001_fixture_binding import build_fixture_manifest_binding, compute_fixture_manifest_binding_sha256, verify_fixture_manifest_binding_document"
           python -c "from deltawitness.claim_witness import build_claim_witness_declaration, run_claim_witness_localization, verify_claim_witness_localization_document"
+          python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
           python scripts/smoke_dw001_unrelated_assertion.py
           python scripts/smoke_claim_witness_localization.py
+          python scripts/smoke_dw001_development_pilot_plan.py
 
       - name: Validate public tree
         run: python scripts/validate_public_tree.py
@@ -61,6 +63,10 @@ jobs:
 
       - name: Run unit and integration tests
         run: python -m unittest discover -s tests -v
+
+      - name: Render canonical development pilot archive
+        if: matrix.python-version == '3.11'
+        run: python scripts/render_dw001_development_pilot_archive.py --gzip-base64-stdout
 
       - name: Run end-to-end demo
         shell: bash
@@ -94,7 +100,9 @@ jobs:
           python -c "from deltawitness.dw001_scenarios import compute_fixture_specification_sha256, materialize_synthetic_fixture, verify_fixture_identity_document"
           python -c "from deltawitness.dw001_fixture_binding import build_fixture_manifest_binding, compute_fixture_manifest_binding_sha256, verify_fixture_manifest_binding_document"
           python -c "from deltawitness.claim_witness import build_claim_witness_declaration, run_claim_witness_localization, verify_claim_witness_localization_document"
+          python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
           python scripts/smoke_dw001_unrelated_assertion.py
           python scripts/smoke_claim_witness_localization.py
+          python scripts/smoke_dw001_development_pilot_plan.py
