@@ -59,7 +59,7 @@ def _state_observation(state_name: str, outcome: str, observer: str) -> dict[str
         receipt_counts: dict[str, int] | None = {
             "tests_run": 1,
             "passed": 1 if outcome == "pass" else 0,
-            "failed": 1 if outcome == "fail" else 0,
+            "failures": 1 if outcome == "fail" else 0,
             "errors": 0,
             "skipped": 0,
             "expected_failures": 0,
@@ -210,6 +210,23 @@ class DW001ProjectionTests(unittest.TestCase):
         valid, errors = verify_projection_document(projection)
         self.assertTrue(valid, errors)
 
+    def test_typed_receipt_arm_is_projected_without_observer_confound(self) -> None:
+        projection = project_baselines(
+            _report(observers=("outcome-receipt-v1",)),
+            scenario_id="typed-regression-001",
+        )
+
+        self.assertEqual(projection["source"]["observer"], "outcome-receipt-v1")
+        self.assertEqual(projection["source"]["observer_id"], "O1_TYPED_RECEIPT")
+        self.assertTrue(
+            all(
+                method["combined_method_id"].endswith("__O1_TYPED_RECEIPT")
+                for method in projection["methods"]
+            )
+        )
+        valid, errors = verify_projection_document(projection)
+        self.assertTrue(valid, errors)
+
     def test_non_discriminating_candidate_test_is_missed_only_by_final_state(self) -> None:
         report = _report()
         _set_outcome(report, "base_candidate", "pass")
@@ -261,19 +278,20 @@ class DW001ProjectionTests(unittest.TestCase):
         report = _report()
         _set_outcome(report, "base_base", "error")
 
-        methods = _method_map(
-            project_baselines(
-                report,
-                scenario_id="invalid-hybrid-001",
-                non_applicable_states={"base_base": "The frozen fixture declares BB semantically invalid."},
-            )
+        projection = project_baselines(
+            report,
+            scenario_id="invalid-hybrid-001",
+            non_applicable_states={"base_base": "The frozen fixture declares BB semantically invalid."},
         )
+        methods = _method_map(projection)
 
         self.assertEqual(methods["M0_FINAL"]["decision"], "accept")
         self.assertEqual(methods["M1_F2P"]["decision"], "accept")
         self.assertEqual(methods["M2_F2P_P2P"]["decision"], "accept")
         self.assertEqual(methods["M3_FOUR_STATE"]["decision"], "not_applicable")
         self.assertEqual(methods["M3_FOUR_STATE"]["claims"], [])
+        valid, errors = verify_projection_document(projection)
+        self.assertTrue(valid, errors)
 
     def test_method_payload_contains_only_its_declared_states(self) -> None:
         methods = _method_map(project_baselines(_report(), scenario_id="visibility-001"))
