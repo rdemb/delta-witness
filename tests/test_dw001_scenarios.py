@@ -48,6 +48,30 @@ def _method_decisions(projection: dict[str, object]) -> dict[str, tuple[str, str
     }
 
 
+def _execute_fixture_pipeline(
+    repo: Path,
+    descriptor: dict[str, object],
+    identity: dict[str, object],
+):
+    report = verify_repository(
+        repo,
+        identity["git"]["base_commit_sha"],
+        identity["git"]["head_commit_sha"],
+        load_config(repo / identity["specification"]["path"]),
+    )
+    report_path = repo / ".git" / "deltawitness" / "generator-report.json"
+    write_report(report, report_path)
+    decoded_report = load_report(report_path)
+    report_valid, report_errors = verify_report_document(decoded_report)
+    if not report_valid:
+        raise AssertionError(report_errors)
+    projection = project_baselines(
+        decoded_report,
+        scenario_id=descriptor["scenario_id"],
+    )
+    return report, projection
+
+
 class DW001ScenarioGeneratorTests(unittest.TestCase):
     def test_same_descriptor_reproduces_exact_git_identity_across_directories(self) -> None:
         descriptor = build_fixture_descriptor(
@@ -106,6 +130,23 @@ class DW001ScenarioGeneratorTests(unittest.TestCase):
                 family_id="unknown-family",
             )
 
+    def test_unknown_generator_or_template_version_is_rejected_before_write(self) -> None:
+        descriptor = build_fixture_descriptor(
+            scenario_id="generator-version-001",
+            family_id="valid-discriminating-regression",
+        )
+        for component in ("generator", "template"):
+            with self.subTest(component=component), tempfile.TemporaryDirectory() as directory:
+                tampered = deepcopy(descriptor)
+                tampered[component]["version"] = "999"
+                tampered["descriptor_sha256"] = compute_fixture_descriptor_sha256(tampered)
+                destination = Path(directory)
+
+                with self.assertRaisesRegex(DW001ScenarioError, "unsupported"):
+                    materialize_synthetic_fixture(tampered, destination)
+
+                self.assertEqual(list(destination.iterdir()), [])
+
     def test_nonempty_destination_is_rejected_without_deleting_user_file(self) -> None:
         descriptor = build_fixture_descriptor(
             scenario_id="generator-nonempty-001",
@@ -140,6 +181,58 @@ class DW001ScenarioGeneratorTests(unittest.TestCase):
             errors,
         )
 
+    def test_materialized_verifier_detects_specification_tampering(self) -> None:
+        descriptor = build_fixture_descriptor(
+            scenario_id="generator-spec-tamper-001",
+            family_id="valid-discriminating-regression",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            identity = materialize_synthetic_fixture(descriptor, repo)
+            (repo / identity["specification"]["path"]).write_text(
+                "# tampered after identity emission\n",
+                encoding="utf-8",
+            )
+
+            valid, errors = verify_materialized_fixture(identity, descriptor, repo)
+
+        self.assertFalse(valid)
+        self.assertTrue(
+            any("specification digest" in error for error in errors),
+            errors,
+        )
+
+    def test_exit_code_observer_arm_matches_descriptor_semantics(self) -> None:
+        descriptor = build_fixture_descriptor(
+            scenario_id="generator-exit-code-001",
+            family_id="valid-discriminating-regression",
+            observer="exit-code-v1",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            identity = materialize_synthetic_fixture(descriptor, repo)
+            report, projection = _execute_fixture_pipeline(repo, descriptor, identity)
+
+        expected_states = {
+            state["state"]: state["expected_observed"]
+            for state in descriptor["expected_states"]
+        }
+        self.assertEqual(
+            {state.state: state.observed for state in report.claims[0].states},
+            expected_states,
+        )
+        self.assertEqual(
+            descriptor["expected_states"][1]["failure_cause"],
+            "test_failure_untyped",
+        )
+        self.assertEqual(
+            _method_decisions(projection),
+            {
+                method["method_id"]: (method["decision"], method["reason_code"])
+                for method in descriptor["expected_methods"]
+            },
+        )
+
     def test_generated_repositories_match_recorded_identity_and_expected_semantics(self) -> None:
         for family_id in SUPPORTED_FAMILIES:
             with self.subTest(family=family_id):
@@ -163,22 +256,7 @@ class DW001ScenarioGeneratorTests(unittest.TestCase):
                     self.assertTrue(materialized_valid, materialized_errors)
                     self.assertEqual(_git(repo, "status", "--porcelain=v1"), "")
                     self.assertEqual(_git(repo, "rev-parse", "HEAD"), identity["git"]["head_commit_sha"])
-
-                    report = verify_repository(
-                        repo,
-                        identity["git"]["base_commit_sha"],
-                        identity["git"]["head_commit_sha"],
-                        load_config(repo / identity["specification"]["path"]),
-                    )
-                    report_path = repo / ".git" / "deltawitness" / "generator-report.json"
-                    write_report(report, report_path)
-                    decoded_report = load_report(report_path)
-                    report_valid, report_errors = verify_report_document(decoded_report)
-                    self.assertTrue(report_valid, report_errors)
-                    projection = project_baselines(
-                        decoded_report,
-                        scenario_id=descriptor["scenario_id"],
-                    )
+                    report, projection = _execute_fixture_pipeline(repo, descriptor, identity)
 
                 observed_states = {
                     state.state: state.observed
