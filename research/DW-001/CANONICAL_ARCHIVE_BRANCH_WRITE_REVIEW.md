@@ -50,6 +50,16 @@ archive_sha256     = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fc
 semantic_sha256    = bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
 ```
 
+Final pre-merge validation before this checklist closure:
+
+```text
+workflow run       = 31955828629
+run number         = 212
+validated head     = ab5f3cb44dae83f0b213e503c14fff0c8413d2b3
+Python 3.11 tests  = 223 / 223
+Python matrix      = 3.11, 3.12, 3.13, 3.14 success
+```
+
 ## Threat-model amendment
 
 ### Temporary threat
@@ -66,6 +76,7 @@ The GitHub-hosted runner received a token able to write repository contents on t
 6. **No main write:** the push target was the exact PR head ref.
 7. **No persistence:** the write job and `contents: write` were removed after the generated commit.
 8. **Audit trail:** workflow, generated commit, archive digest, semantic digest, and exact changed paths are retained.
+9. **Exact retained file set:** final bundle and archive verification derives all 84 allowed files from the sealed plan and rejects missing, duplicate, unsafe, linked, special, or unexpected JSON and non-JSON entries.
 
 ## Residual risks
 
@@ -96,8 +107,8 @@ The committed archive contains only project-owned synthetic evidence. Archive an
 - [x] abandoned segmented-transport manifest removed;
 - [x] committed-archive regression and complete packaged smoke added;
 - [x] temporary write job and `contents: write` removed;
-- [ ] final PR CI passes on Python 3.11–3.14 after all documentation updates;
-- [ ] final PR diff and unresolved review threads checked before merge.
+- [x] final PR CI passed on Python 3.11–3.14 after all substantive documentation updates;
+- [x] final PR diff, changed-file list, comments, reviews, and unresolved review threads were checked before merge.
 
 ## Current permission state
 
