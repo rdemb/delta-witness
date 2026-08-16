@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add `deltawitness.dw001-claim-scoped-mutation-plan.v1` as a deterministic pre-execution contract that freezes one fixed Python source scope, one exact AST return-expression target, three outcome-blind generic mutation operators, paired strong/weak selector profiles, and future outcome semantics before any mutation test result is observed.
+- Add `deltawitness.dw001-claim-scoped-mutant-catalog.v1` with exact target and mutant identities plus explicit `generated`, `duplicate`, `not_applicable`, and `invalid` records; duplicate, unsupported, and compile-invalid mutations remain visible instead of being silently dropped or counted.
+- Bind semantic AST identities through a versioned canonical representation that omits empty optional fields and source locations while retaining source-byte and exact target-position identities, and pin the resulting plan, target, mutant, and catalog digests across Python 3.11–3.14.
+- Keep the previously observed `nonempty-role-boolean-v1` weak-proxy mutant as a separately labeled historical challenge control, excluded from the generic operator set and from any future operator-generalization claim.
+- Freeze paired `strong-authorization-oracle-v1` and `weak-boolean-proxy-v1` profiles over the same candidate source and generic mutant catalog while retaining complete per-mutant tables and prohibiting execution authorization, holdout selection, headline scores, universal thresholds, merge blockers, and primary-denominator eligibility.
+- Exercise the committed mutation plan and catalog from editable and force-reinstalled wheel packages on Python 3.11–3.14 without executing mutants, tests against mutants, external repositories, or third-party mutation engines.
 - Add the fixed `weak-proxy-oracle` DW-001 family as a development-only oracle-strength negative control with one frozen task prompt, candidate, declared selector, claim-violating mutant, and hidden development claim check.
 - Demonstrate one controlled case where both observer arms produce a canonical `pass / fail / pass / pass` matrix, all `M0`–`M3` methods accept, and exact declared-selector localization is `supported` and `discriminating`, while the fixed mutant still passes the declared selector.
 - Execute five shell-free typed mutation controls proving that the selector fails on base, passes on candidate and mutant, and that a separately fixed viewer-denial check passes on candidate and fails on mutant.
