@@ -19,7 +19,8 @@ from deltawitness.dw001_scenarios import (
     verify_fixture_identity_document,
     verify_materialized_fixture,
 )
-from deltawitness.matrix import report_to_dict, verify_repository
+from deltawitness.matrix import verify_repository, write_report
+from deltawitness.reporting import load_report, verify_report_document
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -169,8 +170,13 @@ class DW001ScenarioGeneratorTests(unittest.TestCase):
                         identity["git"]["head_commit_sha"],
                         load_config(repo / identity["specification"]["path"]),
                     )
+                    report_path = repo / ".git" / "deltawitness" / "generator-report.json"
+                    write_report(report, report_path)
+                    decoded_report = load_report(report_path)
+                    report_valid, report_errors = verify_report_document(decoded_report)
+                    self.assertTrue(report_valid, report_errors)
                     projection = project_baselines(
-                        report_to_dict(report),
+                        decoded_report,
                         scenario_id=descriptor["scenario_id"],
                     )
 
