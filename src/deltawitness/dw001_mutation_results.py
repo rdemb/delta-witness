@@ -5,10 +5,10 @@ mutants, historical challenge control, selector profiles, and reference checks
 frozen by PR #38 and issue #39. Duplicate, not-applicable, and invalid catalog
 records remain visible but are never executed.
 
-The result retains every typed selector observation and explicitly withholds a
-mutation score, universal threshold, merge blocker, holdout, and primary
-research denominator. It is an owned-synthetic calibration result, not a
-mutation-adequacy or ecological-effectiveness claim.
+Complete but unexpected observations are retained as negative results. Frozen
+expectations remain explicit and separate from observed evidence; concordance
+is derived rather than used as a validity condition. Malformed, contradictory,
+or relationally inconsistent evidence still fails closed.
 """
 
 from __future__ import annotations
@@ -62,10 +62,81 @@ _ROOT_FIELDS = {
     "candidate_baseline",
     "records",
     "summary",
+    "analysis",
     "policy",
     "cost",
     "semantic_sha256",
     "report_sha256",
+}
+_OBSERVATION_FIELDS = {
+    "implementation_id",
+    "profile_id",
+    "selector",
+    "source_sha256",
+    "test_sha256",
+    "command",
+    "expected_observed",
+    "observed",
+    "concordant",
+    "return_code",
+    "timed_out",
+    "duration_seconds",
+    "stdout_sha256",
+    "stderr_sha256",
+    "invocation_binding",
+    "receipt_sha256",
+    "receipt_outcome",
+    "receipt_producer",
+    "receipt_counts",
+    "observation_error",
+}
+_PROFILE_FIELDS = {
+    "profile_id",
+    "profile_role",
+    "selectors",
+    "expected_outcome",
+    "outcome",
+    "concordant",
+}
+_REFERENCE_FIELDS = {
+    "profile_id",
+    "selectors",
+    "expected_outcome",
+    "outcome",
+    "concordant",
+}
+_RECORD_FIELDS = {
+    "record_id",
+    "implementation_id",
+    "record_role",
+    "operator_id",
+    "mutant_id",
+    "catalog_status",
+    "source_sha256",
+    "source_ast_sha256",
+    "execution_status",
+    "counts_toward_generic_generalization",
+    "profiles",
+    "reference",
+    "concordant",
+    "cost",
+}
+_RECORD_COST_FIELDS = {
+    "status",
+    "command_count",
+    "selector_count",
+    "wall_clock_seconds",
+    "cpu_seconds",
+    "missing_reason",
+}
+_ROOT_COST_FIELDS = {
+    "status",
+    "implementation_count",
+    "command_count",
+    "selector_count",
+    "wall_clock_seconds",
+    "cpu_seconds",
+    "missing_reason",
 }
 
 _CALIBRATION_TESTS = """import sys
@@ -142,6 +213,62 @@ def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _finite_nonnegative(value: object, *, context: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise _error(context, "must be a finite nonnegative number")
+    numeric = float(value)
+    if not math.isfinite(numeric) or numeric < 0.0:
+        raise _error(context, "must be a finite nonnegative number")
+    return numeric
+
+
+def _exact_keys(
+    value: object,
+    expected: set[str],
+    *,
+    context: str,
+) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise _error(context, "must be an object")
+    actual = set(value)
+    if actual != expected:
+        raise _error(
+            context,
+            f"field mismatch; missing={sorted(expected - actual)}, "
+            f"extra={sorted(actual - expected)}",
+        )
+    return value
+
+
+def _strict_equal(expected: object, observed: object) -> bool:
+    if type(expected) is not type(observed):
+        return False
+    if isinstance(expected, dict):
+        return (
+            set(expected) == set(observed)
+            and all(_strict_equal(expected[key], observed[key]) for key in expected)
+        )
+    if isinstance(expected, list):
+        return (
+            len(expected) == len(observed)
+            and all(
+                _strict_equal(expected_item, observed_item)
+                for expected_item, observed_item in zip(
+                    expected, observed, strict=True
+                )
+            )
+        )
+    return expected == observed
+
+
 def _counts(observed: str) -> dict[str, int]:
     if observed == "pass":
         return {
@@ -177,19 +304,11 @@ def _receipt_outcome(observed: str) -> str:
     )
 
 
-def _test_bytes(selector: str) -> tuple[str, bytes, str]:
+def _test_bytes(selector: str) -> tuple[str, bytes]:
     if selector.startswith("test_access.AccessTests."):
-        return (
-            "test_access.py",
-            _CALIBRATION_TESTS.encode("utf-8"),
-            "calibration_profile",
-        )
+        return "test_access.py", _CALIBRATION_TESTS.encode("utf-8")
     if selector.startswith("test_hidden_claim.HiddenClaimTests."):
-        return (
-            "test_hidden_claim.py",
-            _REFERENCE_TESTS.encode("utf-8"),
-            "reference_claim",
-        )
+        return "test_hidden_claim.py", _REFERENCE_TESTS.encode("utf-8")
     raise _error("mutation result selector", f"unsupported selector {selector!r}")
 
 
@@ -235,7 +354,9 @@ def _expected_observation(
     source_sha256: str,
     observed: str,
 ) -> dict[str, Any]:
-    _, tests, _ = _test_bytes(selector)
+    """Build canonical complete pass/fail evidence for one selector."""
+
+    _, tests = _test_bytes(selector)
     test_sha256 = _sha256_bytes(tests)
     command = canonical_unittest_selector_command(selector)
     binding = _invocation_binding(
@@ -250,15 +371,14 @@ def _expected_observation(
     )
     receipt_outcome = _receipt_outcome(observed)
     counts = _counts(observed)
-    receipt_document = build_receipt_document(
-        binding=binding,
-        producer_name=_PRODUCER_NAME,
-        producer_version=__version__,
-        outcome=receipt_outcome,
-        counts=counts,
-    )
     receipt = validate_receipt_document(
-        receipt_document,
+        build_receipt_document(
+            binding=binding,
+            producer_name=_PRODUCER_NAME,
+            producer_version=__version__,
+            outcome=receipt_outcome,
+            counts=counts,
+        ),
         expected_binding=binding,
     )
     return {
@@ -268,7 +388,9 @@ def _expected_observation(
         "source_sha256": source_sha256,
         "test_sha256": test_sha256,
         "command": command,
+        "expected_observed": observed,
         "observed": observed,
+        "concordant": True,
         "return_code": 0 if observed == "pass" else 1,
         "timed_out": False,
         "duration_seconds": None,
@@ -287,14 +409,13 @@ def _expected_observation(
 
 
 def _classify_observation(observation: object) -> tuple[str, str | None]:
-    timed_out = observation.timed_out  # type: ignore[attr-defined]
-    if timed_out:
+    if bool(getattr(observation, "timed_out")):
         return "timeout", None
-    receipt_error = observation.receipt_error  # type: ignore[attr-defined]
+    receipt_error = getattr(observation, "receipt_error")
     if receipt_error is not None:
         return "error", str(receipt_error)
-    receipt_outcome = observation.receipt_outcome  # type: ignore[attr-defined]
-    return_code = observation.return_code  # type: ignore[attr-defined]
+    receipt_outcome = getattr(observation, "receipt_outcome")
+    return_code = getattr(observation, "return_code")
     if receipt_outcome == "passed" and return_code == 0:
         return "pass", None
     if receipt_outcome == "test_failure" and return_code == 1:
@@ -312,7 +433,9 @@ def _execute_observation(
     selector: str,
     source_sha256: str,
 ) -> dict[str, Any]:
-    _, tests, _ = _test_bytes(selector)
+    """Execute one exact selector through the existing typed receipt adapter."""
+
+    _, tests = _test_bytes(selector)
     test_sha256 = _sha256_bytes(tests)
     command = canonical_unittest_selector_command(selector)
     binding = _invocation_binding(
@@ -362,7 +485,11 @@ def _profile_outcome(observations: Sequence[str], *, baseline: bool) -> str:
     if any(item in {"error", "timeout"} for item in observations):
         return "indeterminate"
     if baseline:
-        return "baseline_passed" if all(item == "pass" for item in observations) else "baseline_failed"
+        return (
+            "baseline_passed"
+            if all(item == "pass" for item in observations)
+            else "baseline_failed"
+        )
     return "survived" if all(item == "pass" for item in observations) else "killed"
 
 
@@ -404,11 +531,14 @@ def _expected_profile(
         )
         for selector, observed in zip(selectors, expected, strict=True)
     ]
+    expected_outcome = _profile_outcome(expected, baseline=baseline)
     return {
         "profile_id": profile["profile_id"],
         "profile_role": profile["profile_role"],
         "selectors": observations,
-        "outcome": _profile_outcome(expected, baseline=baseline),
+        "expected_outcome": expected_outcome,
+        "outcome": expected_outcome,
+        "concordant": True,
     }
 
 
@@ -438,10 +568,13 @@ def _expected_reference(
         )
         for selector, observed in zip(selectors, expected, strict=True)
     ]
+    expected_outcome = _reference_outcome(expected)
     return {
         "profile_id": _REFERENCE_PROFILE_ID,
         "selectors": observations,
-        "outcome": _reference_outcome(expected),
+        "expected_outcome": expected_outcome,
+        "outcome": expected_outcome,
+        "concordant": True,
     }
 
 
@@ -501,6 +634,7 @@ def _expected_executed_record(
         ),
         "profiles": profiles,
         "reference": reference,
+        "concordant": True,
         "cost": {
             "status": "measured",
             "command_count": 5,
@@ -537,6 +671,7 @@ def _expected_generation_record(record: Mapping[str, object]) -> dict[str, Any]:
         "counts_toward_generic_generalization": False,
         "profiles": [],
         "reference": None,
+        "concordant": True,
         "cost": {
             "status": "not_executed",
             "command_count": 0,
@@ -548,10 +683,10 @@ def _expected_generation_record(record: Mapping[str, object]) -> dict[str, Any]:
     }
 
 
-def _expected_semantic_result(
+def _expected_templates(
     plan: Mapping[str, object],
     catalog: Mapping[str, object],
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     source = plan["source_scope"]
     if not isinstance(source, dict):
         raise _error("mutation result source scope", "must be an object")
@@ -575,8 +710,7 @@ def _expected_semantic_result(
     if not isinstance(catalog_records, list) or len(catalog_records) != 6:
         raise _error("mutation result catalog mutants", "must contain six records")
     for record in catalog_records:
-        status = record["status"]
-        if status == "generated":
+        if record["status"] == "generated":
             operator_id = str(record["operator_id"])
             expected = _EXPECTED_BY_OPERATOR.get(operator_id)
             if expected is None:
@@ -622,7 +756,153 @@ def _expected_semantic_result(
             baseline=False,
         )
     )
+    return candidate, records
 
+
+def _profile_for(record: Mapping[str, object], profile_id: str) -> Mapping[str, object]:
+    profiles = record.get("profiles")
+    if not isinstance(profiles, list):
+        raise _error("mutation result summary profiles", "must be a list")
+    matches = [profile for profile in profiles if profile.get("profile_id") == profile_id]
+    if len(matches) != 1 or not isinstance(matches[0], dict):
+        raise _error(
+            "mutation result summary profile",
+            f"expected one {profile_id!r} profile",
+        )
+    return matches[0]
+
+
+def _derive_summary(
+    candidate: Mapping[str, object],
+    records: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    generic = [record for record in records if record.get("record_role") == "generic_operator"]
+    historical = [
+        record
+        for record in records
+        if record.get("record_role") == "historical_challenge_control"
+    ]
+    generation = [
+        record for record in records if record.get("record_role") == "generation_control"
+    ]
+    candidate_reference = candidate.get("reference")
+    candidate_profiles = candidate.get("profiles")
+    candidate_valid = (
+        isinstance(candidate_profiles, list)
+        and all(
+            isinstance(profile, dict) and profile.get("outcome") == "baseline_passed"
+            for profile in candidate_profiles
+        )
+        and isinstance(candidate_reference, dict)
+        and candidate_reference.get("outcome") == "reference_passed"
+    )
+    return {
+        "candidate_baseline_valid": candidate_valid,
+        "catalog_records": 6,
+        "generic_mutants_executed": len(generic),
+        "historical_controls_executed": len(historical),
+        "generation_records_not_executed": len(generation),
+        "generic_strong_killed": sum(
+            _profile_for(record, _STRONG_PROFILE_ID).get("outcome") == "killed"
+            for record in generic
+        ),
+        "generic_strong_survived": sum(
+            _profile_for(record, _STRONG_PROFILE_ID).get("outcome") == "survived"
+            for record in generic
+        ),
+        "generic_strong_indeterminate": sum(
+            _profile_for(record, _STRONG_PROFILE_ID).get("outcome") == "indeterminate"
+            for record in generic
+        ),
+        "generic_weak_killed": sum(
+            _profile_for(record, _WEAK_PROFILE_ID).get("outcome") == "killed"
+            for record in generic
+        ),
+        "generic_weak_survived": sum(
+            _profile_for(record, _WEAK_PROFILE_ID).get("outcome") == "survived"
+            for record in generic
+        ),
+        "generic_weak_indeterminate": sum(
+            _profile_for(record, _WEAK_PROFILE_ID).get("outcome") == "indeterminate"
+            for record in generic
+        ),
+        "generic_claim_violations_observed": sum(
+            isinstance(record.get("reference"), dict)
+            and record["reference"].get("outcome") == "claim_violation_observed"
+            for record in generic
+        ),
+        "mutation_score": None,
+    }
+
+
+def _derive_analysis(
+    candidate: Mapping[str, object],
+    records: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    unexpected_observations = 0
+    unexpected_profiles = 0
+    unexpected_references = 0
+    unexpected_record_ids: list[str] = []
+    for record in [candidate, *records]:
+        profiles = record.get("profiles")
+        if isinstance(profiles, list):
+            for profile in profiles:
+                if not isinstance(profile, dict):
+                    continue
+                if profile.get("concordant") is not True:
+                    unexpected_profiles += 1
+                selectors = profile.get("selectors")
+                if isinstance(selectors, list):
+                    unexpected_observations += sum(
+                        isinstance(selector, dict)
+                        and selector.get("concordant") is not True
+                        for selector in selectors
+                    )
+        reference = record.get("reference")
+        if isinstance(reference, dict):
+            if reference.get("concordant") is not True:
+                unexpected_references += 1
+            selectors = reference.get("selectors")
+            if isinstance(selectors, list):
+                unexpected_observations += sum(
+                    isinstance(selector, dict)
+                    and selector.get("concordant") is not True
+                    for selector in selectors
+                )
+        if record.get("concordant") is not True:
+            unexpected_record_ids.append(str(record.get("record_id")))
+    return {
+        "status": "expected" if not unexpected_record_ids else "unexpected",
+        "candidate_baseline_concordant": candidate.get("concordant") is True,
+        "unexpected_observation_count": unexpected_observations,
+        "unexpected_profile_count": unexpected_profiles,
+        "unexpected_reference_count": unexpected_references,
+        "unexpected_record_ids": unexpected_record_ids,
+    }
+
+
+def _policy() -> dict[str, object]:
+    return {
+        "retain_complete_mutant_table": True,
+        "headline_score": None,
+        "universal_threshold": None,
+        "merge_blocker_authorized": False,
+        "ecological_inference_allowed": False,
+        "holdout_selected": False,
+        "primary_denominator_eligible": False,
+        "generic_operator_generalization_allowed": False,
+    }
+
+
+def _base_result(
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+    candidate: Mapping[str, object],
+    records: Sequence[Mapping[str, object]],
+) -> dict[str, Any]:
+    source = plan["source_scope"]
+    if not isinstance(source, dict):
+        raise _error("mutation result source", "must be an object")
     return {
         "schema_version": RESULT_SCHEMA_VERSION,
         "study_id": "DW-001",
@@ -638,33 +918,11 @@ def _expected_semantic_result(
             "source_ast_sha256": source["ast_sha256"],
             "target_id": catalog["target"]["target_id"],
         },
-        "candidate_baseline": candidate,
-        "records": records,
-        "summary": {
-            "candidate_baseline_valid": True,
-            "catalog_records": 6,
-            "generic_mutants_executed": 3,
-            "historical_controls_executed": 1,
-            "generation_records_not_executed": 3,
-            "generic_strong_killed": 3,
-            "generic_strong_survived": 0,
-            "generic_strong_indeterminate": 0,
-            "generic_weak_killed": 0,
-            "generic_weak_survived": 3,
-            "generic_weak_indeterminate": 0,
-            "generic_claim_violations_observed": 3,
-            "mutation_score": None,
-        },
-        "policy": {
-            "retain_complete_mutant_table": True,
-            "headline_score": None,
-            "universal_threshold": None,
-            "merge_blocker_authorized": False,
-            "ecological_inference_allowed": False,
-            "holdout_selected": False,
-            "primary_denominator_eligible": False,
-            "generic_operator_generalization_allowed": False,
-        },
+        "candidate_baseline": deepcopy(candidate),
+        "records": deepcopy(list(records)),
+        "summary": _derive_summary(candidate, records),
+        "analysis": _derive_analysis(candidate, records),
+        "policy": _policy(),
         "cost": {
             "status": "measured",
             "implementation_count": 5,
@@ -742,58 +1000,6 @@ def compute_mutation_result_report_sha256(document: dict[str, Any]) -> str:
     return sha256_document(normalized)
 
 
-def _differences(
-    expected: object,
-    observed: object,
-    *,
-    context: str,
-) -> list[str]:
-    errors: list[str] = []
-    if isinstance(expected, dict):
-        if not isinstance(observed, dict):
-            return [f"{context}: must be an object"]
-        expected_keys = set(expected)
-        observed_keys = set(observed)
-        if expected_keys != observed_keys:
-            errors.append(
-                f"{context}: field mismatch; missing={sorted(expected_keys - observed_keys)}, "
-                f"extra={sorted(observed_keys - expected_keys)}"
-            )
-        for key in sorted(expected_keys & observed_keys):
-            errors.extend(
-                _differences(
-                    expected[key],
-                    observed[key],
-                    context=f"{context}.{key}",
-                )
-            )
-        return errors
-    if isinstance(expected, list):
-        if not isinstance(observed, list):
-            return [f"{context}: must be a list"]
-        if len(expected) != len(observed):
-            errors.append(
-                f"{context}: length mismatch; expected {len(expected)}, "
-                f"observed {len(observed)}"
-            )
-        for index, (expected_item, observed_item) in enumerate(
-            zip(expected, observed, strict=False)
-        ):
-            errors.extend(
-                _differences(
-                    expected_item,
-                    observed_item,
-                    context=f"{context}[{index}]",
-                )
-            )
-        return errors
-    if observed != expected:
-        errors.append(
-            f"{context}: expected={expected!r}, observed={observed!r}"
-        )
-    return errors
-
-
 def _materialize_source_for_record(record: Mapping[str, object]) -> str:
     operator_id = str(record["operator_id"])
     status, source, ast_sha256, compile_valid, _ = _mutated_source(operator_id)
@@ -814,6 +1020,18 @@ def _materialize_source_for_record(record: Mapping[str, object]) -> str:
             "does not match frozen catalog",
         )
     return source
+
+
+def _enrich_observation(
+    raw: Mapping[str, object],
+    expected: Mapping[str, object],
+) -> dict[str, Any]:
+    observation = deepcopy(dict(raw))
+    observation["expected_observed"] = expected["expected_observed"]
+    observation["concordant"] = (
+        observation.get("observed") == expected["expected_observed"]
+    )
+    return observation
 
 
 def _execute_record(
@@ -851,20 +1069,22 @@ def _execute_record(
         actual_profiles: list[dict[str, Any]] = []
         for expected_profile in expected_record["profiles"]:
             actual_selectors = [
-                _execute_observation(
-                    root=root,
-                    plan_sha256=str(plan["plan_sha256"]),
-                    catalog_sha256=str(catalog["catalog_sha256"]),
-                    implementation_id=implementation_id,
-                    profile_id=str(expected_profile["profile_id"]),
-                    selector=str(expected_selector["selector"]),
-                    source_sha256=source_sha256,
+                _enrich_observation(
+                    _execute_observation(
+                        root=root,
+                        plan_sha256=str(plan["plan_sha256"]),
+                        catalog_sha256=str(catalog["catalog_sha256"]),
+                        implementation_id=implementation_id,
+                        profile_id=str(expected_profile["profile_id"]),
+                        selector=str(expected_selector["selector"]),
+                        source_sha256=source_sha256,
+                    ),
+                    expected_selector,
                 )
                 for expected_selector in expected_profile["selectors"]
             ]
-            observed = [item["observed"] for item in actual_selectors]
             outcome = _profile_outcome(
-                observed,
+                [item["observed"] for item in actual_selectors],
                 baseline=(expected_record["record_role"] == "candidate_baseline"),
             )
             actual_profiles.append(
@@ -872,42 +1092,58 @@ def _execute_record(
                     "profile_id": expected_profile["profile_id"],
                     "profile_role": expected_profile["profile_role"],
                     "selectors": actual_selectors,
+                    "expected_outcome": expected_profile["expected_outcome"],
                     "outcome": outcome,
+                    "concordant": outcome == expected_profile["expected_outcome"],
                 }
             )
 
         expected_reference = expected_record["reference"]
-        assert isinstance(expected_reference, dict)
+        if not isinstance(expected_reference, dict):
+            raise _error(
+                f"mutation result {implementation_id}.reference",
+                "must be an object for executed records",
+            )
         actual_reference_selectors = [
-            _execute_observation(
-                root=root,
-                plan_sha256=str(plan["plan_sha256"]),
-                catalog_sha256=str(catalog["catalog_sha256"]),
-                implementation_id=implementation_id,
-                profile_id=_REFERENCE_PROFILE_ID,
-                selector=str(expected_selector["selector"]),
-                source_sha256=source_sha256,
+            _enrich_observation(
+                _execute_observation(
+                    root=root,
+                    plan_sha256=str(plan["plan_sha256"]),
+                    catalog_sha256=str(catalog["catalog_sha256"]),
+                    implementation_id=implementation_id,
+                    profile_id=_REFERENCE_PROFILE_ID,
+                    selector=str(expected_selector["selector"]),
+                    source_sha256=source_sha256,
+                ),
+                expected_selector,
             )
             for expected_selector in expected_reference["selectors"]
         ]
+        reference_outcome = _reference_outcome(
+            [item["observed"] for item in actual_reference_selectors]
+        )
         actual_reference = {
             "profile_id": _REFERENCE_PROFILE_ID,
             "selectors": actual_reference_selectors,
-            "outcome": _reference_outcome(
-                [item["observed"] for item in actual_reference_selectors]
-            ),
+            "expected_outcome": expected_reference["expected_outcome"],
+            "outcome": reference_outcome,
+            "concordant": reference_outcome == expected_reference["expected_outcome"],
         }
 
     wall = time.perf_counter() - started_wall
     cpu = time.process_time() - started_cpu
-    actual = {
+    return {
         **{
             key: deepcopy(value)
             for key, value in expected_record.items()
-            if key not in {"profiles", "reference", "cost"}
+            if key not in {"profiles", "reference", "concordant", "cost"}
         },
         "profiles": actual_profiles,
         "reference": actual_reference,
+        "concordant": (
+            all(profile["concordant"] for profile in actual_profiles)
+            and actual_reference["concordant"]
+        ),
         "cost": {
             "status": "measured",
             "command_count": 5,
@@ -917,25 +1153,6 @@ def _execute_record(
             "missing_reason": None,
         },
     }
-    differences = _differences(
-        _semantic_view({
-            **_expected_semantic_result(plan, catalog),
-            "candidate_baseline": expected_record,
-            "records": [],
-        })["candidate_baseline"],
-        _semantic_view({
-            **_expected_semantic_result(plan, catalog),
-            "candidate_baseline": actual,
-            "records": [],
-        })["candidate_baseline"],
-        context=f"claim-scoped mutation execution {implementation_id}",
-    )
-    if differences:
-        raise _error(
-            f"claim-scoped mutation execution {implementation_id}",
-            "; ".join(differences),
-        )
-    return actual
 
 
 def _preflight(
@@ -967,84 +1184,75 @@ def run_claim_scoped_mutation_result(
     plan: object,
     catalog: object,
 ) -> dict[str, Any]:
-    """Execute the exact frozen owned-synthetic catalog and paired profiles."""
+    """Execute the exact frozen catalog and retain expected or unexpected evidence."""
 
     normalized_plan, normalized_catalog = _preflight(plan, catalog)
-    expected = _expected_semantic_result(normalized_plan, normalized_catalog)
+    candidate_template, record_templates = _expected_templates(
+        normalized_plan,
+        normalized_catalog,
+    )
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
 
     candidate = _execute_record(
         plan=normalized_plan,
         catalog=normalized_catalog,
-        expected_record=expected["candidate_baseline"],
+        expected_record=candidate_template,
         source=_weak_proxy.CANDIDATE_CODE,
     )
 
     catalog_records = normalized_catalog["mutants"]
-    assert isinstance(catalog_records, list)
-    expected_records = expected["records"]
-    actual_records: list[dict[str, Any]] = []
+    if not isinstance(catalog_records, list):
+        raise _error("mutation result catalog records", "must be a list")
     catalog_by_id = {
         str(record["mutant_id"]): record
         for record in catalog_records
     }
-    for expected_record in expected_records:
-        if expected_record["execution_status"] != "executed":
-            actual_records.append(deepcopy(expected_record))
+    actual_records: list[dict[str, Any]] = []
+    for template in record_templates:
+        if template["execution_status"] != "executed":
+            actual_records.append(deepcopy(template))
             continue
-        if expected_record["record_role"] == "historical_challenge_control":
+        if template["record_role"] == "historical_challenge_control":
             source = _weak_proxy.MUTANT_CODE
         else:
-            frozen_record = catalog_by_id[str(expected_record["mutant_id"])]
-            source = _materialize_source_for_record(frozen_record)
+            source = _materialize_source_for_record(
+                catalog_by_id[str(template["mutant_id"])]
+            )
         actual_records.append(
             _execute_record(
                 plan=normalized_plan,
                 catalog=normalized_catalog,
-                expected_record=expected_record,
+                expected_record=template,
                 source=source,
             )
         )
 
     wall = time.perf_counter() - started_wall
     cpu = time.process_time() - started_cpu
-    result: dict[str, Any] = {
-        **{
-            key: deepcopy(value)
-            for key, value in expected.items()
-            if key not in {
-                "created_at",
-                "runtime",
-                "candidate_baseline",
-                "records",
-                "cost",
-                "semantic_sha256",
-                "report_sha256",
-            }
-        },
-        "created_at": datetime.now(timezone.utc).isoformat().replace(
-            "+00:00", "Z"
-        ),
-        "runtime": {
-            "tool_version": __version__,
-            "python_implementation": platform.python_implementation(),
-            "python_version": platform.python_version(),
-            "platform_system": platform.system(),
-        },
-        "candidate_baseline": candidate,
-        "records": actual_records,
-        "cost": {
-            "status": "measured",
-            "implementation_count": 5,
-            "command_count": 25,
-            "selector_count": 25,
-            "wall_clock_seconds": round(wall, 6),
-            "cpu_seconds": round(cpu, 6),
-            "missing_reason": None,
-        },
-        "semantic_sha256": None,
-        "report_sha256": None,
+    result = _base_result(
+        normalized_plan,
+        normalized_catalog,
+        candidate,
+        actual_records,
+    )
+    result["created_at"] = datetime.now(timezone.utc).isoformat().replace(
+        "+00:00", "Z"
+    )
+    result["runtime"] = {
+        "tool_version": __version__,
+        "python_implementation": platform.python_implementation(),
+        "python_version": platform.python_version(),
+        "platform_system": platform.system(),
+    }
+    result["cost"] = {
+        "status": "measured",
+        "implementation_count": 5,
+        "command_count": 25,
+        "selector_count": 25,
+        "wall_clock_seconds": round(wall, 6),
+        "cpu_seconds": round(cpu, 6),
+        "missing_reason": None,
     }
     result["semantic_sha256"] = compute_mutation_result_semantic_sha256(result)
     result["report_sha256"] = compute_mutation_result_report_sha256(result)
@@ -1061,89 +1269,458 @@ def run_claim_scoped_mutation_result(
     return result
 
 
-def _finite_nonnegative(value: object, *, context: str) -> None:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise _error(context, "must be a finite nonnegative number")
-    numeric = float(value)
-    if not math.isfinite(numeric) or numeric < 0.0:
-        raise _error(context, "must be a finite nonnegative number")
-
-
-def _validate_volatiles(document: Mapping[str, object]) -> None:
+def _validate_runtime_and_costs(document: Mapping[str, object]) -> None:
     created_at = document.get("created_at")
     if not isinstance(created_at, str) or not created_at:
         raise _error("claim-scoped mutation result.created_at", "must be a non-empty string")
-    runtime = document.get("runtime")
-    if not isinstance(runtime, dict) or set(runtime) != {
-        "tool_version",
-        "python_implementation",
-        "python_version",
-        "platform_system",
-    }:
-        raise _error("claim-scoped mutation result.runtime", "has invalid fields")
+    runtime = _exact_keys(
+        document.get("runtime"),
+        {
+            "tool_version",
+            "python_implementation",
+            "python_version",
+            "platform_system",
+        },
+        context="claim-scoped mutation result.runtime",
+    )
     if any(not isinstance(value, str) or not value for value in runtime.values()):
         raise _error("claim-scoped mutation result.runtime", "values must be non-empty strings")
-
-    root_cost = document.get("cost")
-    if not isinstance(root_cost, dict):
-        raise _error("claim-scoped mutation result.cost", "must be an object")
+    root_cost = _exact_keys(
+        document.get("cost"),
+        _ROOT_COST_FIELDS,
+        context="claim-scoped mutation result.cost",
+    )
+    if (
+        root_cost["status"] != "measured"
+        or root_cost["implementation_count"] != 5
+        or root_cost["command_count"] != 25
+        or root_cost["selector_count"] != 25
+        or root_cost["missing_reason"] is not None
+    ):
+        raise _error(
+            "claim-scoped mutation result.cost",
+            "does not match fixed execution contract",
+        )
     _finite_nonnegative(
-        root_cost.get("wall_clock_seconds"),
+        root_cost["wall_clock_seconds"],
         context="claim-scoped mutation result.cost.wall_clock_seconds",
     )
     _finite_nonnegative(
-        root_cost.get("cpu_seconds"),
+        root_cost["cpu_seconds"],
         context="claim-scoped mutation result.cost.cpu_seconds",
     )
 
-    implementations: list[object] = [document.get("candidate_baseline")]
-    records = document.get("records")
-    if not isinstance(records, list):
-        raise _error("claim-scoped mutation result.records", "must be a list")
-    implementations.extend(records)
-    for implementation in implementations:
-        if not isinstance(implementation, dict):
-            raise _error("claim-scoped mutation result implementation", "must be an object")
-        cost = implementation.get("cost")
-        if not isinstance(cost, dict):
-            raise _error("claim-scoped mutation result implementation.cost", "must be an object")
-        _finite_nonnegative(
-            cost.get("wall_clock_seconds"),
-            context="claim-scoped mutation result implementation.cost.wall_clock_seconds",
-        )
-        _finite_nonnegative(
-            cost.get("cpu_seconds"),
-            context="claim-scoped mutation result implementation.cost.cpu_seconds",
-        )
-        for profile in implementation.get("profiles", []):
-            if not isinstance(profile, dict):
-                raise _error("claim-scoped mutation result profile", "must be an object")
-            for selector in profile.get("selectors", []):
-                _validate_observation_volatiles(selector)
-        reference = implementation.get("reference")
-        if isinstance(reference, dict):
-            for selector in reference.get("selectors", []):
-                _validate_observation_volatiles(selector)
 
-
-def _validate_observation_volatiles(selector: object) -> None:
-    if not isinstance(selector, dict):
-        raise _error("claim-scoped mutation result selector", "must be an object")
+def _canonical_observation(
+    actual: object,
+    expected: Mapping[str, object],
+    *,
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+) -> dict[str, Any]:
+    observation = _exact_keys(
+        actual,
+        _OBSERVATION_FIELDS,
+        context=(
+            "claim-scoped mutation result observation "
+            f"{expected['implementation_id']}/{expected['selector']}"
+        ),
+    )
+    for field in (
+        "implementation_id",
+        "profile_id",
+        "selector",
+        "source_sha256",
+        "test_sha256",
+        "command",
+        "invocation_binding",
+        "expected_observed",
+    ):
+        if observation[field] != expected[field]:
+            raise _error(
+                f"claim-scoped mutation result observation.{field}",
+                "does not match frozen relation",
+            )
     _finite_nonnegative(
-        selector.get("duration_seconds"),
-        context="claim-scoped mutation result selector.duration_seconds",
+        observation["duration_seconds"],
+        context="claim-scoped mutation result observation.duration_seconds",
     )
     for field in ("stdout_sha256", "stderr_sha256"):
-        value = selector.get(field)
-        if (
-            not isinstance(value, str)
-            or len(value) != 64
-            or any(character not in "0123456789abcdef" for character in value)
-        ):
+        if not _is_sha256(observation[field]):
             raise _error(
-                f"claim-scoped mutation result selector.{field}",
+                f"claim-scoped mutation result observation.{field}",
                 "must be a lowercase SHA-256 digest",
             )
+
+    observed = observation["observed"]
+    if observed not in {"pass", "fail", "error", "timeout"}:
+        raise _error(
+            "claim-scoped mutation result observation.observed",
+            "is unsupported",
+        )
+    if observed in {"pass", "fail"}:
+        complete = _expected_observation(
+            plan_sha256=str(plan["plan_sha256"]),
+            catalog_sha256=str(catalog["catalog_sha256"]),
+            implementation_id=str(expected["implementation_id"]),
+            profile_id=str(expected["profile_id"]),
+            selector=str(expected["selector"]),
+            source_sha256=str(expected["source_sha256"]),
+            observed=str(observed),
+        )
+        for field in (
+            "return_code",
+            "timed_out",
+            "receipt_sha256",
+            "receipt_outcome",
+            "receipt_producer",
+            "receipt_counts",
+            "observation_error",
+        ):
+            if not _strict_equal(complete[field], observation[field]):
+                raise _error(
+                    f"claim-scoped mutation result observation.{field}",
+                    f"is inconsistent with observed={observed!r}",
+                )
+    elif observed == "timeout":
+        if observation["timed_out"] is not True:
+            raise _error(
+                "claim-scoped mutation result observation.timed_out",
+                "must be true when observed='timeout'",
+            )
+    else:
+        if observation["timed_out"] is True:
+            raise _error(
+                "claim-scoped mutation result observation.observed",
+                "error cannot also be timeout",
+            )
+        if observation["observation_error"] is None:
+            raise _error(
+                "claim-scoped mutation result observation.observation_error",
+                "must explain observed='error'",
+            )
+
+    canonical = deepcopy(observation)
+    canonical["concordant"] = observed == expected["expected_observed"]
+    return canonical
+
+
+def _canonical_profile(
+    actual: object,
+    expected: Mapping[str, object],
+    *,
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+    baseline: bool,
+) -> dict[str, Any]:
+    profile = _exact_keys(
+        actual,
+        _PROFILE_FIELDS,
+        context=f"claim-scoped mutation result profile {expected['profile_id']}",
+    )
+    for field in ("profile_id", "profile_role", "expected_outcome"):
+        if profile[field] != expected[field]:
+            raise _error(
+                f"claim-scoped mutation result profile.{field}",
+                "does not match frozen profile",
+            )
+    actual_selectors = profile["selectors"]
+    expected_selectors = expected["selectors"]
+    if (
+        not isinstance(actual_selectors, list)
+        or not isinstance(expected_selectors, list)
+        or len(actual_selectors) != len(expected_selectors)
+    ):
+        raise _error(
+            "claim-scoped mutation result profile.selectors",
+            "cardinality does not match frozen profile",
+        )
+    selectors = [
+        _canonical_observation(
+            actual_selector,
+            expected_selector,
+            plan=plan,
+            catalog=catalog,
+        )
+        for actual_selector, expected_selector in zip(
+            actual_selectors,
+            expected_selectors,
+            strict=True,
+        )
+    ]
+    outcome = _profile_outcome(
+        [str(selector["observed"]) for selector in selectors],
+        baseline=baseline,
+    )
+    canonical = {
+        "profile_id": expected["profile_id"],
+        "profile_role": expected["profile_role"],
+        "selectors": selectors,
+        "expected_outcome": expected["expected_outcome"],
+        "outcome": outcome,
+        "concordant": outcome == expected["expected_outcome"],
+    }
+    if profile["outcome"] != canonical["outcome"]:
+        raise _error(
+            "claim-scoped mutation result profile.outcome",
+            "does not match observed selector evidence",
+        )
+    if profile["concordant"] is not canonical["concordant"]:
+        raise _error(
+            "claim-scoped mutation result profile.concordant",
+            "does not match expected and observed outcomes",
+        )
+    return canonical
+
+
+def _canonical_reference(
+    actual: object,
+    expected: Mapping[str, object],
+    *,
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+) -> dict[str, Any]:
+    reference = _exact_keys(
+        actual,
+        _REFERENCE_FIELDS,
+        context="claim-scoped mutation result reference",
+    )
+    for field in ("profile_id", "expected_outcome"):
+        if reference[field] != expected[field]:
+            raise _error(
+                f"claim-scoped mutation result reference.{field}",
+                "does not match frozen reference contract",
+            )
+    actual_selectors = reference["selectors"]
+    expected_selectors = expected["selectors"]
+    if (
+        not isinstance(actual_selectors, list)
+        or not isinstance(expected_selectors, list)
+        or len(actual_selectors) != len(expected_selectors)
+    ):
+        raise _error(
+            "claim-scoped mutation result reference.selectors",
+            "cardinality does not match frozen reference checks",
+        )
+    selectors = [
+        _canonical_observation(
+            actual_selector,
+            expected_selector,
+            plan=plan,
+            catalog=catalog,
+        )
+        for actual_selector, expected_selector in zip(
+            actual_selectors,
+            expected_selectors,
+            strict=True,
+        )
+    ]
+    outcome = _reference_outcome([str(selector["observed"]) for selector in selectors])
+    canonical = {
+        "profile_id": expected["profile_id"],
+        "selectors": selectors,
+        "expected_outcome": expected["expected_outcome"],
+        "outcome": outcome,
+        "concordant": outcome == expected["expected_outcome"],
+    }
+    if reference["outcome"] != canonical["outcome"]:
+        raise _error(
+            "claim-scoped mutation result reference.outcome",
+            "does not match observed selector evidence",
+        )
+    if reference["concordant"] is not canonical["concordant"]:
+        raise _error(
+            "claim-scoped mutation result reference.concordant",
+            "does not match expected and observed outcomes",
+        )
+    return canonical
+
+
+def _canonical_executed_record(
+    actual: object,
+    expected: Mapping[str, object],
+    *,
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+) -> dict[str, Any]:
+    record = _exact_keys(
+        actual,
+        _RECORD_FIELDS,
+        context=f"claim-scoped mutation result record {expected['record_id']}",
+    )
+    for field in (
+        "record_id",
+        "implementation_id",
+        "record_role",
+        "operator_id",
+        "mutant_id",
+        "catalog_status",
+        "source_sha256",
+        "source_ast_sha256",
+        "execution_status",
+        "counts_toward_generic_generalization",
+    ):
+        if record[field] != expected[field]:
+            raise _error(
+                f"claim-scoped mutation result record.{field}",
+                "does not match frozen plan/catalog relation",
+            )
+    actual_profiles = record["profiles"]
+    expected_profiles = expected["profiles"]
+    if (
+        not isinstance(actual_profiles, list)
+        or not isinstance(expected_profiles, list)
+        or len(actual_profiles) != len(expected_profiles)
+    ):
+        raise _error(
+            "claim-scoped mutation result record.profiles",
+            "cardinality does not match frozen profiles",
+        )
+    profiles = [
+        _canonical_profile(
+            actual_profile,
+            expected_profile,
+            plan=plan,
+            catalog=catalog,
+            baseline=(expected["record_role"] == "candidate_baseline"),
+        )
+        for actual_profile, expected_profile in zip(
+            actual_profiles,
+            expected_profiles,
+            strict=True,
+        )
+    ]
+    expected_reference = expected["reference"]
+    if not isinstance(expected_reference, dict):
+        raise _error(
+            "claim-scoped mutation result expected reference",
+            "must be an object for executed records",
+        )
+    reference = _canonical_reference(
+        record["reference"],
+        expected_reference,
+        plan=plan,
+        catalog=catalog,
+    )
+    cost = _exact_keys(
+        record["cost"],
+        _RECORD_COST_FIELDS,
+        context="claim-scoped mutation result record.cost",
+    )
+    if (
+        cost["status"] != "measured"
+        or cost["command_count"] != 5
+        or cost["selector_count"] != 5
+        or cost["missing_reason"] is not None
+    ):
+        raise _error(
+            "claim-scoped mutation result record.cost",
+            "does not match fixed execution contract",
+        )
+    _finite_nonnegative(
+        cost["wall_clock_seconds"],
+        context="claim-scoped mutation result record.cost.wall_clock_seconds",
+    )
+    _finite_nonnegative(
+        cost["cpu_seconds"],
+        context="claim-scoped mutation result record.cost.cpu_seconds",
+    )
+    concordant = all(profile["concordant"] for profile in profiles) and reference[
+        "concordant"
+    ]
+    if record["concordant"] is not concordant:
+        raise _error(
+            "claim-scoped mutation result record.concordant",
+            "does not match profile/reference concordance",
+        )
+    return {
+        **{
+            key: deepcopy(expected[key])
+            for key in (
+                "record_id",
+                "implementation_id",
+                "record_role",
+                "operator_id",
+                "mutant_id",
+                "catalog_status",
+                "source_sha256",
+                "source_ast_sha256",
+                "execution_status",
+                "counts_toward_generic_generalization",
+            )
+        },
+        "profiles": profiles,
+        "reference": reference,
+        "concordant": concordant,
+        "cost": deepcopy(cost),
+    }
+
+
+def _canonical_generation_record(
+    actual: object,
+    expected: Mapping[str, object],
+) -> dict[str, Any]:
+    record = _exact_keys(
+        actual,
+        _RECORD_FIELDS,
+        context=f"claim-scoped mutation result record {expected['record_id']}",
+    )
+    if not _strict_equal(dict(expected), record):
+        raise _error(
+            f"claim-scoped mutation result record {expected['record_id']}",
+            "does not match frozen non-execution record",
+        )
+    return deepcopy(dict(expected))
+
+
+def _canonical_result(
+    document: object,
+    plan: Mapping[str, object],
+    catalog: Mapping[str, object],
+) -> dict[str, Any]:
+    result = _exact_keys(
+        document,
+        _ROOT_FIELDS,
+        context="claim-scoped mutation result",
+    )
+    _validate_runtime_and_costs(result)
+    candidate_template, record_templates = _expected_templates(plan, catalog)
+    candidate = _canonical_executed_record(
+        result["candidate_baseline"],
+        candidate_template,
+        plan=plan,
+        catalog=catalog,
+    )
+    actual_records = result["records"]
+    if not isinstance(actual_records, list) or len(actual_records) != len(record_templates):
+        raise _error(
+            "claim-scoped mutation result.records",
+            "cardinality does not match frozen catalog plus historical control",
+        )
+    records = [
+        (
+            _canonical_executed_record(
+                actual,
+                expected,
+                plan=plan,
+                catalog=catalog,
+            )
+            if expected["execution_status"] == "executed"
+            else _canonical_generation_record(actual, expected)
+        )
+        for actual, expected in zip(
+            actual_records,
+            record_templates,
+            strict=True,
+        )
+    ]
+    canonical = _base_result(plan, catalog, candidate, records)
+    canonical["created_at"] = result["created_at"]
+    canonical["runtime"] = deepcopy(result["runtime"])
+    canonical["cost"] = deepcopy(result["cost"])
+    canonical["semantic_sha256"] = result["semantic_sha256"]
+    canonical["report_sha256"] = result["report_sha256"]
+    return canonical
 
 
 def verify_claim_scoped_mutation_result_document(
@@ -1151,36 +1728,47 @@ def verify_claim_scoped_mutation_result_document(
     plan: object,
     catalog: object,
 ) -> tuple[bool, tuple[str, ...]]:
-    """Verify source relations, stable semantics, volatile fields, and digests."""
+    """Verify complete evidence while retaining valid unexpected observations."""
 
     try:
         normalized_plan, normalized_catalog = _preflight(plan, catalog)
-        if not isinstance(document, dict):
-            raise _error("claim-scoped mutation result", "must be an object")
-        if set(document) != _ROOT_FIELDS:
-            raise _error(
-                "claim-scoped mutation result",
-                f"field mismatch; missing={sorted(_ROOT_FIELDS - set(document))}, "
-                f"extra={sorted(set(document) - _ROOT_FIELDS)}",
-            )
-        _validate_volatiles(document)
-        expected = _expected_semantic_result(normalized_plan, normalized_catalog)
-        actual_semantic = _semantic_view(document)
-        differences = _differences(
-            expected,
-            actual_semantic,
-            context="claim-scoped mutation result",
+        canonical = _canonical_result(
+            document,
+            normalized_plan,
+            normalized_catalog,
         )
-        recorded_semantic = document.get("semantic_sha256")
-        computed_semantic = compute_mutation_result_semantic_sha256(document)
-        if recorded_semantic != computed_semantic:
-            differences.append(
+        assert isinstance(document, dict)
+        errors: list[str] = []
+        for field in (
+            "schema_version",
+            "study_id",
+            "result_id",
+            "partition",
+            "plan_sha256",
+            "catalog_sha256",
+            "source",
+            "candidate_baseline",
+            "records",
+            "summary",
+            "analysis",
+            "policy",
+            "cost",
+        ):
+            if not _strict_equal(canonical[field], document[field]):
+                errors.append(
+                    f"claim-scoped mutation result.{field}: does not match "
+                    "source-derived or observation-derived semantics"
+                )
+        if document.get("semantic_sha256") != compute_mutation_result_semantic_sha256(
+            document
+        ):
+            errors.append(
                 "claim-scoped mutation result.semantic_sha256: digest mismatch"
             )
-        recorded_report = document.get("report_sha256")
-        computed_report = compute_mutation_result_report_sha256(document)
-        if recorded_report != computed_report:
-            differences.append(
+        if document.get("report_sha256") != compute_mutation_result_report_sha256(
+            document
+        ):
+            errors.append(
                 "claim-scoped mutation result.report_sha256: digest mismatch"
             )
     except (
@@ -1201,7 +1789,7 @@ def verify_claim_scoped_mutation_result_document(
             "claim-scoped mutation result: verification failed closed: "
             f"{type(exc).__name__}: {exc}",
         )
-    unique = tuple(dict.fromkeys(differences))
+    unique = tuple(dict.fromkeys(errors))
     return not unique, unique
 
 
