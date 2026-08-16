@@ -1,12 +1,12 @@
 # DW-001 Protocol
 
-**Status:** DRAFT — NOT FROZEN — OWNED-SYNTHETIC DEVELOPMENT MECHANISM PILOT EXECUTED AND RETAINED — CLAIM-SCOPED MUTATION DESIGN FROZEN BUT NOT EXECUTED — NO ECOLOGICAL OR HOLDOUT EXECUTION AUTHORIZED.
+**Status:** DRAFT — NOT FROZEN — OWNED-SYNTHETIC DEVELOPMENT MECHANISM PILOT EXECUTED AND RETAINED — CLAIM-SCOPED MUTATION DESIGN FROZEN AND ONE BOUNDED TYPED RESULT EXECUTED — NO ECOLOGICAL OR HOLDOUT EXECUTION AUTHORIZED.
 
 **Study identifier:** `DW-001`.
 
-**Implementation lineage for this revision:** stable `main` at `89455edce47c0d82517637dee8334adf3d3fa1c2` plus the claim-scoped mutation plan and deterministic catalog under review in PR #38. Exact future mutation-result, ecological protocol, implementation, generator, schema, baseline, environment, sampling, and analysis commits remain unpinned until their respective freeze gates.
+**Implementation lineage for this revision:** stable `main` at `687c71bcd1a6edd1cd0831accb74735e82c2f796` plus the claim-scoped mutation-result implementation under review in PR #40. Exact future broader calibration, ecological protocol, implementation, generator, schema, baseline, environment, sampling, and analysis commits remain unpinned until their respective freeze gates.
 
-This document is a protocol candidate, not a preregistration. The sealed five-family owned-synthetic development mechanism pilot has been executed and retained. The later weak-proxy challenge has been executed as development-only negative-control evidence. The claim-scoped mutation plan and catalog freeze pre-execution inputs only; no mutant has been executed under that plan. None of these steps freezes the broader protocol, authorizes external repository execution, creates a holdout, or permits ecological inference.
+This document is a protocol candidate, not a preregistration. The sealed five-family owned-synthetic development mechanism pilot has been executed and retained. The later weak-proxy challenge has been executed as development-only negative-control evidence. The claim-scoped mutation plan and catalog froze their source, target, operators, profiles, reference checks, identities, and result taxonomy before execution; one bounded typed development result now executes those exact inputs. None of these steps freezes the broader protocol, authorizes external repository execution, creates a holdout, permits ecological inference, or establishes mutation adequacy.
 
 No held-out command may execute until the complete protocol, target population, sampling frame, instance authorization, containment environment, ground-truth process, metrics, exclusions, versions, and commitment digest are immutably recorded before unblinding.
 
@@ -36,20 +36,25 @@ The primary incremental contrast is:
 
 > Can the first mutation calibration freeze one outcome-blind generic operator set, one exact source/AST target, one deterministic mutant catalog, and paired strong/weak selector profiles before any mutation-test outcome, while retaining duplicate, invalid, and not-applicable generation records and separating the known weak-proxy mutant from generic operator evidence?
 
-The oracle-relevance and oracle-strength questions are negative controls. The mutation-design question concerns pre-execution methodological integrity only. A positive result does not establish a complete relevance or strength method, a valid mutation score, or useful mutation evidence.
+### 1.6 Mutation-result integrity question
+
+> Can the exact frozen catalog be executed through invocation-bound typed selectors while retaining complete preregistration-concordant or preregistration-divergent observations, recomputing all profile/reference/summary/analysis semantics, and refusing to replace the complete table with a scalar score or policy decision?
+
+The oracle-relevance and oracle-strength questions are negative controls. The mutation-design question concerns pre-execution methodological integrity. The mutation-result question concerns bounded execution and evidence retention. Positive results do not establish a complete relevance or strength method, a valid mutation score, operator representativeness, or ecological effectiveness.
 
 ## 2. Claims not under test
 
 DW-001 does not establish:
 
 - complete patch correctness, security, or semantic intent;
-- test-oracle relevance, adequacy, completeness, or mutation strength;
-- that any cataloged mutant is killed, survived, equivalent, covered, or relevant;
+- test-oracle relevance, adequacy, completeness, or general mutation strength;
+- representativeness of the three generic mutants or the historical control;
+- mutation adequacy, mutation-score validity, or complete equivalent-mutant classification;
 - vulnerability removal or absence of untested regressions;
 - production safety or universal causality;
 - complete environment reproducibility;
 - producer, reviewer, agent, model, or organization authenticity;
-- authorization to merge, deploy, publish, execute an external repository, execute the frozen mutation catalog, or inspect a holdout;
+- authorization to merge, deploy, publish, execute an external repository, block a merge, or inspect a holdout;
 - scientific novelty or general superiority.
 
 Exact path-level influence is outside the primary state-set acceptance rule and may appear only as exploratory secondary evidence where its own prerequisites hold.
@@ -457,15 +462,19 @@ Oracle-relevance controls must directly establish which assertion is the sole su
 
 Weak-oracle controls must freeze task, selector, candidate, mutant, hidden check, and outcomes before execution.
 
+Claim-scoped mutation execution must verify the exact plan and catalog, execute no free-form record, retain expected and observed outcomes separately, preserve complete unexpected evidence, and keep every result development-only.
+
 ## 20. Cost execution
 
 Native method cost must be measured separately from decision-equivalence projection. A cost run executes only states required by that method.
 
+The claim-scoped mutation result records 25 typed selector commands across five implementation identities. These timings describe only the fixed owned-synthetic workload and are not native cost estimates for broader mutation engines or ecological repositories.
+
 The frozen ecological protocol must define method order, cache policy, timing boundaries, state and command counts, wall-clock and CPU measurement, peak resources where supported, repetition, and partial-run accounting.
 
-A projected full-matrix run must not be presented as native runtime for `M0`, `M1`, or `M2`. Fixed synthetic challenge counts must not be extrapolated to ecological repositories.
+A projected full-matrix run must not be presented as native runtime for `M0`, `M1`, or `M2`. Fixed synthetic challenge or mutation-result counts must not be extrapolated to ecological repositories.
 
-## 21. Development boundary and completed mechanism pilot
+## 21. Development boundary and completed mechanism evidence
 
 Development material may be used to:
 
@@ -475,7 +484,8 @@ Development material may be used to:
 - design a precision target without holdout inspection;
 - refine exclusions, deviations, review procedures, and containment requirements;
 - demonstrate known method limitations through explicit negative controls;
-- freeze experimental inputs before later development calibration.
+- freeze experimental inputs before development calibration;
+- execute bounded owned-synthetic calibration while retaining complete positive or negative results.
 
 Development artifacts remain labeled `development`, outside the primary denominator, and permanently separate from holdout material.
 
@@ -491,11 +501,11 @@ It executed 40 matrix states, 12 selector states, and five controlled contrasts.
 
 That pilot establishes fixed-pipeline behavior only. The later weak-proxy family is a separate inspected development challenge and is not silently added to the historical pilot population.
 
-The claim-scoped mutation plan and catalog are also separate development artifacts. They freeze future calibration inputs but contain no mutation-test outcomes.
+The claim-scoped mutation plan and catalog are separate pre-execution development artifacts. The typed mutation result executes only those exact inputs and retains the complete table. None of these artifacts enters the primary denominator or becomes a holdout.
 
-No effectiveness, superiority, prevalence, model-quality, mutation-adequacy, or generalization claim may be made from these development fixtures or plans.
+No effectiveness, superiority, prevalence, model-quality, mutation-adequacy, or generalization claim may be made from these development fixtures, plans, or results.
 
-## 22. Ground-truth, selector, and mutation controls
+## 22. Ground-truth, selector, mutation, and result controls
 
 Ground truth must be fixed without inspecting DeltaWitness outcomes.
 
@@ -503,18 +513,21 @@ Every scenario requires state outcomes and causes, applicability, expected metho
 
 Generated expectations must verify before execution. Generator determinism does not create reviewer independence.
 
-Failure cause has separate evidence layers:
+Failure and mutation evidence have separate layers:
 
 - runtime typed class, such as `test_error` or `test_failure`;
 - independently fixed mechanism label, such as `import_error`;
 - predeclared selector identity and exact outcome transition;
-- separately defined oracle-strength evidence, such as a frozen mutant set.
+- frozen mutation source, target, operator, and mutant identity;
+- observed selector result under one exact mutant;
+- separately fixed reference development checks;
+- derived profile/reference/record concordance.
 
 A mechanism subtype must not be inferred post hoc from a generic runtime result.
 
-A genuine assertion failure does not establish claim relevance. A discriminating selector does not establish oracle strength. A killed or surviving single mutant does not establish mutation adequacy. A compiled mutant catalog does not establish that any mutant is killed or survives.
+A genuine assertion failure does not establish claim relevance. A discriminating selector does not establish oracle strength. A killed or surviving single mutant does not establish mutation adequacy. A compiled mutant catalog does not establish outcomes. One complete synthetic result table does not establish population performance.
 
-The current claim-scoped mutation design freezes before outcome inspection:
+The claim-scoped mutation design froze before outcome inspection:
 
 - one exact source and AST target;
 - three ordered generic operators;
@@ -522,16 +535,30 @@ The current claim-scoped mutation design freezes before outcome inspection:
 - mutant identity and deduplication rules;
 - paired strong and weak selector profiles;
 - reference development claim checks;
-- future killed/survived/invalid/equivalent-review-required/indeterminate taxonomy;
+- killed/survived/invalid/equivalent-review-required/indeterminate taxonomy;
 - prohibitions on scores, thresholds, blockers, holdout selection, and denominator eligibility.
+
+The mutation-result contract additionally fixes:
+
+- five implementation identities and 25 selector commands;
+- source, test, command, invocation-binding, and typed-receipt relations;
+- separate frozen expectations and observed evidence;
+- error/timeout precedence over killed/survived;
+- non-execution of duplicate, invalid, and not-applicable records;
+- complete unexpected-result retention;
+- summary and analysis recomputation;
+- semantic versus complete-report digests;
+- policy and denominator refusal.
+
+A complete observation that disagrees with preregistration remains a negative result. It must not be suppressed as a harness error. Malformed or contradictory evidence remains invalid and must not be relabeled as unexpected.
 
 Any future mutation or coverage study must additionally freeze before outcome inspection:
 
-- execution environment and command semantics;
+- broader execution environment and command semantics;
 - mutant result aggregation and precedence;
 - equivalent-mutant review procedure;
 - coverage targets and collection semantics;
-- positive and negative controls;
+- positive and negative control population;
 - thresholds, exclusions, and missingness;
 - calibration and policy boundary.
 
@@ -618,30 +645,102 @@ strong-authorization-oracle-v1
 weak-boolean-proxy-v1
 ```
 
-No mutation test has executed under this plan. The current contract fixes:
-
-```text
-execution_authorized          = false
-execution_status              = not_implemented
-headline_score                = null
-universal_threshold           = null
-merge_blocker_authorized      = false
-holdout_selected              = false
-primary_denominator_eligible  = false
-```
+The plan itself authorizes no external execution, holdout, score, threshold, blocker, or denominator eligibility. Its identities remain immutable inputs to the separate result runner.
 
 Plan and catalog verifiers reconstruct complete canonical artifacts from fixed source and constants. Recomputed unkeyed digests cannot hide source, target, operator, profile, generation-status, duplicate, invalid, summary, authorization, holdout, score, threshold, or denominator drift.
 
-The next mutation-execution layer requires a separate red-first result contract and cannot modify this plan after outcomes are visible.
+## 25. Claim-scoped mutation result
 
-## 25. Freeze checklist
+Canonical result artifacts:
+
+```text
+research/DW-001/schema/claim-scoped-mutation-result.schema.json
+research/DW-001/MUTATION_RESULT_V1.md
+src/deltawitness/dw001_mutation_results.py
+scripts/smoke_dw001_mutation_results.py
+```
+
+The runner first verifies the exact plan and catalog. It then executes:
+
+```text
+candidate baseline
+3 frozen generic generated mutants
+1 separately labeled historical control
+```
+
+Each implementation runs:
+
+```text
+2 strong selectors
+1 weak selector
+2 reference selectors
+```
+
+Total fixed workload:
+
+```text
+5 implementations × 5 selectors = 25 typed commands
+```
+
+Duplicate, invalid, and not-applicable records remain ordered in the result with zero commands and explicit non-execution reasons.
+
+Every selector stores:
+
+```text
+expected_observed
+observed
+concordant
+```
+
+Every profile and reference group stores:
+
+```text
+expected_outcome
+outcome
+concordant
+```
+
+Record concordance, summary counts, and top-level analysis are recomputed. A complete typed observation that diverges from preregistration remains valid evidence and produces `analysis.status = unexpected`. This is a negative result, not a harness failure.
+
+The expected current owned-synthetic contrast is:
+
+```text
+all 3 generic mutants:
+    strong profile -> killed
+    weak profile   -> survived
+    reference      -> claim_violation_observed
+```
+
+The historical control is executed but excluded from generic evidence. Agreement with this table validates the bounded mechanism only.
+
+The result fixes:
+
+```text
+mutation_score                           = null
+headline_score                           = null
+universal_threshold                      = null
+merge_blocker_authorized                 = false
+ecological_inference_allowed             = false
+holdout_selected                         = false
+primary_denominator_eligible             = false
+generic_operator_generalization_allowed  = false
+```
+
+`semantic_sha256` excludes timestamps, runtime metadata, output digests, and timing while retaining expected/observed outcomes, receipt identities, concordance, summary, analysis, and policy. `report_sha256` binds the complete document.
+
+Malformed structure, source/selector/command/binding substitution, receipt contradiction, impossible stored aggregates, non-finite costs, or digest tampering fail closed. An `unexpected` label cannot rescue invalid evidence.
+
+A valid result does not establish mutation adequacy, equivalent-mutant completeness, real-agent prevalence, ecological effectiveness, or merge-policy validity.
+
+## 26. Freeze checklist
 
 No held-out command may execute until the complete protocol is frozen in one immutable commit. Required items include:
 
 - [ ] accepted scenario taxonomy and generator specification;
 - [ ] accepted descriptor, identity, binding, manifest, result, declaration, and localization contracts;
 - [x] frozen development-only claim-scoped mutation source, operator set, profiles, target identity, and deterministic generation catalog;
-- [ ] accepted mutation-result and coverage-evidence contracts if used in confirmatory analysis;
+- [x] implemented development-only typed mutation-result contract with complete expected/unexpected evidence retention;
+- [ ] accepted mutation-result population, equivalent-mutant review, coverage-evidence, and policy contracts for confirmatory analysis;
 - [ ] direct-baseline implementations or exact semantic contracts;
 - [ ] immutable dataset releases and exact instance manifest;
 - [ ] per-instance license, authorization, environment, and publication review;
@@ -659,9 +758,9 @@ No held-out command may execute until the complete protocol is frozen in one imm
 - [ ] public commitment recorded before unblinding;
 - [ ] exact protocol, implementation, generator, schema, baseline, image, and dependency versions pinned.
 
-The checked mutation-design item applies only to the committed owned-synthetic development plan and catalog. It does not freeze a mutation-result method or confirmatory protocol. Passing tests or completing a synthetic challenge does not freeze the broader study.
+The checked mutation items apply only to the committed owned-synthetic development plan/catalog/result. They do not freeze a confirmatory mutation method or broader protocol. Passing tests or matching the preregistered table does not freeze the study.
 
-## 26. Holdout commitment
+## 27. Holdout commitment
 
 Before any held-out command:
 
@@ -671,9 +770,9 @@ Before any held-out command:
 4. retain sensitive material privately where required;
 5. preserve later deviations without rewriting the commitment.
 
-A commit containing only individual manifests, identities, source metadata, mutation plans, catalogs, or challenge artifacts does not bind undisclosed holdout membership.
+A commit containing only individual manifests, identities, source metadata, mutation plans, catalogs, development results, or challenge artifacts does not bind undisclosed holdout membership.
 
-## 27. Measurements under consideration
+## 28. Measurements under consideration
 
 The frozen ecological protocol is expected to report explicit all-scenario and applicable-scenario denominators for:
 
@@ -685,7 +784,8 @@ The frozen ecological protocol is expected to report explicit all-scenario and a
 - declared-selector localization outcomes;
 - failure-subtype accuracy only where independently labeled;
 - oracle-relevance and mutation-warning performance only after reviewed procedures exist;
-- per-mutant killed, survived, invalid, equivalent-review-required, and indeterminate outcomes;
+- expected versus observed mutation outcomes and concordance;
+- per-mutant killed, survived, invalid, equivalent-review-required, indeterminate, and non-executed outcomes;
 - duplicate and not-applicable generation records;
 - surviving claim-violating mutants and invalid/equivalent mutant handling;
 - executed-state and command multipliers;
@@ -694,7 +794,7 @@ The frozen ecological protocol is expected to report explicit all-scenario and a
 
 No aggregate accuracy or mutation score may replace paired tables, four-way outcome flow, per-selector evidence, and the complete retained per-mutant table. Interval method, multiplicity handling, precision target, sampling frame, and primary endpoint remain unfrozen.
 
-## 28. Falsification and narrowing
+## 29. Falsification and narrowing
 
 Narrow, redesign, or abandon the four-state layer for the tested population if:
 
@@ -720,7 +820,18 @@ Narrow or redesign the frozen mutation design if:
 - operator choice dominates later outcomes;
 - established mutation tooling or a simpler fixed-mutant baseline offers the same evidence with lower complexity.
 
-Narrow or redesign any mutation/oracle-integrity result layer if it:
+Narrow or redesign the mutation-result layer if:
+
+- complete unexpected observations are suppressed as harness errors;
+- malformed or contradictory evidence is accepted as an unexpected result;
+- error or timeout is counted as killed;
+- generation-only records leak into execution denominators;
+- summaries or analysis drift from the complete table;
+- repeated clean runs change stable semantic outcomes;
+- source, selector, command, binding, receipt, or policy substitution survives semantic verification;
+- the complete table cannot be published without exposing prohibited source or raw output.
+
+Narrow or redesign any broader mutation/oracle-integrity layer if it:
 
 - cannot expose the weak-proxy negative control without materially rejecting valid controls;
 - cannot preserve the unrelated-assertion distinction;
@@ -730,9 +841,9 @@ Narrow or redesign any mutation/oracle-integrity result layer if it:
 - treats an LLM explanation as an unverified decision authority;
 - becomes more complex than a stronger direct baseline without incremental evidence.
 
-Negative results are valid and must not trigger post-hoc operator or benchmark repair.
+Negative and unexpected results are valid and must not trigger post-hoc operator, selector, expected-label, or benchmark repair without a recorded deviation.
 
-## 29. Independent reproduction
+## 30. Independent reproduction
 
 Issue #4 remains open. The maintainer's second run, another machine controlled by the same workflow, or another run by the same agent process is not independent.
 
@@ -743,25 +854,27 @@ Until qualifying external reproduction is accepted:
 - the roadmap gate remains unchecked;
 - reproduction must cite an exact commit or release.
 
-## 30. Safety and publication
+## 31. Safety and publication
 
 Only synthetic, owned, licensed, or explicitly authorized targets may be used.
 
 The runner and generator are not sandboxes. Execution requires a separately secured disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance, not containment.
 
-Current weak-oracle controls execute only fixed project-owned Python bytes in temporary directories. The mutation-plan adapter parses, transforms, unparses, reparses, and compiles only fixed project-owned bytes and executes no mutants or tests. Neither authorizes external repository execution.
+Current weak-oracle controls and the claim-scoped mutation result execute only fixed project-owned Python bytes in temporary directories. The mutation-plan adapter parses, transforms, unparses, reparses, and compiles the same fixed project-owned source. None authorizes external repository execution.
 
-Artifacts may expose prompts, paths, commands, selectors, mutant IDs, AST/source digests, Git IDs, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, timings, and costs. Every export requires privacy and claim-boundary review.
+Artifacts may expose prompts, paths, commands, selectors, mutant IDs, AST/source/test digests, invocation bindings, receipt metadata, Git IDs, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, timings, and costs. Every export requires privacy and claim-boundary review.
 
-Raw tracebacks and command output remain excluded by default. Source and mutant bodies are excluded from the mutation plan and catalog. Output digests can still reveal equality or support guessing of low-entropy values.
+Raw tracebacks and command output remain excluded by default. Source, mutant, and test bodies are excluded from public mutation plan/catalog/result artifacts. Output digests can still reveal equality or support guessing of low-entropy values.
 
-## 31. Deviation policy
+## 32. Deviation policy
 
 Every post-freeze deviation records stable IDs, affected scenario or method, problem, action, result visibility, confirmatory impact, and approval when applied.
 
-A results-visible applied deviation cannot retain impact `none`. Frozen protocol, sampling frame, partition lock, commitment, mutation source, operator set, profiles, target identities, mutant catalog, hidden checks, or original artifacts must never be rewritten to conceal a deviation.
+A results-visible applied deviation cannot retain impact `none`. Frozen protocol, sampling frame, partition lock, commitment, mutation source, operator set, profiles, target identities, mutant catalog, reference checks, expected outcomes, or original artifacts must never be rewritten to conceal a deviation.
 
-## 32. Current status
+Complete unexpected observations remain in the original result. A later design change must cite them and create a new version rather than rewriting the earlier record.
+
+## 33. Current status
 
 ### Implemented and synthetically tested
 
@@ -781,16 +894,21 @@ A results-visible applied deviation cannot retain impact `none`. Frozen protocol
 - exact source, semantic-AST, target, generated-mutant, duplicate, invalid, and not-applicable identities;
 - paired strong/weak selector profiles over identical source and generic mutant catalog;
 - known weak-proxy control excluded from generic operator evidence;
-- committed mutation plan and deterministic catalog with execution authorization false;
+- committed mutation plan and deterministic catalog;
+- typed execution of candidate, three generic mutants, and one historical control through 25 frozen selectors;
+- complete per-selector, profile, reference, record, summary, analysis, and cost evidence;
+- complete unexpected-result retention without weakening malformed-evidence rejection;
+- generation-only records retained with zero execution;
+- stable mutation-result semantic digest and complete-report digest;
 - descriptor-derived specification verification;
 - malformed-object and recomputed-digest regressions;
 - editable and installed-wheel full-chain smoke validation on Python 3.11–3.14.
 
 ### Not implemented, authorized, accepted, or frozen
 
-- mutation execution under the frozen plan;
-- typed per-mutant killed/survived/equivalent-review/indeterminate result artifact;
-- calibrated mutation warning or mutation score;
+- broader mutation population beyond one source and three generic operators;
+- independent equivalent-mutant adjudication;
+- calibrated false-warning, missed-warning, applicability, or mutation-score estimates;
 - assertion-delta weakening analysis;
 - claim-boundary coverage analysis;
 - over-mocking analysis;
@@ -806,7 +924,7 @@ A results-visible applied deviation cannot retain impact `none`. Frozen protocol
 - independent reproduction;
 - confirmatory result.
 
-## 33. Public wording rule
+## 34. Public wording rule
 
 Permitted:
 
@@ -818,7 +936,11 @@ Permitted:
 
 > A further development-only challenge shows one exact declared fail-to-pass selector that a fixed claim-violating mutant survives.
 
-> A pre-execution development plan now freezes one minimal generic AST operator set, exact mutant identities, and paired strong/weak selector profiles before any mutation-test outcome.
+> A pre-execution development plan freezes one minimal generic AST operator set, exact mutant identities, and paired strong/weak selector profiles before mutation-test outcomes.
+
+> One bounded owned-synthetic result executes that exact catalog through 25 typed selectors, retains the complete table, and separates preregistered expectations from observed outcomes and concordance.
+
+> In the current bounded table, the three generic mutants are killed by the strong profile and survive the weak Boolean-proxy profile; this is development mechanism evidence only.
 
 Not permitted from this draft:
 
@@ -826,9 +948,9 @@ Not permitted from this draft:
 
 > Selector localization proves semantic relevance.
 
-> The weak-proxy challenge validates mutation testing or oracle strength.
+> The weak-proxy challenge or bounded result validates mutation testing or complete oracle strength.
 
-> The frozen catalog establishes that mutants were killed, survived, covered, or mutation-adequate.
+> The frozen catalog or one result table establishes mutation adequacy, representative operator quality, or a valid mutation score.
 
 > Four-state replay proves patch correctness.
 
