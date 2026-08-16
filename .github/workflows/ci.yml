@@ -49,6 +49,7 @@ jobs:
           python -c "from deltawitness.dw001_fixture_binding import build_fixture_manifest_binding, compute_fixture_manifest_binding_sha256, verify_fixture_manifest_binding_document"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
+          python scripts/smoke_dw001_unrelated_assertion.py
 
       - name: Validate public tree
         run: python scripts/validate_public_tree.py
@@ -92,3 +93,4 @@ jobs:
           python -c "from deltawitness.dw001_fixture_binding import build_fixture_manifest_binding, compute_fixture_manifest_binding_sha256, verify_fixture_manifest_binding_document"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
+          python scripts/smoke_dw001_unrelated_assertion.py

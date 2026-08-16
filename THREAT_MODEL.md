@@ -2,7 +2,7 @@
 
 ## Protected claims
 
-DeltaWitness currently supports seven narrow statement classes.
+DeltaWitness currently supports eight narrow statement classes.
 
 ### Canonical change witness
 
@@ -30,13 +30,17 @@ A typed observer further bounds that statement by a cooperating adapter's semant
 
 > Given one verified descriptor, fixture identity, and scenario manifest, the binding verifier checks their shared study, scenario, commit, path, execution, observer, state, method, family, and specification relations without repurposing manifest v1 fields.
 
-### DW-001 paired wrong-reason observer probe
+### DW-001 paired import-error observer probe
 
 > Given one fixed owned-synthetic scenario with identical source/test mechanism and scenario identity, `exit-code-v1` accepts a canonical-looking `pass / fail / pass / pass` matrix when `BC` terminates in a pre-assertion import error, while `outcome-receipt-v1` preserves generic `test_error` evidence and makes every method requiring `BC` indeterminate.
 
-This last statement is one controlled development probe. It is not a prevalence, accuracy, or general superiority claim.
+### DW-001 unrelated-assertion negative control
 
-None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy, run a pilot, or execute a holdout.
+> Given one fixed owned-synthetic scenario with a non-discriminating claim-facing assertion and a collateral assertion as the sole `BC` failure source, both observer arms and all nested state-set methods accept the canonical matrix even though the failing assertion is unrelated to the declared authorization claim.
+
+The final two statements are controlled development probes. The import pair isolates one observer distinction. The unrelated-assertion case establishes a known limitation. Neither is a prevalence, accuracy, oracle-adequacy, or general-superiority claim.
+
+None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, oracle relevance, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy, run a pilot, or execute a holdout.
 
 ## Assets
 
@@ -47,6 +51,7 @@ The design aims to protect:
 - claim, command, specification, observer, state, tree, and commit bindings;
 - separation of assertion failure from execution or infrastructure error;
 - separation of generic runtime error from independently fixed failure subtype;
+- separation of assertion failure from claim-oracle relevance;
 - separation of unsupported evidence from incomplete execution;
 - endpoint consistency and completeness of exact influence tables;
 - exact arithmetic and semantic integrity of released metrics;
@@ -57,6 +62,7 @@ The design aims to protect:
 - deterministic fixture descriptor, identity, Git, and specification semantics;
 - correspondence between generated fixture and scenario manifest;
 - equality of source/test mechanism across paired observer arms;
+- direct negative-control evidence showing which assertion is the sole `BC` failure source;
 - public artifacts from accidental disclosure of absolute paths, environment values, credentials, private output, or unauthorized material;
 - separation between consecutive claims, coalitions, scenarios, and study artifacts.
 
@@ -66,6 +72,7 @@ The model includes:
 
 - an AI coding agent that creates a misleading patch, weak test, collateral change, or self-confirming result;
 - a contributor that deliberately weakens, skips, replaces, or misdirects an oracle;
+- a candidate suite whose claim-facing assertion is non-discriminating while an unrelated assertion creates fail-to-pass behavior;
 - a patch author that groups paths to manipulate attribution;
 - stale, unrelated, incorrectly selected, or substituted Git refs;
 - hostile Git overrides, replacement objects, hooks, filters, configuration, or binaries;
@@ -73,26 +80,29 @@ The model includes:
 - changed submodules or links with unresolved or escaping state;
 - commands that return success without effective assertions;
 - runners that reuse one exit code for assertion, import, collection, setup, dependency, teardown, producer, or infrastructure failure;
+- a typed adapter that reports a genuine assertion failure while a caller overstates its relevance to the declared claim;
 - a typed adapter that reports only a generic error while a caller overstates a precise subtype;
 - post-result relabeling of a generic error as `import_error`, `setup_error`, or another mechanism;
+- post-result relabeling of an unrelated assertion as the intended regression oracle;
 - missing, malformed, oversized, stale, contradictory, or state-mismatched receipts;
 - tested code that reads the visible invocation binding and forges a receipt;
 - invalid partial patches, nondeterminism, or environment drift;
 - background processes or external effects that survive repository resets;
 - one claim or coalition contaminating later execution;
 - raw output containing credentials or private data;
-- tampered reports, projections, manifests, results, fixture identities, or bindings;
+- tampered reports, projections, manifests, results, fixture identities, bindings, or direct-control records;
 - recomputation of unkeyed digests after semantic modification;
 - hidden-state leakage or mixed observer arms;
 - false ownership, license, authorization, reviewer, or independence declarations;
 - a valid artifact paired with the wrong report, manifest, projection, fixture, descriptor, or expected digest;
 - a descriptor relabeled to another family after outcomes are known;
 - a scenario pair that changes source/test bytes or scenario identity while claiming an observer-only contrast;
+- a negative control whose collateral assertion is not actually the sole discrimination source;
 - a substituted specification digest hidden by recomputed metadata;
 - a non-empty or symbolic-link destination redirecting or overwriting fixture output;
 - malicious Python, Git, filesystem, dependency, kernel, or container behavior;
 - coordinated replacement of a complete artifact chain and all expected digests;
-- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, fixture identity, binding validity, or one observer contrast as proof of correctness or safety;
+- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, fixture identity, binding validity, or one controlled contrast as proof of correctness, oracle relevance, or safety;
 - malicious repository content executed with operator privileges.
 
 ## Security and integrity invariants
@@ -126,101 +136,125 @@ The model includes:
 19. Missing, malformed, inconclusive, stale, contradictory, or non-assertion error receipts make the state incomplete.
 20. Receipt outcome, producer, counts, digest, binding, and observer error enter the semantic digest.
 21. Receipt v1 distinguishes assertion failure from generic test error, not every error subtype.
-22. A failure subtype recorded in fixture or manifest ground truth must be fixed independently before execution or remain generic.
-23. A typed receipt is cooperating-producer evidence, not authentication.
+22. Receipt v1 does not identify which assertion is relevant to the declared claim.
+23. A failure subtype recorded in fixture or manifest ground truth must be fixed independently before execution or remain generic.
+24. A typed receipt is cooperating-producer evidence, not authentication.
 
 ### Exact influence
 
-24. Influence starts only from a complete supported canonical `pass / fail / pass / pass` witness.
-25. Intervention units are sorted changed code paths.
-26. More than eight code paths are rejected before coalition execution.
-27. Every `2^n` coalition runs under base and candidate test worlds; no value is sampled, pruned, or imputed.
-28. Candidate documentation is held constant and recorded.
-29. Four endpoint anchors compare intervention endpoints with canonical states.
-30. Full-coalition trees equal canonical candidate-side trees.
-31. Empty-coalition outcomes equal canonical base-side outcomes; tree equality is additionally required when no documentation changed.
-32. Any incomplete coalition or inconsistent endpoint withholds all exact metrics.
-33. An already-sufficient empty coalition or insufficient full coalition withholds attribution.
-34. No monotonicity assumption is imposed; negative marginal edges are retained.
-35. Shapley, Banzhaf, and interaction values use exact rational arithmetic before rendering.
-36. Metrics, anchors, coalitions, Git identities, and observer evidence enter `influence_sha256`.
+25. Influence starts only from a complete supported canonical `pass / fail / pass / pass` witness.
+26. Intervention units are sorted changed code paths.
+27. More than eight code paths are rejected before coalition execution.
+28. Every `2^n` coalition runs under base and candidate test worlds; no value is sampled, pruned, or imputed.
+29. Candidate documentation is held constant and recorded.
+30. Four endpoint anchors compare intervention endpoints with canonical states.
+31. Full-coalition trees equal canonical candidate-side trees.
+32. Empty-coalition outcomes equal canonical base-side outcomes; tree equality is additionally required when no documentation changed.
+33. Any incomplete coalition or inconsistent endpoint withholds all exact metrics.
+34. An already-sufficient empty coalition or insufficient full coalition withholds attribution.
+35. No monotonicity assumption is imposed; negative marginal edges are retained.
+36. Shapley, Banzhaf, and interaction values use exact rational arithmetic before rendering.
+37. Metrics, anchors, coalitions, Git identities, and observer evidence enter `influence_sha256`.
+38. Exact influence remains conditional on the declared Boolean witness and does not establish oracle relevance.
 
 ### DW-001 projection
 
-37. Projection starts from a strict-decoded, semantically verified schema `0.3` report.
-38. Every source claim uses canonical expectations and one observer arm.
-39. Method state sets are fixed as `CC`, `BC+CC`, `BC+CB+CC`, and `BB+BC+CB+CC`.
-40. Each method payload contains only its declared observations.
-41. `not_applicable` comes only from pre-execution annotation.
-42. For applicable methods, indeterminate evidence precedes rejection.
-43. Exact fields, canonical identifiers, ordered methods, and ordered state slices are required.
-44. Claim and method decisions, reasons, contradictions, indeterminate states, and applicability are recomputed.
-45. Shared observations serialize identically wherever exposed.
-46. `projection_sha256` covers the complete projection with its own field normalized to `null`.
-47. A projection does not establish correspondence to omitted report bytes; the source report remains separately required.
+39. Projection starts from a strict-decoded, semantically verified schema `0.3` report.
+40. Every source claim uses canonical expectations and one observer arm.
+41. Method state sets are fixed as `CC`, `BC+CC`, `BC+CB+CC`, and `BB+BC+CB+CC`.
+42. Each method payload contains only its declared observations.
+43. `not_applicable` comes only from pre-execution annotation.
+44. For applicable methods, indeterminate evidence precedes rejection.
+45. Exact fields, canonical identifiers, ordered methods, and ordered state slices are required.
+46. Claim and method decisions, reasons, contradictions, indeterminate states, and applicability are recomputed.
+47. Shared observations serialize identically wherever exposed.
+48. `projection_sha256` covers the complete projection with its own field normalized to `null`.
+49. A projection does not establish correspondence to omitted report bytes; the source report remains separately required.
+50. Projected `accept` means only that the required state predicate matched; it does not establish why a failing state failed.
 
 ### Scenario manifest and result contracts
 
-48. Manifests and results use exact root and nested fields with deterministic ordering.
-49. Builders seal artifacts only after semantic validation.
-50. Development manifests require an uncommitted development lock; holdout manifests require the declared commitment form.
-51. Manifest verification recomputes provenance conditions, endpoints, path relations, observer IDs, exit classes, state/cause consistency, method labels, review status, and denominator eligibility.
-52. An approved manifest requires an approving reviewer declared independent of scenario author and implementation; rejection takes precedence.
-53. Included results contain no exclusion metadata; excluded results require code, reason, and decision reference.
-54. Applied deviations require approval; rejected deviations carry no approval or confirmatory impact.
-55. Exploratory-only, excluded, or results-visible deviations cannot silently preserve confirmatory eligibility.
-56. Decisions, reasons, concordance, denominator membership, and cost missingness are recomputed.
-57. Cross-artifact result verification preflights sources and checks manifest, projection, report, witness, observer, decision, and denominator relations.
-58. Internal commitment fields do not prove that a commitment predates execution.
+51. Manifests and results use exact root and nested fields with deterministic ordering.
+52. Builders seal artifacts only after semantic validation.
+53. Development manifests require an uncommitted development lock; holdout manifests require the declared commitment form.
+54. Manifest verification recomputes provenance conditions, endpoints, path relations, observer IDs, exit classes, state/cause consistency, method labels, review status, and denominator eligibility.
+55. An approved manifest requires an approving reviewer declared independent of scenario author and implementation; rejection takes precedence.
+56. Included results contain no exclusion metadata; excluded results require code, reason, and decision reference.
+57. Applied deviations require approval; rejected deviations carry no approval or confirmatory impact.
+58. Exploratory-only, excluded, or results-visible deviations cannot silently preserve confirmatory eligibility.
+59. Decisions, reasons, concordance, denominator membership, and cost missingness are recomputed.
+60. Cross-artifact result verification preflights sources and checks manifest, projection, report, witness, observer, decision, and denominator relations.
+61. Internal commitment fields do not prove that a commitment predates execution.
+62. Manifest ground truth does not become correct merely because it is internally consistent and digest-valid.
 
 ### Synthetic fixture generator
 
-59. A descriptor uses exact fields, supported versions and families, canonical paths, one observer arm, and method labels derived from states.
-60. Unsupported descriptors fail before materialization.
-61. The destination is absent or a literal empty directory; a symbolic-link final path is rejected.
-62. The generator never deletes existing destination content.
-63. Git runs without a shell, with fixed metadata, timestamps, messages, object format, and known staged paths under a reduced environment.
-64. The generated repository is clean after candidate commit.
-65. Identity records descriptor, generator, template, observer, Git, path, state, method, and specification identities.
-66. Public identity excludes absolute destination paths, usernames, environment values, and raw Git output.
-67. Equivalent descriptors reproduce the same identity in clean supported directories.
-68. Materialized verification checks `HEAD`, base ancestry, exact trees, cleanliness, and specification bytes.
-69. Public identity verification recomputes descriptor-derived specification bytes.
-70. Descriptor and identity digests cover complete documents with their own fields normalized to `null`.
+63. A descriptor uses exact fields, supported versions and families, canonical paths, one observer arm, and method labels derived from states.
+64. Unsupported descriptors fail before materialization.
+65. The destination is absent or a literal empty directory; a symbolic-link final path is rejected.
+66. The generator never deletes existing destination content.
+67. Git runs without a shell, with fixed metadata, timestamps, messages, object format, and known staged paths under a reduced environment.
+68. The generated repository is clean after candidate commit.
+69. Identity records descriptor, generator, template, observer, Git, path, state, method, and specification identities.
+70. Public identity excludes absolute destination paths, usernames, environment values, and raw Git output.
+71. Equivalent descriptors reproduce the same identity in clean supported directories.
+72. Materialized verification checks `HEAD`, base ancestry, exact trees, cleanliness, and specification bytes.
+73. Public identity verification recomputes descriptor-derived specification bytes.
+74. Descriptor and identity digests cover complete documents with their own fields normalized to `null`.
+75. Fixed-family adapters accept no caller-provided executable source or test bytes.
 
 ### Fixture-manifest binding
 
-71. The builder accepts only independently verified descriptor, identity, and manifest sources.
-72. All binding values are derived; callers provide no free-form duplicated relation data.
-73. Descriptor-to-identity family, generator, template, observer, paths, states, methods, and descriptor digest agree.
-74. Manifest provenance, base/head commits, paths, observer, command, timeout, ground truth, and family agree.
-75. Specification path belongs to declared documentation paths and digest equals descriptor-derived bytes.
-76. `relation_scope` distinguishes verified relations, manifest-owned governance fields, and fixture-only values.
-77. Binding cannot change partition, review, authorization, or denominator eligibility.
-78. The verifier re-verifies all sources, rejects malformed structures with typed diagnostics, recomputes `binding_sha256`, re-derives the canonical relation, and requires exact equality.
-79. Recomputed binding digests cannot hide mismatched sources.
+76. The builder accepts only independently verified descriptor, identity, and manifest sources.
+77. All binding values are derived; callers provide no free-form duplicated relation data.
+78. Descriptor-to-identity family, generator, template, observer, paths, states, methods, and descriptor digest agree.
+79. Manifest provenance, base/head commits, paths, observer, command, timeout, ground truth, and family agree.
+80. Specification path belongs to declared documentation paths and digest equals descriptor-derived bytes.
+81. `relation_scope` distinguishes verified relations, manifest-owned governance fields, and fixture-only values.
+82. Binding cannot change partition, review, authorization, or denominator eligibility.
+83. The verifier re-verifies all sources, rejects malformed structures with typed diagnostics, recomputes `binding_sha256`, re-derives the canonical relation, and requires exact equality.
+84. Recomputed binding digests cannot hide mismatched sources.
+85. A valid binding does not establish that a test oracle is relevant or strong.
 
-### Paired wrong-reason observer probe
+### Paired import-error observer probe
 
-80. Both arms use the same scenario ID, family, control role, generator, template, timeout, path categories, and source/test bytes.
-81. Only observer-derived descriptor fields may differ.
-82. Candidate tests import a fixed candidate-introduced symbol before assertions.
-83. `O0_EXIT_CODE` must record `BC = fail` with no typed receipt evidence and produce the declared complete accepted matrix.
-84. `O1_TYPED_RECEIPT` must record `BC = error`, receipt outcome `test_error`, zero assertion failures, at least one error, and incomplete evidence.
-85. `M0` remains `accept`; `M1`–`M3` become `indeterminate` only in the typed arm.
-86. `import_error` remains predeclared fixture ground truth and is never presented as a receipt-v1 runtime subtype.
-87. Both manifests remain development-partition and primary-denominator ineligible.
-88. Public descriptor, identity, binding, report, and projection artifacts contain no raw traceback or absolute local path.
+86. Both arms use the same scenario ID, family, control role, generator, template, timeout, path categories, and source/test bytes.
+87. Only observer-derived descriptor fields may differ.
+88. Candidate tests import a fixed candidate-introduced symbol before assertions.
+89. `O0_EXIT_CODE` records `BC = fail` with no typed receipt evidence and produces the declared complete accepted matrix.
+90. `O1_TYPED_RECEIPT` records `BC = error`, receipt outcome `test_error`, zero assertion failures, at least one error, and incomplete evidence.
+91. `M0` remains `accept`; `M1`–`M3` become `indeterminate` only in the typed arm.
+92. `import_error` remains predeclared fixture ground truth and is never presented as a receipt-v1 runtime subtype.
+93. Both manifests remain development-partition and primary-denominator ineligible.
+94. Public descriptor, identity, binding, report, and projection artifacts contain no raw traceback or absolute local path.
 
-### Execution and publication
+### Unrelated-assertion negative control
 
-89. Commands execute without a shell.
-90. The full host environment is not inherited.
-91. Raw output is excluded unless explicitly requested.
-92. Absolute repository and specification paths are excluded from public artifacts.
-93. Default reports live in private Git metadata.
-94. Ambiguous configuration and harness errors stop analysis.
-95. Every exported fixture, binding, report, projection, manifest, and result requires privacy and boundary review.
+95. Both arms use the same scenario ID, family, control role, generator, template, timeout, path categories, and source/test bytes.
+96. Base and candidate expose fixed claim-facing and collateral behavior dimensions.
+97. The claim-facing viewer test executes the declared behavior but asserts only a property that passes on base and candidate.
+98. A separate fixed collateral assertion is the sole source of `BC = fail`.
+99. Direct controls require the claim-facing test to pass against both code versions.
+100. Direct controls require the complete candidate suite to fail against base code and the suite without the collateral assertion to pass.
+101. `O0_EXIT_CODE` records `BC = fail` with cause `test_failure_untyped`.
+102. `O1_TYPED_RECEIPT` records `BC = fail`, outcome `test_failure`, at least one assertion failure, and zero errors.
+103. Both reports remain complete and supported.
+104. `M0` through `M3` accept under both observers.
+105. Both manifests remain development-partition and primary-denominator ineligible.
+106. Public artifacts contain no raw failure narrative or absolute local path.
+107. The result is documented as a limitation and is never presented as oracle-relevance validation.
+
+### Execution, packaging, and publication
+
+108. Commands execute without a shell.
+109. The full host environment is not inherited.
+110. Raw output is excluded unless explicitly requested.
+111. Absolute repository and specification paths are excluded from public artifacts.
+112. Default reports live in private Git metadata.
+113. Ambiguous configuration and harness errors stop analysis.
+114. Editable-install and installed-wheel smoke execute complete fixture chains for supported development probes.
+115. Packaged smoke is not independent reproduction.
+116. Every exported fixture, binding, report, projection, manifest, and result requires privacy and boundary review.
 
 ## Residual risks
 
@@ -242,15 +276,21 @@ Rejecting changed links and a linked fixture destination does not establish trus
 
 ### Typed receipts are not attestations or complete diagnoses
 
-The cooperating adapter improves failure/error precision, but receipts are unsigned and binding is visible. The wrong-reason probe shows one distinction between assertion failure and generic error. It does not show reliable import/setup/collection subtype diagnosis or resistance to malicious tested code.
+The cooperating adapter improves failure/error precision, but receipts are unsigned and binding is visible. The import probe shows one distinction between assertion failure and generic error. It does not show reliable import/setup/collection subtype diagnosis or resistance to malicious tested code.
 
-### Ground-truth subtype risk
+### Typed assertion failure is not oracle relevance
 
-A fixed synthetic `import_error` label is auditable from owned bytes. Real-corpus failure subtypes may be ambiguous and susceptible to post-result relabeling. The frozen protocol needs an independent pre-execution review procedure or must retain generic labels.
+The unrelated-assertion negative control demonstrates that a genuine assertion failure can be caused entirely by collateral behavior while a claim-facing assertion remains non-discriminating. Four-state replay and typed outcomes cannot by themselves identify which assertion witnessed the claim.
+
+A future oracle-integrity layer must have independent ground truth, positive and negative fixtures, measured error rates, and a separate policy boundary. An LLM-generated explanation cannot count as independent confirmation.
+
+### Ground-truth subtype and intent risk
+
+A fixed synthetic `import_error` or `unrelated_assertion` label is auditable from owned bytes and direct controls. Real-corpus failure subtypes and claim relevance may be ambiguous and susceptible to post-result relabeling. The frozen protocol needs an independent pre-execution review procedure or must retain generic/unknown labels.
 
 ### Path interventions are coarse
 
-One path may contain multiple changes and one change may span paths. Rename or grouping choices alter the coalition game. Influence values are not correctness, severity, ownership, or blame.
+One path may contain multiple changes and one change may span paths. Rename or grouping choices alter the coalition game. Influence values are not correctness, severity, ownership, blame, or oracle relevance.
 
 ### Invalid hybrids and nondeterminism
 
@@ -288,12 +328,14 @@ Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, 
 - Verify exact refs, cleanliness, specification, and path classification before execution.
 - Prefer typed observers when a trusted adapter exists, but never treat receipts as attestations.
 - Do not infer a precise error subtype from generic `test_error` without independently fixed evidence.
+- Do not infer claim relevance from `test_failure`, failure counts, or a canonical matrix.
 - Treat execution-sensitive configuration and generated inputs as code.
 - Review every incomplete state, invalid hybrid, endpoint anchor, and coalition before interpretation.
 - Treat exact influence as enumeration over declared units, not complete causality.
 - Strict-decode and verify every report, projection, descriptor, identity, binding, manifest, and result separately.
 - Verify generated identity against its repository before using its commits.
 - Require paired observer probes to hold mechanism and scenario identity constant.
-- Preserve exclusions and deviations rather than deleting them.
-- Do not run DW-001 pilot or holdout while protocol and authorization gates are incomplete.
-- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, valid fixture/binding, or one controlled observer contrast as full correctness, general effectiveness, production readiness, or deployment authorization.
+- Require oracle negative controls to prove directly which assertion is the sole failure source.
+- Preserve exclusions, disputes, negative results, and deviations rather than deleting them.
+- Do not run a DW-001 pilot or holdout while protocol and authorization gates are incomplete.
+- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, valid fixture/binding, or one controlled contrast as full correctness, oracle relevance, general effectiveness, production readiness, or deployment authorization.

@@ -4,7 +4,7 @@
 
 This taxonomy defines mechanism and control labels for deterministic owned-synthetic DW-001 fixtures. A family identifier is not a narrative tag: expected four-state observations, failure-cause declarations, and nested-method decisions are recomputed by the fixture verifier.
 
-The current generator implements four controlled families. Remaining issue #2 mechanisms stay explicit rather than being silently treated as covered. The schema is still pre-freeze; every result must pin the exact implementation commit because older v1 verifiers do not understand families added later during development.
+The current generator implements five controlled families. Remaining issue #2 mechanisms stay explicit rather than being silently treated as covered. The schema is still pre-freeze; every result must pin the exact implementation commit because older v1 verifiers do not understand families added later during development.
 
 ## Taxonomy invariants
 
@@ -30,6 +30,8 @@ Stored method decisions are not authoritative. They are derived from state seman
 | `candidate-regression-against-base-tests` | false-assurance case | `O0` or `O1` | `pass / fail / fail / pass` | `accept / accept / reject / reject` | incremental value of `CB` beyond fail-to-pass validation |
 | `wrong-reason-base-import-failure` | false-assurance case | `O0` | `pass / fail / pass / pass` | `accept / accept / accept / accept` | exit-code-only false assurance from a pre-assertion import error |
 | `wrong-reason-base-import-failure` | false-assurance case | `O1` | `pass / error / pass / pass` | `accept / indeterminate / indeterminate / indeterminate` | typed preservation of error rather than semantic failure |
+| `wrong-reason-unrelated-assertion` | false-assurance case | `O0` | `pass / fail / pass / pass` | `accept / accept / accept / accept` | untyped assertion-channel evidence does not establish claim relevance |
+| `wrong-reason-unrelated-assertion` | false-assurance case | `O1` | `pass / fail / pass / pass` | `accept / accept / accept / accept` | a genuine typed assertion failure can still be unrelated to the claim |
 
 ### `valid-discriminating-regression`
 
@@ -131,15 +133,72 @@ Falsification boundary:
 - the missing-symbol import is itself the intended oracle;
 - harmless environment variation changes the declared mechanism.
 
-This single pair does not estimate how often wrong-reason failures occur in real patches.
+This pair isolates one failure/error distinction. It does not estimate how often wrong-reason execution failures occur in real patches.
+
+### `wrong-reason-unrelated-assertion`
+
+Fixed mechanism:
+
+- base `is_admin` remains buggy and candidate `is_admin` repairs the viewer behavior;
+- base `version_label()` returns `v1` and candidate `version_label()` returns `v2` as a collateral change;
+- the claim-facing viewer test executes `is_admin({"role": "viewer"})` but asserts only that the result is a Boolean;
+- that claim-facing assertion passes on both base and candidate implementations;
+- a separate assertion requires `version_label() == "v2"`;
+- the collateral version-label assertion is the sole source of `BC = fail`;
+- removing that collateral assertion makes `BC` pass;
+- base tests pass under both implementation worlds and candidate tests pass on the candidate.
+
+The same scenario identifier and byte-identical source/test mechanism are used under both observer arms.
+
+#### Exit-code arm
+
+```text
+BB = pass
+BC = fail / test_failure_untyped
+CB = pass
+CC = pass
+```
+
+All nested methods accept. The exit-code arm provides no assertion-cause information.
+
+#### Typed-receipt arm
+
+```text
+BB = pass
+BC = fail / assertion_failure
+CB = pass
+CC = pass
+```
+
+The built-in unittest adapter records `test_failure`, at least one assertion failure, and zero errors. All nested methods still accept because current matrix predicates ask whether `BC` failed, not whether the failing assertion is relevant to the declared claim.
+
+This is a **negative control for oracle relevance**. It establishes a limitation of the current method:
+
+```text
+real assertion failure
+    + typed outcome
+    + canonical four-state witness
+    != claim-oracle relevance
+```
+
+Falsification boundary:
+
+- the claim-facing assertion fails on the base;
+- the collateral assertion is not the sole `BC` failure source;
+- either observer records `error` or `timeout` instead of assertion failure;
+- source/test bytes or scenario identity differ between arms;
+- any nested method rejects or becomes indeterminate;
+- the collateral version label is materially part of the declared authorization claim;
+- the mechanism requires free-form intent that cannot be audited from fixed bytes.
+
+The family does not define an oracle-relevance detector. It demonstrates why test-integrity or claim-to-oracle evidence must remain a separate layer.
 
 ## Required but not yet generated
 
 | Planned family | Required distinction before implementation |
 |---|---|
 | assertion or test weakening | materially weakened oracle versus behavior-preserving test refactor |
-| unrelated assertion failure | intended regression exposure versus a different assertion sharing the same failure channel |
-| collection/setup/dependency/infrastructure error | runtime subtype evidence or independently reviewed ground truth without post-result relabeling |
+| broader collection/setup/dependency/infrastructure error | runtime subtype evidence or independently reviewed ground truth without post-result relabeling |
 | semantically invalid hybrid | pre-execution applicability rather than inference from command failure |
 | no-op or already-resolved task | justified no-change outcome versus unnecessary implementation or test edits |
 | nondeterministic/environment-drift case | repeated execution, aggregation rule, and uncertainty policy |
@@ -150,13 +209,25 @@ These identifiers must not enter `SUPPORTED_FAMILIES` until they have exact gene
 
 `O0_EXIT_CODE` preserves only configured process classes. A nonzero command classified as failure receives `test_failure_untyped`, even when the underlying mechanism is an execution error.
 
-`O1_TYPED_RECEIPT` distinguishes assertion failure from generic test error and other receipt outcomes. Receipt v1 does not provide a complete failure-cause taxonomy or authenticate the producer.
+`O1_TYPED_RECEIPT` distinguishes assertion failure from generic test error and other receipt outcomes. Receipt v1 does not provide a complete failure-cause taxonomy, establish assertion relevance, or authenticate the producer.
 
 The observer arm is part of the descriptor digest. Typed failure causes cannot be retrofitted onto an exit-code fixture, and changing observer fields without changing derived state/method semantics is rejected.
 
+## Oracle-relevance boundary
+
+A typed `test_failure` means that the cooperating adapter observed at least one assertion failure and no higher-precedence test error under its aggregation rules. It does not establish:
+
+- which assertion was intended to witness the claim;
+- whether that assertion discriminates base from candidate for the claimed behavior;
+- whether a different assertion caused the suite to fail;
+- whether the oracle is strong enough to reject plausible incorrect patches;
+- whether mocks, skips, selection, fixtures, or environment effects invalidate the intended meaning.
+
+The unrelated-assertion family is therefore a required negative control for any future test-integrity layer. Absence of a warning signal must not be interpreted as oracle adequacy.
+
 ## Schema compatibility boundary
 
-The fixture descriptor, identity, and binding schemas remain structurally versioned as v1 during development. Adding the wrong-reason family expands their pre-freeze family and failure-cause enums while preserving validity and digest meaning for existing artifacts.
+The fixture descriptor, identity, and binding schemas remain structurally versioned as v1 during development. Adding controlled families expands their pre-freeze family and failure-cause enums while preserving validity and digest meaning for existing artifacts.
 
 Consequences:
 
@@ -174,7 +245,7 @@ The fixtures are controlled mechanism probes. They do not estimate:
 - language, framework, patch-size, or dependency distributions;
 - invalid-hybrid frequency;
 - operational cost;
-- observer accuracy on a held-out population;
+- observer or oracle-analysis accuracy on a held-out population;
 - method effectiveness or superiority.
 
 Development execution may test plumbing, applicability, timing, and analysis code. Inspected development cases cannot later become confirmatory holdout cases.
@@ -186,10 +257,12 @@ Narrow or redesign the taxonomy if:
 - two families encode the same mechanism and control contrast;
 - labels depend on observed DeltaWitness output rather than pre-execution semantics;
 - harmless representation changes alter the family without changing its mechanism;
-- the control does not isolate the intended evidence increment;
+- the control does not isolate the intended evidence increment or limitation;
 - expected labels become free-form values that cannot be recomputed;
 - external reviewers cannot infer the boundary from the descriptor and fixed bytes.
 
 ## Claim boundary
 
-This taxonomy establishes only a pre-freeze vocabulary and four deterministic owned-synthetic mechanism probes. The paired wrong-reason case shows one controlled observer-dependent decision difference. It does not establish completeness, representativeness, prevalence, empirical effectiveness, general superiority of typed receipts, scientific novelty, protocol freeze, independent reproduction, or authorization for pilot or held-out execution.
+This taxonomy establishes only a pre-freeze vocabulary and five deterministic owned-synthetic mechanism probes. The import-error pair shows one controlled observer-dependent decision difference. The unrelated-assertion pair shows one controlled case where typed assertion evidence and four-state replay still accept an oracle-irrelevant failure.
+
+It does not establish completeness, representativeness, prevalence, empirical effectiveness, general superiority of typed receipts, a validated oracle-relevance method, scientific novelty, protocol freeze, independent reproduction, or authorization for pilot or held-out execution.

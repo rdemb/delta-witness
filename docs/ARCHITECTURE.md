@@ -83,11 +83,11 @@ Every other receipt outcome or receipt/exit contradiction becomes `error` and ma
 
 Receipt validation checks exact fields, strict UTF-8 JSON, duplicate keys, bounded regular-file semantics, binding equality, producer syntax, count bounds, count totals, and outcome/count consistency.
 
-Receipt v1 distinguishes assertion failure from generic test error. It does not distinguish every error subtype and does not authenticate the producer. The binding is visible to the tested process.
+Receipt v1 distinguishes assertion failure from generic test error. It does not distinguish every error subtype, identify the assertion relevant to a claim, or authenticate the producer. The binding is visible to the tested process.
 
-## Controlled wrong-reason observer pair
+## Controlled wrong-reason import pair
 
-DW-001 includes one fixed owned-synthetic observer probe:
+DW-001 includes the fixed owned-synthetic observer probe:
 
 ```text
 wrong-reason-base-import-failure
@@ -109,7 +109,7 @@ Only observer-derived descriptor fields differ: observer, observer ID, command, 
 ### Exit-code arm
 
 ```text
-BB / BC / CB / CC = pass / fail / pass / pass
+BB / BC / CB / CC  = pass / fail / pass / pass
 M0 / M1 / M2 / M3 = accept / accept / accept / accept
 ```
 
@@ -118,15 +118,65 @@ The nonzero import-error process is interpreted only through configured `fail` s
 ### Typed-receipt arm
 
 ```text
-BB / BC / CB / CC = pass / error / pass / pass
+BB / BC / CB / CC  = pass / error / pass / pass
 M0 / M1 / M2 / M3 = accept / indeterminate / indeterminate / indeterminate
 ```
 
 The unittest producer records zero assertion failures and at least one error, emitting `test_error`. DeltaWitness preserves incomplete evidence instead of treating it as semantic `fail`.
 
-`import_error` is fixed fixture ground truth for the exact synthetic bytes. It is not inferred from the generic runtime receipt. This separation prevents a claim that receipt v1 diagnoses import/setup/collection subtypes.
+`import_error` is fixed fixture ground truth for the exact synthetic bytes. It is not inferred from the generic runtime receipt. This separation prevents a claim that receipt v1 diagnoses import, setup, or collection subtypes.
 
 The pair is a development mechanism probe, not an effectiveness estimate.
+
+## Controlled unrelated-assertion negative control
+
+DW-001 also includes:
+
+```text
+wrong-reason-unrelated-assertion
+```
+
+The fixture contains two behavior dimensions:
+
+```text
+claim-facing: is_admin(viewer)
+collateral:   version_label()
+```
+
+Base code keeps the buggy role rule and returns `v1` from `version_label()`. Candidate code repairs the role rule and returns `v2`.
+
+Candidate tests contain:
+
+- a viewer test that executes claim-facing behavior but asserts only that the result is a Boolean, so it passes on both implementations;
+- an unrelated assertion that `version_label() == "v2"`, which is the sole `BC` failure source.
+
+Normative direct controls execute the claim-facing test against both code versions and require both to pass. They then execute the complete candidate suite against base code, require failure, remove the exact collateral assertion, and require the remaining suite to pass.
+
+Both observer arms produce:
+
+```text
+BB / BC / CB / CC  = pass / fail / pass / pass
+M0 / M1 / M2 / M3 = accept / accept / accept / accept
+```
+
+The typed arm correctly records:
+
+```text
+receipt outcome = test_failure
+failures >= 1
+errors = 0
+```
+
+This is an intentional negative result. A real assertion failure and canonical four-state witness do not identify whether the failing assertion is relevant to the declared claim.
+
+Architecturally:
+
+```text
+outcome semantics
+    != oracle relevance
+```
+
+A future test-integrity layer must therefore remain separate, must be evaluated against this negative control, and cannot use an LLM explanation as an unverified authority.
 
 ## Exact patch-influence trust path
 
@@ -164,7 +214,7 @@ When release conditions hold, DeltaWitness computes:
 - pairwise Banzhaf interaction;
 - monotonicity diagnostics.
 
-These metrics describe one declared Boolean witness over whole changed paths. They do not establish semantic correctness, blame, severity, ownership, or universal causality.
+These metrics describe one declared Boolean witness over whole changed paths. They do not establish semantic correctness, blame, severity, ownership, oracle relevance, or universal causality.
 
 ## State and environment lifecycle
 
@@ -195,7 +245,7 @@ The descriptor fixes supported family, control role, observer arm, command, time
 
 The generator creates fixed source/test/specification bytes and exact Git objects. Identity records descriptor, generator, observer, Git, path, state, method, and specification identities. Public identity verification recomputes descriptor-derived specification bytes. Repository correspondence remains a separate materialized-fixture check.
 
-The pre-freeze supported-family registry now includes four fixed probes. Existing v1 artifacts remain valid, but older verifiers may reject newer-family artifacts. Exact schema and implementation commits are required until freeze.
+The pre-freeze supported-family registry contains five fixed probes. Existing v1 artifacts remain valid, but older verifiers may reject newer-family artifacts. Exact schema and implementation commits are required until freeze.
 
 ### Scenario manifest and fixture binding
 
@@ -205,7 +255,7 @@ Because manifest v1 predates fixture identity, the separate binding verifies com
 
 `relation_scope` distinguishes verified relations, manifest-owned governance values, and fixture-only tree/specification identities.
 
-A valid binding cannot authenticate sources, prove creation time, validate reviewer claims, or make development material confirmatory.
+A valid binding cannot authenticate sources, prove creation time, validate reviewer claims, establish oracle relevance, or make development material confirmatory.
 
 ### Projection and result
 
@@ -241,12 +291,13 @@ DeltaWitness intentionally refuses substitution among evidence layers:
 
 - process failure does not imply assertion failure;
 - generic typed error does not imply a precise error subtype;
-- typed outcome does not prove oracle relevance;
+- assertion failure does not imply claim-oracle relevance;
+- a canonical four-state matrix does not prove oracle adequacy;
 - exact coalition enumeration does not prove complete causality;
 - a fixture identity does not prove environment reproducibility;
 - a fixture-manifest binding does not validate governance declarations;
 - an unkeyed digest does not authenticate a producer;
 - a matching witness does not authorize deployment;
-- one controlled synthetic pair does not establish general observer superiority.
+- controlled synthetic pairs do not establish general observer or method superiority.
 
-Future work may add broader error-taxonomy adapters, assertion-integrity analysis, mutation or coverage evidence, repeated stochastic execution, reproducible containment, signed provenance, ecological baselines, external policy, and independent reproduction. Each layer must retain its own claim boundary.
+Future work may add assertion-integrity analysis, mutation or coverage evidence, broader error-taxonomy adapters, repeated stochastic execution, reproducible containment, signed provenance, ecological baselines, external policy, and independent reproduction. Each layer must retain its own claim boundary and explicit negative controls.
