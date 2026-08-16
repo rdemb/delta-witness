@@ -1,0 +1,457 @@
+{
+  "$defs": {
+    "cost": {
+      "additionalProperties": false,
+      "properties": {
+        "command_count": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            }
+          ]
+        },
+        "cpu_seconds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "missing_reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nonEmpty"
+            }
+          ]
+        },
+        "review_seconds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "state_count": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "measured",
+            "not_run",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "wall_clock_seconds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "state_count",
+        "command_count",
+        "review_seconds",
+        "missing_reason"
+      ],
+      "type": "object"
+    },
+    "decision": {
+      "enum": [
+        "accept",
+        "reject",
+        "indeterminate",
+        "not_applicable"
+      ],
+      "type": "string"
+    },
+    "gitObject": {
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$",
+      "type": "string"
+    },
+    "method": {
+      "additionalProperties": false,
+      "properties": {
+        "combined_method_id": {
+          "pattern": "^M[0-3]_[A-Z0-9_]+__O[01]_[A-Z0-9_]+$",
+          "type": "string"
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        },
+        "denominator_reason_code": {
+          "enum": [
+            "eligible",
+            "development_partition",
+            "ground_truth_not_approved",
+            "expected_not_applicable",
+            "excluded",
+            "deviation_excluded",
+            "deviation_exploratory_only",
+            "observed_not_applicable"
+          ],
+          "type": "string"
+        },
+        "expected_decision": {
+          "$ref": "#/$defs/decision"
+        },
+        "method_id": {
+          "enum": [
+            "M0_FINAL",
+            "M1_F2P",
+            "M2_F2P_P2P",
+            "M3_FOUR_STATE"
+          ],
+          "type": "string"
+        },
+        "observed_decision": {
+          "$ref": "#/$defs/decision"
+        },
+        "observed_reason_code": {
+          "$ref": "#/$defs/reason"
+        },
+        "observer_id": {
+          "$ref": "#/$defs/observerId"
+        },
+        "primary_denominator_eligible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "method_id",
+        "observer_id",
+        "combined_method_id",
+        "expected_decision",
+        "observed_decision",
+        "observed_reason_code",
+        "concordant",
+        "primary_denominator_eligible",
+        "denominator_reason_code",
+        "cost"
+      ],
+      "type": "object"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "observerId": {
+      "enum": [
+        "O0_EXIT_CODE",
+        "O1_TYPED_RECEIPT"
+      ],
+      "type": "string"
+    },
+    "reason": {
+      "enum": [
+        "predicate_satisfied",
+        "predicate_contradicted",
+        "required_state_indeterminate",
+        "required_state_not_applicable"
+      ],
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/rdemb/delta-witness/raw/main/research/DW-001/schema/result-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Structural schema for a sealed post-execution DW-001 result record. Cross-field and cross-artifact semantics are enforced by deltawitness.dw001_contracts.",
+  "properties": {
+    "deviations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "approval_reference": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/nonEmpty"
+              }
+            ]
+          },
+          "confirmatory_impact": {
+            "enum": [
+              "none",
+              "exploratory_only",
+              "excluded"
+            ],
+            "type": "string"
+          },
+          "deviation_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._/+:-]{0,127}$",
+            "type": "string"
+          },
+          "observed_problem": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "results_visible": {
+            "type": "boolean"
+          },
+          "rule_id": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "status": {
+            "enum": [
+              "applied",
+              "rejected"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviation_id",
+          "status",
+          "rule_id",
+          "observed_problem",
+          "action",
+          "results_visible",
+          "confirmatory_impact",
+          "approval_reference"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "exclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nonEmpty"
+            }
+          ]
+        },
+        "decision_reference": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nonEmpty"
+            }
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nonEmpty"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "included",
+            "excluded"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "code",
+        "reason",
+        "decision_reference"
+      ],
+      "type": "object"
+    },
+    "methods": {
+      "items": false,
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/method"
+            },
+            {
+              "properties": {
+                "method_id": {
+                  "const": "M0_FINAL"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/method"
+            },
+            {
+              "properties": {
+                "method_id": {
+                  "const": "M1_F2P"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/method"
+            },
+            {
+              "properties": {
+                "method_id": {
+                  "const": "M2_F2P_P2P"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/method"
+            },
+            {
+              "properties": {
+                "method_id": {
+                  "const": "M3_FOUR_STATE"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "type": "array"
+    },
+    "partition": {
+      "enum": [
+        "development",
+        "holdout"
+      ],
+      "type": "string"
+    },
+    "result_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "scenario_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "scenario_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "schema_version": {
+      "const": "deltawitness.dw001-result-record.v1"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_contract_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generator_commit": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/gitObject"
+            }
+          ]
+        },
+        "implementation_commit": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "matrix_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "observer_id": {
+          "$ref": "#/$defs/observerId"
+        },
+        "projection_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "protocol_commit": {
+          "$ref": "#/$defs/gitObject"
+        },
+        "witness_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "protocol_commit",
+        "implementation_commit",
+        "generator_commit",
+        "baseline_contract_sha256",
+        "matrix_report_sha256",
+        "witness_sha256",
+        "projection_sha256",
+        "observer_id"
+      ],
+      "type": "object"
+    },
+    "study_id": {
+      "const": "DW-001"
+    }
+  },
+  "required": [
+    "schema_version",
+    "study_id",
+    "scenario_id",
+    "partition",
+    "scenario_manifest_sha256",
+    "source",
+    "exclusion",
+    "deviations",
+    "methods",
+    "result_sha256"
+  ],
+  "title": "DeltaWitness DW-001 Result Record v1",
+  "type": "object"
+}
