@@ -1,12 +1,14 @@
 """Public DW-001 development mechanism-pilot API.
 
 The plan contract is deterministic and development-only. The runner stages and
-self-verifies the exact ten-arm bundle before publication. A canonical text
-archive can retain every verified JSON artifact without adding an external
-upload mechanism. Public bundle and archive operations require the complete
-sealed file set with no additional entries. None of these contracts authorizes
-a holdout, creates a confirmatory denominator, authenticates producers, or
-provides containment.
+self-verifies the exact ten-arm bundle before publication, and the supported
+public execution boundary requires an absent output path so publication is one
+same-filesystem rename rather than a sequence of partially visible moves. A
+canonical text archive can retain every verified JSON artifact without adding
+an external upload mechanism. Public bundle and archive operations require the
+complete sealed file set with no additional entries. None of these contracts
+authorizes a holdout, creates a confirmatory denominator, authenticates
+producers, or provides containment.
 """
 
 from __future__ import annotations
@@ -58,9 +60,14 @@ def run_development_pilot(
     plan: object,
     output_directory: Path,
 ) -> dict[str, Any]:
-    """Execute only the exact verified development plan into a safe bundle."""
+    """Execute the sealed plan and atomically publish to an absent final path."""
 
-    return run_pilot(plan, output_directory)
+    output = Path(output_directory)
+    if output.is_symlink() or output.exists():
+        raise DW001PilotError(
+            "development pilot output directory: must be absent for atomic publication"
+        )
+    return run_pilot(plan, output)
 
 
 def verify_development_pilot_index_document(
