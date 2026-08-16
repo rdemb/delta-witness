@@ -45,6 +45,7 @@ _ROOT_FIELDS = {
     "candidate_baseline",
     "records",
     "summary",
+    "analysis",
     "policy",
     "cost",
     "semantic_sha256",
@@ -90,6 +91,31 @@ def _profile(record: dict[str, object], profile_id: str) -> dict[str, object]:
     return matches[0]
 
 
+def _semantic_copy(document: dict[str, object]) -> dict[str, object]:
+    normalized = deepcopy(document)
+    normalized["created_at"] = None
+    normalized["runtime"] = None
+    normalized["report_sha256"] = None
+    normalized["semantic_sha256"] = None
+    normalized["cost"]["wall_clock_seconds"] = None
+    normalized["cost"]["cpu_seconds"] = None
+    for record in [normalized["candidate_baseline"], *normalized["records"]]:
+        if record["cost"]["status"] == "measured":
+            record["cost"]["wall_clock_seconds"] = None
+            record["cost"]["cpu_seconds"] = None
+        for profile in record["profiles"]:
+            for selector in profile["selectors"]:
+                selector["duration_seconds"] = None
+                selector["stdout_sha256"] = None
+                selector["stderr_sha256"] = None
+        if record["reference"] is not None:
+            for selector in record["reference"]["selectors"]:
+                selector["duration_seconds"] = None
+                selector["stdout_sha256"] = None
+                selector["stderr_sha256"] = None
+    return normalized
+
+
 class DW001ClaimScopedMutationResultTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -122,10 +148,13 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
         self.assertEqual(baseline["execution_status"], "executed")
         self.assertEqual(baseline["record_role"], "candidate_baseline")
         self.assertIs(baseline["counts_toward_generic_generalization"], False)
+        self.assertIs(baseline["concordant"], True)
 
         strong = _profile(baseline, "strong-authorization-oracle-v1")
         weak = _profile(baseline, "weak-boolean-proxy-v1")
+        self.assertEqual(strong["expected_outcome"], "baseline_passed")
         self.assertEqual(strong["outcome"], "baseline_passed")
+        self.assertEqual(weak["expected_outcome"], "baseline_passed")
         self.assertEqual(weak["outcome"], "baseline_passed")
         self.assertEqual(
             [selector["observed"] for selector in strong["selectors"]],
@@ -161,16 +190,16 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
             with self.subTest(operator=operator_id):
                 self.assertEqual(record["catalog_status"], "generated")
                 self.assertEqual(record["execution_status"], "executed")
+                self.assertIs(record["concordant"], True)
                 self.assertIs(
                     record["counts_toward_generic_generalization"],
                     True,
                 )
-                strong = _profile(
-                    record,
-                    "strong-authorization-oracle-v1",
-                )
+                strong = _profile(record, "strong-authorization-oracle-v1")
                 weak = _profile(record, "weak-boolean-proxy-v1")
+                self.assertEqual(strong["expected_outcome"], "killed")
                 self.assertEqual(strong["outcome"], "killed")
+                self.assertEqual(weak["expected_outcome"], "survived")
                 self.assertEqual(weak["outcome"], "survived")
                 self.assertEqual(
                     [item["observed"] for item in strong["selectors"]],
@@ -251,6 +280,7 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
             self.assertEqual(record["cost"]["command_count"], 0)
             self.assertEqual(record["cost"]["selector_count"], 0)
             self.assertIs(record["counts_toward_generic_generalization"], False)
+            self.assertIs(record["concordant"], True)
 
     def test_all_executed_selectors_have_consistent_typed_receipts(self) -> None:
         executed = [
@@ -273,6 +303,11 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
                 implementation=observation["implementation_id"],
                 selector=observation["selector"],
             ):
+                self.assertEqual(
+                    observation["expected_observed"],
+                    observation["observed"],
+                )
+                self.assertIs(observation["concordant"], True)
                 self.assertIn(observation["observed"], {"pass", "fail"})
                 self.assertFalse(observation["timed_out"])
                 self.assertIsNone(observation["observation_error"])
@@ -286,10 +321,7 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
                     if observation["observed"] == "pass"
                     else "test_failure",
                 )
-                self.assertEqual(
-                    observation["receipt_counts"]["tests_run"],
-                    1,
-                )
+                self.assertEqual(observation["receipt_counts"]["tests_run"], 1)
                 self.assertEqual(observation["receipt_counts"]["errors"], 0)
                 self.assertEqual(
                     observation["receipt_counts"]["failures"],
@@ -300,7 +332,7 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
                 self.assertTrue(math.isfinite(observation["duration_seconds"]))
                 self.assertGreaterEqual(observation["duration_seconds"], 0.0)
 
-    def test_summary_policy_and_cost_preserve_denominators_and_no_score(self) -> None:
+    def test_summary_analysis_policy_and_cost_preserve_boundaries(self) -> None:
         self.assertEqual(
             self.first["summary"],
             {
@@ -317,6 +349,17 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
                 "generic_weak_indeterminate": 0,
                 "generic_claim_violations_observed": 3,
                 "mutation_score": None,
+            },
+        )
+        self.assertEqual(
+            self.first["analysis"],
+            {
+                "status": "expected",
+                "candidate_baseline_concordant": True,
+                "unexpected_observation_count": 0,
+                "unexpected_profile_count": 0,
+                "unexpected_reference_count": 0,
+                "unexpected_record_ids": [],
             },
         )
         self.assertEqual(
@@ -344,25 +387,10 @@ class DW001ClaimScopedMutationResultTests(unittest.TestCase):
             self.first["semantic_sha256"],
             self.second["semantic_sha256"],
         )
-        first_semantic = deepcopy(self.first)
-        second_semantic = deepcopy(self.second)
-        for document in (first_semantic, second_semantic):
-            document["created_at"] = None
-            document["runtime"] = None
-            document["report_sha256"] = None
-            document["semantic_sha256"] = None
-            document["cost"]["wall_clock_seconds"] = None
-            document["cost"]["cpu_seconds"] = None
-            for record in [document["candidate_baseline"], *document["records"]]:
-                record["cost"]["wall_clock_seconds"] = None
-                record["cost"]["cpu_seconds"] = None
-                for profile in record["profiles"]:
-                    for selector in profile["selectors"]:
-                        selector["duration_seconds"] = None
-                if record["reference"] is not None:
-                    for selector in record["reference"]["selectors"]:
-                        selector["duration_seconds"] = None
-        self.assertEqual(canonical_json(first_semantic), canonical_json(second_semantic))
+        self.assertEqual(
+            canonical_json(_semantic_copy(self.first)),
+            canonical_json(_semantic_copy(self.second)),
+        )
 
     def test_recomputed_digests_cannot_hide_source_outcome_or_policy_drift(self) -> None:
         for mutator, expected in (
