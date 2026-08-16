@@ -301,6 +301,68 @@ Command arguments, reviewer records, authorization references, and scenario meta
 
 Every exported artifact requires human review.
 
+## DW-001 synthetic fixture generator addendum
+
+The optional generator adds one narrow protected statement:
+
+> Given one verified supported fixture descriptor and one trusted operator-supplied literal destination, the generator materializes the recorded owned-synthetic template into exact base and candidate SHA-1 Git objects and emits a public-safe identity whose deterministic semantics and digests can be independently rechecked.
+
+This statement does not establish cross-platform reproducible builds, environment reproducibility, sandboxing, fixture realism, taxonomy completeness, producer authenticity, or authorization to execute a pilot.
+
+### Generator assets and failure sources
+
+The additional assets are:
+
+- descriptor-to-family and descriptor-to-observer semantic consistency;
+- recomputation of expected nested-method decisions from expected states;
+- exact base/head commit and tree identities;
+- exact specification bytes and SHA-256;
+- absence of absolute destination paths, usernames, environment values, and raw Git output from the public identity;
+- preservation of pre-existing destination content.
+
+Additional failure sources include:
+
+- a descriptor relabeled to a different family after expected outcomes are known;
+- an unsupported family or template version being treated as a supported case;
+- nondeterministic author, committer, timestamp, message, newline, file-mode, or checkout behavior changing Git objects;
+- global or system Git configuration, signing, hooks, filters, LFS, or line-ending conversion changing generated content;
+- a symbolic-link destination redirecting writes outside the literal final path;
+- a non-empty destination being cleaned or overwritten;
+- a malicious or substituted `git` executable resolved from `PATH`;
+- a trusted destination parent containing symlink, mount, namespace, or filesystem redirection not represented by the final-path check;
+- a generated repository or specification being modified after identity emission;
+- treating equality of Git objects as equality of the complete execution environment;
+- publishing a fixture identity as evidence that the taxonomy is realistic or representative.
+
+### Generator invariants
+
+1. The descriptor uses exact fields, supported family/template/generator versions, one supported observer arm, canonical path categories, and deterministic method labels derived from expected state semantics.
+2. The descriptor digest covers the complete descriptor with its own field normalized to `null`.
+3. Unsupported descriptors are rejected before materialization.
+4. The destination must be absent or an existing literal empty directory.
+5. The public wrapper rejects a symbolic-link final destination before file or Git operations.
+6. The generator never deletes existing destination content.
+7. Git executes without a shell, with fixed author/committer metadata, timestamps, messages, known staged paths, disabled global/system configuration, disabled signing, and explicit SHA-1 object format.
+8. The generated repository must be clean after the candidate commit.
+9. The identity records descriptor, generator, template, observer, exact commit/tree, path, expected-semantics, and specification identities.
+10. The identity digest covers the complete identity with its own field normalized to `null`.
+11. Materialized verification checks candidate `HEAD`, base ancestry, exact trees, repository cleanliness, and specification bytes.
+12. Equivalent descriptors are required by tests to reproduce byte-equivalent identities across two clean directories in the supported CI environment.
+13. Matrix integration writes a report, strict-decodes it, verifies its semantic and complete-report digests, and only then projects DW-001 baseline decisions.
+14. Fixture descriptor and identity schemas retain strict object boundaries; Python semantic verification remains authoritative for relational invariants.
+
+### Residual generator trust
+
+The public final-path symlink check is not a complete directory-capability boundary. The operator still trusts the destination parent and all ancestor components, mount configuration, filesystem semantics, and process namespace.
+
+The generator also trusts the Python runtime and the `git` executable resolved from the supplied `PATH`. It does not hash or attest those binaries. A malicious binary can emit chosen objects or modify unrelated data despite the reduced Git environment.
+
+Fixed SHA-1 Git objects are identities within the tested Git object model. They do not prove that another operating system, filesystem, Git version, locale implementation, or checkout stack will reproduce the same worktree behavior. SHA-1 object-format selection is not a security claim and does not authenticate repository provenance.
+
+The generator creates only project-owned synthetic source and test bytes, but the resulting commands are later executed by the ordinary DeltaWitness runner. The runner remains unsandboxed. Use only disposable, non-sensitive environments without credentials.
+
+The scenario-manifest v1 records exact Git endpoints and study semantics but does not carry a dedicated fixture-identity digest. Until a versioned binding is accepted, retain the descriptor, identity, manifest, strict source report, projection, and result as separate reviewed artifacts.
+
 ## Safe operation
 
 - Run DeltaWitness only on repositories and commands you trust.
@@ -310,10 +372,12 @@ Every exported artifact requires human review.
 - Review endpoint anchors and every indeterminate coalition before interpreting influence.
 - Treat exact influence as exact enumeration over declared path units, not proof of full causality.
 - Strict-decode and verify the source matrix report, projection, scenario manifest, and result separately; then verify explicit cross-artifact bindings.
+- Verify each generated fixture descriptor, identity, materialized repository, and specification before constructing a scenario manifest.
+- Supply only a trusted absent or literal empty destination under a trusted parent; never treat the final symlink check as filesystem containment.
 - Treat scenario applicability and expected outcomes as pre-execution ground truth, not values inferred from failed commands.
 - Independently review license and authorization references before using external material.
 - Do not interpret a manifest's internal commitment field as proof of a timely holdout commitment; record the complete commitment externally before execution.
 - Preserve excluded results and deviations rather than deleting them from the evidence chain.
 - Do not execute a DW-001 development pilot or holdout while the protocol is marked draft or before the corresponding authorization and freeze gates are complete.
-- Review every report, projection, manifest, and result before publication, especially artifacts containing non-public scenario or reviewer metadata.
-- Never interpret `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, a projected `accept`, or a concordant result as proof that a patch is correct, secure, complete, minimal, empirically superior, production-ready, or authorized for deployment.
+- Review every fixture identity, report, projection, manifest, and result before publication, especially artifacts containing non-public scenario or reviewer metadata.
+- Never interpret `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, a projected `accept`, a generated fixture identity, or a concordant result as proof that a patch is correct, secure, complete, minimal, empirically superior, production-ready, or authorized for deployment.

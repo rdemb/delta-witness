@@ -4,9 +4,9 @@
 
 **Study identifier:** `DW-001`.
 
-**Implementation base for this revision:** `d96046eaf222d30d371d59f0a935764b1385c76c`. The study-contract implementation, schemas, tests, and this protocol revision on `research/dw-001-study-contracts-v1` remain unfrozen until review and merge.
+**Implementation base for this revision:** `358df164620929f331753ec799122f50a1dbcc9c`. The scenario-taxonomy, fixture-generator implementation, schemas, tests, and this protocol revision on `research/dw-001-scenario-generator-v1` remain unfrozen until review and merge.
 
-This document is a protocol candidate, not a preregistration. It may be revised during design review and development-pilot preparation. No held-out scenario may be executed until the freeze checklist is complete and the frozen protocol, generator, manifests, metrics, exclusions, and commitment digest are recorded immutably before unblinding.
+This document is a protocol candidate, not a preregistration. It may be revised during design review and development-pilot preparation. No development pilot or held-out scenario may be executed until the applicable authorization and freeze gates are complete. No held-out scenario may be executed until the frozen protocol, generator, manifests, metrics, exclusions, and commitment digest are recorded immutably before unblinding.
 
 ## 1. Primary research question
 
@@ -176,6 +176,45 @@ The verifier independently recomputes applicability, ordered state slices, claim
 
 The digest is unkeyed. A caller can recompute it after modifying an artifact, so digest verification never substitutes for semantic recomputation.
 
+## 9A. Synthetic fixture descriptor and identity
+
+Development-pilot preparation may use the owned-synthetic generator only for the explicitly supported taxonomy subset defined in:
+
+```text
+research/DW-001/SCENARIO_TAXONOMY.md
+```
+
+The descriptor and identity contracts are:
+
+```text
+research/DW-001/schema/fixture-descriptor.schema.json
+research/DW-001/schema/fixture-identity.schema.json
+src/deltawitness/_dw001_scenarios.py
+src/deltawitness/dw001_scenarios.py
+```
+
+A descriptor fixes the family, control role, generator/template versions, observer arm, command, timeout, path categories, state semantics, failure causes, and expected nested-method decisions. The verifier recomputes stored method decisions from expected state semantics before accepting `descriptor_sha256`.
+
+For one valid descriptor, the generator writes fixed owned-synthetic bytes into an explicitly supplied absent or empty non-symlink destination, creates deterministic base and candidate commits, and emits exact commit, tree, and specification identities. Equivalent descriptors must reproduce the same Git objects and identity across clean directories under the supported SHA-1 object model.
+
+The public identity excludes absolute destinations, usernames, environment values, and raw Git output. It does not bind the Git binary, Python runtime, kernel, filesystem implementation, container image, or complete environment.
+
+Generator v1 implements only:
+
+- `valid-discriminating-regression`;
+- `non-discriminating-candidate-test`;
+- `candidate-regression-against-base-tests`.
+
+Assertion weakening, wrong-reason failures, collection/import/setup errors, invalid hybrids, and no-op/already-resolved controls remain required but unsupported. They must not be represented by relabeling one of the implemented templates.
+
+The fixture descriptor and identity are upstream pre-execution artifacts. The existing scenario-manifest v1 records exact Git, path, execution, and ground-truth fields but has no dedicated fixture-identity digest field. Until a versioned manifest amendment or separate binding record is accepted, both artifacts must be retained and reviewed; no hidden schema extension is permitted.
+
+Complete generator boundaries are documented in:
+
+```text
+research/DW-001/FIXTURE_GENERATOR.md
+```
+
 ## 10. Scenario-manifest contract
 
 The pre-execution artifact is defined by:
@@ -226,7 +265,7 @@ A result record contains:
 - method-specific cost fields or explicit missingness;
 - `result_sha256`.
 
-An excluded result remains in the record but cannot remain denominator eligible. An applied deviation requires an approval reference. A deviation marked `exploratory_only` or `excluded` cannot silently preserve confirmatory eligibility.
+An excluded result remains in the record but cannot remain denominator eligible. An applied deviation requires an approval reference. A deviation marked `exploratory_only` or `excluded` cannot silently preserve confirmatory eligibility. A results-visible applied deviation cannot retain `confirmatory_impact = none`.
 
 A measured cost requires finite nonnegative wall-clock, CPU, state-count, command-count, and review fields. `not_run` and `unavailable` require `null` quantitative fields and an explicit missing reason. Missing values are not encoded as zero.
 
@@ -245,6 +284,8 @@ A measured cost requires finite nonnegative wall-clock, CPU, state-count, comman
 9. observed decisions and reason codes from the projection;
 10. concordance and denominator membership across all supplied artifacts.
 
+Each source artifact is preflighted before relational fields are dereferenced. Malformed input returns typed invalid diagnostics instead of an uncaught lookup error.
+
 The verifier does not possess source matrix-report bytes. The source report must still be strict-decoded and verified separately, and its trusted digest must be compared with the projection and result.
 
 Complete contract details are maintained in:
@@ -255,18 +296,21 @@ research/DW-001/STUDY_CONTRACTS.md
 
 ## 13. Decision-equivalence execution
 
-For the primary detection comparison:
+For a generated development scenario, the complete artifact path is:
 
-1. select a pre-execution manifest whose semantics and digest verify;
-2. execute the complete four-state matrix once for one observer arm;
-3. strict-decode and integrity-verify the source report;
-4. project `M0` through `M3` from the same immutable observations;
-5. independently verify projection semantics and digest;
-6. construct the result record linked to the supplied manifest and projection;
-7. independently verify result semantics, digest, and cross-artifact bindings;
-8. retain the complete artifact chain and separately trusted expected digests.
+1. validate and retain the fixture descriptor;
+2. materialize the owned-synthetic repository into a disposable literal destination;
+3. verify the fixture identity against the materialized repository;
+4. construct and review the pre-execution scenario manifest using the exact fixture identities;
+5. execute the complete four-state matrix once for one observer arm;
+6. write, strict-decode, and integrity-verify the source report;
+7. project `M0` through `M3` from the same immutable observations;
+8. independently verify projection semantics and digest;
+9. construct the result record linked to the supplied manifest and projection;
+10. independently verify result semantics, digest, and cross-artifact bindings;
+11. retain the complete artifact chain and separately trusted expected digests.
 
-This controls run-to-run drift across nested state-set methods.
+This controls run-to-run drift across nested state-set methods. It does not convert the implemented synthetic templates into a representative study population.
 
 Observer-arm comparisons require separately configured homogeneous source reports unless a later frozen protocol defines and validates a common dual-channel observation artifact. The current matrix report does not record enough exit-class configuration to reconstruct every `O0` decision faithfully from an `O1` report after the fact.
 
@@ -291,8 +335,8 @@ A projected full-matrix run must not be presented as the native runtime of `M0`,
 
 Before freeze, a development corpus may be used only to:
 
-- test scenario construction;
-- test manifest, projection, result, and schema correctness;
+- test scenario construction and deterministic regeneration;
+- test fixture, manifest, projection, result, and schema correctness;
 - estimate applicability and invalid-hybrid frequency;
 - estimate runtime and scenario-generation cost;
 - choose a precision target without inspecting holdout results;
@@ -300,6 +344,8 @@ Before freeze, a development corpus may be used only to:
 - refine exclusion and deviation procedures.
 
 Development-pilot scenarios and outcomes must be labeled `development`. Their method records must remain outside the primary denominator. They cannot be moved into the holdout or reported as confirmatory evidence.
+
+The three implemented generator families are mechanism probes for plumbing and controlled contrasts. They are not a prevalence-weighted or representative development corpus by themselves.
 
 No claim of effectiveness, superiority, prevalence, or generalization may be made from the development pilot.
 
@@ -316,6 +362,8 @@ Every scenario requires:
 - explicit environmental assumptions;
 - at least one reviewed rationale;
 - an independence disclosure for each reviewer.
+
+For generated fixtures, descriptor expectations and method labels must verify before matrix execution. The resulting scenario manifest still requires separate human ground-truth review; generator determinism does not create reviewer independence.
 
 An `approved` manifest requires an approving reviewer independent of both the scenario author and the implementation. A rejection takes precedence over approval. A post-freeze ambiguity becomes an exclusion, deviation, or documented dispute; it is never silently relabeled.
 
@@ -342,7 +390,7 @@ No held-out execution is authorized until all items are complete in an immutable
 - [ ] public commitment digest recorded before unblinding;
 - [ ] exact implementation, generator, and baseline versions pinned.
 
-Implementation of a checklist item does not mark it frozen. The checkboxes remain open until the complete protocol is frozen in one immutable commit.
+Implementation of a checklist item does not mark it frozen. The checkboxes remain open until the complete protocol is accepted and frozen in one immutable commit. The current taxonomy and generator are drafts and therefore do not complete the first checkbox.
 
 ## 18. Holdout commitment
 
@@ -354,7 +402,7 @@ Before any held-out command runs:
 4. retain sensitive material privately when required;
 5. preserve every post-commit deviation without rewriting the original commitment.
 
-A Git commit containing only the protocol or individual manifests does not credibly bind undisclosed holdout membership or labels.
+A Git commit containing only the protocol, generator, fixture identities, or individual manifests does not credibly bind undisclosed holdout membership or labels.
 
 ## 19. Primary measurements under consideration
 
@@ -386,7 +434,9 @@ The four-state layer should be narrowed, redesigned, or abandoned for the tested
 - observed gains disappear under fair observer and runner controls;
 - cost exceeds the incremental evidence value;
 - results are unstable under harmless scenario-preserving transformations;
-- independent operators cannot reproduce the states, projections, contracts, or arithmetic.
+- independent operators cannot reproduce the states, generated fixtures, projections, contracts, or arithmetic.
+
+The generator/taxonomy layer should be narrowed or redesigned if equivalent descriptors do not reproduce the same semantic and Git identities, family labels cannot be distinguished from their controls, or toolchain effects dominate the generated identity.
 
 A negative result is a valid outcome and must not trigger post-hoc benchmark repair.
 
@@ -405,9 +455,11 @@ DW-001 design, implementation QA, and development-pilot preparation may proceed,
 
 Only synthetic, owned, licensed, or explicitly authorized targets may be used. External baseline artifacts must be reviewed before execution.
 
-The current runner is not a sandbox. Any development or held-out execution must occur in a disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance evidence, not a containment claim.
+The current runner and generator are not sandboxes. Any development or held-out execution must occur in a disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance evidence, not a containment claim.
 
-Manifests and results can expose repository IDs, paths, commands, environment-variable names, reviewer identifiers, authorization references, exclusions, deviations, and cost data. Every exported artifact requires privacy and publication-boundary review.
+The synthetic generator accepts only owned template bytes and a trusted operator-supplied absent or empty literal destination. It rejects a symbolic-link final path but does not prove that every ancestor directory, mount, Git executable, Python runtime, or filesystem implementation is trusted or reproducible.
+
+Fixture identities, manifests, and results can expose scenario IDs, family labels, generator/template versions, Git IDs, paths, specification digests, commands, environment-variable names, reviewer identifiers, authorization references, exclusions, deviations, and cost data. Every exported artifact requires privacy and publication-boundary review.
 
 ## 23. Deviation policy
 
@@ -420,7 +472,7 @@ Every deviation after freeze must record:
 - confirmatory impact;
 - approval reference when applied.
 
-The frozen protocol, partition lock, and commitment digest must never be rewritten to conceal a deviation.
+An applied deviation after results became visible cannot retain confirmatory impact `none`. The frozen protocol, partition lock, and commitment digest must never be rewritten to conceal a deviation.
 
 ## 24. Current status
 
@@ -439,12 +491,19 @@ The frozen protocol, partition lock, and commitment digest must never be rewritt
 - exclusion, deviation, denominator, and cost-missingness checks;
 - cross-artifact manifest–projection–result verification;
 - deterministic unkeyed integrity digests;
+- a versioned three-family scenario taxonomy draft;
+- strict fixture-descriptor and fixture-identity schemas;
+- deterministic owned-synthetic Git fixture materialization;
+- repeated-directory Git-object reproducibility checks;
+- generated-repository identity and strict matrix-report/projection integration checks;
+- fail-closed non-empty and symbolic-link destination checks;
 - red-first adversarial fixtures.
 
-### Not implemented or frozen
+### Not implemented, accepted, or frozen
 
-- scenario taxonomy and generator;
-- development corpus;
+- the five remaining required scenario families;
+- a reviewed development corpus and pilot authorization;
+- a versioned direct fixture-identity field in the scenario-manifest contract;
 - direct ecological baseline runners;
 - holdout corpus or public commitment;
 - aggregation and statistical analysis;
@@ -458,13 +517,15 @@ The frozen protocol, partition lock, and commitment digest must never be rewritt
 
 Permitted:
 
-> DeltaWitness is preparing a preregistered study of nested final-state, fail-to-pass, regression-preservation, and four-state evidence under controlled observer semantics and integrity-bound study contracts.
+> DeltaWitness is preparing a preregistered study of nested final-state, fail-to-pass, regression-preservation, and four-state evidence under controlled observer semantics, integrity-bound study contracts, and deterministic owned-synthetic mechanism probes.
 
 Not permitted from this draft:
 
 > DW-001 proves that four-state verification is superior.
 
 > DeltaWitness has validated the method on held-out coding-agent patches.
+
+> The scenario taxonomy is complete or representative.
 
 > The protocol is frozen or independently reproduced.
 
