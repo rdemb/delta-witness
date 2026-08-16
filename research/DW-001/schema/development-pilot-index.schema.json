@@ -1,0 +1,595 @@
+{
+  "$id": "https://github.com/rdemb/delta-witness/research/DW-001/schema/development-pilot-index.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeltaWitness DW-001 Development Mechanism Pilot Index v1",
+  "description": "Public-safe index for one complete development-only ten-arm mechanism pilot bundle. Semantic and cross-artifact verification is performed by deltawitness.dw001_pilot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "pilot_id",
+    "partition",
+    "plan_sha256",
+    "protocol_commit_sha",
+    "implementation_commit_sha",
+    "created_at",
+    "complete",
+    "cases",
+    "analysis",
+    "semantic_sha256",
+    "index_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deltawitness.dw001-development-pilot-index.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    },
+    "pilot_id": {
+      "const": "DW-001-DEV-PILOT-V1"
+    },
+    "partition": {
+      "const": "development"
+    },
+    "plan_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "protocol_commit_sha": {
+      "$ref": "#/$defs/gitSha"
+    },
+    "implementation_commit_sha": {
+      "$ref": "#/$defs/gitSha"
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "complete": {
+      "const": true
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "analysis": {
+      "$ref": "#/$defs/analysis"
+    },
+    "semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "index_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "descriptor",
+        "identity",
+        "manifest",
+        "binding",
+        "matrix_report",
+        "projection",
+        "declaration",
+        "localization",
+        "result"
+      ],
+      "properties": {
+        "descriptor": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "identity": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "manifest": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "binding": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "matrix_report": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "projection": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "declaration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "localization": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {
+          "$ref": "#/$defs/relativePath"
+        }
+      }
+    },
+    "stableEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "descriptor_sha256",
+        "identity_sha256",
+        "manifest_sha256",
+        "binding_sha256",
+        "witness_sha256"
+      ],
+      "properties": {
+        "descriptor_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "identity_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "binding_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "witness_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "reportEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matrix_report_sha256",
+        "projection_sha256",
+        "declaration_sha256",
+        "localization_sha256",
+        "localization_report_sha256",
+        "result_sha256"
+      ],
+      "properties": {
+        "matrix_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "projection_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "declaration_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "localization_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "localization_report_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method_id",
+        "decision",
+        "reason_code",
+        "concordant",
+        "primary_denominator_eligible"
+      ],
+      "properties": {
+        "method_id": {
+          "enum": [
+            "M0_FINAL",
+            "M1_F2P",
+            "M2_F2P_P2P",
+            "M3_FOUR_STATE"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "accept",
+            "reject",
+            "indeterminate",
+            "not_applicable"
+          ]
+        },
+        "reason_code": {
+          "enum": [
+            "predicate_satisfied",
+            "predicate_contradicted",
+            "required_state_indeterminate",
+            "required_state_not_applicable"
+          ]
+        },
+        "concordant": {
+          "const": true
+        },
+        "primary_denominator_eligible": {
+          "const": false
+        }
+      }
+    },
+    "localizationSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "expected_status",
+        "observed_status",
+        "concordant"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "expected_status": {
+          "enum": [
+            "supported",
+            "unsupported",
+            "candidate_invalid",
+            "indeterminate",
+            "not_applicable"
+          ]
+        },
+        "observed_status": {
+          "enum": [
+            "supported",
+            "unsupported",
+            "candidate_invalid",
+            "indeterminate",
+            "not_applicable"
+          ]
+        },
+        "concordant": {
+          "const": true
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "executed_matrix_states",
+        "executed_selector_states",
+        "command_count",
+        "artifact_count",
+        "public_bundle_bytes",
+        "review_time_minutes",
+        "review_status",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "measured_review_unavailable"
+        },
+        "wall_clock_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "executed_matrix_states": {
+          "const": 4
+        },
+        "executed_selector_states": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "command_count": {
+          "type": "integer",
+          "minimum": 4
+        },
+        "artifact_count": {
+          "type": "integer",
+          "minimum": 7
+        },
+        "public_bundle_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "review_time_minutes": {
+          "type": "null"
+        },
+        "review_status": {
+          "const": "unmeasured"
+        },
+        "missing_reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order",
+        "case_id",
+        "scenario_id",
+        "family_id",
+        "observer_id",
+        "control_role",
+        "partition",
+        "status",
+        "artifacts",
+        "stable_evidence",
+        "report_evidence",
+        "methods",
+        "localization",
+        "cost"
+      ],
+      "properties": {
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "case_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "scenario_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "family_id": {
+          "enum": [
+            "valid-discriminating-regression",
+            "non-discriminating-candidate-test",
+            "candidate-regression-against-base-tests",
+            "wrong-reason-base-import-failure",
+            "wrong-reason-unrelated-assertion"
+          ]
+        },
+        "observer_id": {
+          "enum": [
+            "O0_EXIT_CODE",
+            "O1_TYPED_RECEIPT"
+          ]
+        },
+        "control_role": {
+          "enum": [
+            "valid-patch-control",
+            "false-assurance-case"
+          ]
+        },
+        "partition": {
+          "const": "development"
+        },
+        "status": {
+          "const": "valid"
+        },
+        "artifacts": {
+          "$ref": "#/$defs/artifacts"
+        },
+        "stable_evidence": {
+          "$ref": "#/$defs/stableEvidence"
+        },
+        "report_evidence": {
+          "$ref": "#/$defs/reportEvidence"
+        },
+        "methods": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/method"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M0_FINAL"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/method"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M1_F2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/method"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M2_F2P_P2P"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/method"
+                },
+                {
+                  "properties": {
+                    "method_id": {
+                      "const": "M3_FOUR_STATE"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "localization": {
+          "$ref": "#/$defs/localizationSummary"
+        },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "metric",
+        "observed"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "contrast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contrast_id",
+        "status",
+        "case_ids",
+        "evidence"
+      ],
+      "properties": {
+        "contrast_id": {
+          "enum": [
+            "candidate-test-discrimination",
+            "original-test-preservation",
+            "typed-import-error",
+            "declared-witness-mismatch",
+            "valid-positive-control"
+          ]
+        },
+        "status": {
+          "const": "observed_as_expected"
+        },
+        "case_ids": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contrasts",
+        "headline_score",
+        "ecological_inference_allowed",
+        "retain_case_tables"
+      ],
+      "properties": {
+        "contrasts": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/contrast"
+          }
+        },
+        "headline_score": {
+          "type": "null"
+        },
+        "ecological_inference_allowed": {
+          "const": false
+        },
+        "retain_case_tables": {
+          "const": true
+        }
+      }
+    }
+  }
+}
