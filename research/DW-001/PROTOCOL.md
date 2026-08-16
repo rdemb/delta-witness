@@ -1,12 +1,14 @@
 # DW-001 Protocol
 
-**Status:** DRAFT — DEVELOPMENT-PILOT PREPARATION ONLY — NOT FROZEN — NO PILOT OR HOLDOUT EXECUTION AUTHORIZED.
+**Status:** DRAFT — NOT FROZEN — OWNED-SYNTHETIC DEVELOPMENT MECHANISM PILOT EXECUTED AND RETAINED — NO ECOLOGICAL OR HOLDOUT EXECUTION AUTHORIZED.
 
 **Study identifier:** `DW-001`.
 
-**Implementation lineage for this revision:** stable `main` at `f40ecfa0796d8771345a83b4b241256ec071ba89` plus the unrelated-assertion negative control under review in PR #25. Exact protocol, implementation, generator, schema, baseline, environment, and analysis commits remain unpinned until freeze.
+**Implementation lineage for this revision:** stable `main` at `6d34b77705c109f9251271728c95976b8f61caa7` plus the `weak-proxy-oracle` development control under review in PR #34. Exact future ecological protocol, implementation, generator, schema, baseline, environment, sampling, and analysis commits remain unpinned until freeze.
 
-This document is a protocol candidate, not a preregistration. It may change during design review and development-pilot preparation. No development pilot or held-out command may execute until the corresponding authorization gate is complete. No held-out execution may occur until the complete protocol, population, generator, metrics, exclusions, versions, environment requirements, and commitment digest are immutably recorded before unblinding.
+This document is a protocol candidate, not a preregistration. The sealed five-family owned-synthetic development mechanism pilot has been executed and retained. That execution does not freeze this broader protocol, authorize external repository execution, create a holdout, or permit ecological inference.
+
+No held-out command may execute until the complete protocol, target population, sampling frame, instance authorization, containment environment, ground-truth process, metrics, exclusions, versions, and commitment digest are immutably recorded before unblinding.
 
 ## 1. Research questions
 
@@ -24,24 +26,28 @@ The primary incremental contrast is:
 
 ### 1.3 Oracle-relevance limitation question
 
-> When a candidate suite contains a genuine assertion failure that is caused only by collateral behavior while the claim-facing assertion is non-discriminating, do typed outcomes and all nested state-set methods still accept the witness?
+> When a suite contains a genuine assertion failure caused only by collateral behavior while a claim-facing assertion is non-discriminating, do typed outcomes and all nested state-set methods still accept the witness, and can exact selector localization expose the mismatch?
 
-This third question is a negative control. A positive result means the current method has the predicted limitation; it is not evidence that the limitation has been solved.
+### 1.4 Oracle-strength limitation question
+
+> When the exact predeclared claim selector is itself a genuine typed fail-to-pass witness, can one fixed claim-violating mutant still pass that selector while failing a separately fixed development claim check?
+
+The final two questions are negative controls. A positive result means the current evidence has the predicted limitation. It is not evidence that a complete relevance or strength method has been solved.
 
 ## 2. Claims not under test
 
 DW-001 does not establish:
 
 - complete patch correctness, security, or semantic intent;
-- test-oracle relevance, adequacy, or resistance to overfitting;
+- test-oracle relevance, adequacy, completeness, or mutation strength;
 - vulnerability removal or absence of untested regressions;
 - production safety or universal causality;
 - complete environment reproducibility;
-- producer, reviewer, agent, or organization authenticity;
-- authorization to merge, deploy, publish, or execute a holdout;
+- producer, reviewer, agent, model, or organization authenticity;
+- authorization to merge, deploy, publish, execute an external repository, or inspect a holdout;
 - scientific novelty or general superiority.
 
-Exact path-level influence is outside the primary acceptance rule and may appear only as exploratory secondary evidence where its own prerequisites hold.
+Exact path-level influence is outside the primary state-set acceptance rule and may appear only as exploratory secondary evidence where its own prerequisites hold.
 
 ## 3. Canonical state model
 
@@ -65,7 +71,7 @@ CC = pass
 
 ## 4. Controlled state-set methods
 
-All primary state-set methods are projected from one immutable source report for one homogeneous observer arm.
+All primary methods are projected from one immutable source report for one homogeneous observer arm.
 
 | Method | Required states | Acceptance predicate |
 |---|---|---|
@@ -82,7 +88,7 @@ M2 - M1 = original-test preservation
 M3 - M2 = base-endpoint validity and complete-matrix consistency
 ```
 
-These labels describe nested evidence increments. They are not universal causal effects and do not establish oracle relevance.
+These labels describe nested evidence increments. They are not universal causal effects and do not establish which assertion failed, whether it is relevant, or whether it is strong enough.
 
 ## 5. Observation arms
 
@@ -91,13 +97,14 @@ These labels describe nested evidence increments. They are not universal causal 
 | `O0_EXIT_CODE` | `exit-code-v1` | configured disjoint process exit classes |
 | `O1_TYPED_RECEIPT` | `outcome-receipt-v1` | invocation-bound typed receipt plus process-exit agreement |
 
-One projected comparison contains exactly one observer arm. Mixed-observer reports are invalid because they confound state-set and observation-semantics effects.
+A projected comparison contains exactly one observer arm. Mixed-observer reports are invalid because they confound state-set and observation-semantics effects.
 
 Receipt v1 distinguishes assertion failure from generic test error and other aggregate outcomes. It does not:
 
 - identify every error subtype;
 - identify which assertion caused a suite failure;
-- determine whether an assertion is relevant to a claim;
+- determine whether a selector is semantically relevant;
+- determine whether an assertion is strong enough to reject plausible incorrect implementations;
 - authenticate its producer.
 
 An exact synthetic fixture may therefore have predeclared `import_error` ground truth while the runtime receipt honestly records only generic `test_error`.
@@ -122,7 +129,7 @@ The v1 projector accepts only a matrix report that:
 - contains at least one claim;
 - uses one homogeneous observer arm.
 
-The complete source report is validated before any projected decision is exposed. Validation of a hidden state is not permission for a weaker method to consume that state.
+The complete source report is validated before any projected decision is exposed. Validation of a hidden state is not permission for a weaker method to consume that state's outcome.
 
 Source-report bytes and projection remain separately mandatory. A projection records source digests but cannot reconstruct omitted source fields.
 
@@ -167,7 +174,7 @@ The digest is unkeyed. Semantic recomputation is mandatory.
 
 ## 10. Synthetic fixture descriptor and identity
 
-Development preparation may use the project-owned deterministic generator only for explicitly supported families:
+Development research may use the project-owned deterministic generator only for explicitly supported families:
 
 ```text
 research/DW-001/SCENARIO_TAXONOMY.md
@@ -176,6 +183,7 @@ research/DW-001/schema/fixture-descriptor.schema.json
 research/DW-001/schema/fixture-identity.schema.json
 src/deltawitness/_dw001_scenarios.py
 src/deltawitness/_dw001_wrong_reason.py
+src/deltawitness/_dw001_weak_proxy.py
 src/deltawitness/dw001_scenarios.py
 ```
 
@@ -185,15 +193,18 @@ The generator writes fixed owned-synthetic bytes into an absent or empty non-sym
 
 Fixture-identity verification recomputes descriptor-derived specification bytes and rejects a substituted SHA-256 even when `identity_sha256` is recomputed.
 
-Generator v1 currently implements five families:
+Generator v1 currently implements six families:
 
 - `valid-discriminating-regression`;
 - `non-discriminating-candidate-test`;
 - `candidate-regression-against-base-tests`;
 - `wrong-reason-base-import-failure`;
-- `wrong-reason-unrelated-assertion`.
+- `wrong-reason-unrelated-assertion`;
+- `weak-proxy-oracle`.
 
-The schemas remain pre-freeze. Adding a supported family expands their v1 enums while preserving existing artifact validity and digest meaning. Older verifiers may reject a new-family artifact; every result must retain exact schema and implementation commits.
+The committed ten-arm development mechanism pilot remains fixed to the five families in its sealed plan. The later weak-proxy family is a separate development-only Gate 1 control and does not rewrite that archive.
+
+The schemas remain pre-freeze. Adding a family expands v1 enums while preserving existing artifact validity and digest meaning. Older verifiers may reject newer-family artifacts; every result must retain exact schema and implementation commits.
 
 ## 11. Paired import-error observer contrast
 
@@ -212,11 +223,11 @@ O1: BB/BC/CB/CC = pass/error/pass/pass
     M0/M1/M2/M3 = accept/indeterminate/indeterminate/indeterminate
 ```
 
-For `O1`, `import_error` is fixed fixture ground truth and `test_error` is the runtime receipt class. Those are distinct layers and must not be conflated.
+For O1, `import_error` is fixed fixture ground truth and `test_error` is the runtime receipt class. Those layers must not be conflated.
 
 Falsify or redesign the contrast if source/test bytes or scenario identity differ between arms, the import is itself the intended oracle, or the typed arm does not preserve incomplete generic-error evidence.
 
-## 12. Unrelated-assertion oracle negative control
+## 12. Unrelated-assertion oracle-relevance negative control
 
 The unrelated-assertion family uses fixed bytes:
 
@@ -224,7 +235,7 @@ The unrelated-assertion family uses fixed bytes:
 - base `version_label()` returns `v1`, candidate returns `v2`;
 - the claim-facing viewer test asserts only that `is_admin(viewer)` returns a Boolean and passes on both implementations;
 - a separate collateral assertion requires `version_label() == "v2"`;
-- that collateral assertion is the sole source of `BC = fail`;
+- that assertion is the sole source of `BC = fail`;
 - removing it makes `BC` pass.
 
 Expected under both observers:
@@ -234,15 +245,7 @@ BB/BC/CB/CC = pass/fail/pass/pass
 M0/M1/M2/M3 = accept/accept/accept/accept
 ```
 
-Observer-specific evidence:
-
-```text
-O0: BC cause = test_failure_untyped
-O1: BC cause = assertion_failure
-    receipt outcome = test_failure
-    failures >= 1
-    errors = 0
-```
+The typed arm records a real assertion failure. Exact selector localization later classifies the claim-facing selector as non-discriminating.
 
 The expected result is a limitation:
 
@@ -253,11 +256,119 @@ real assertion failure
     != claim-oracle relevance
 ```
 
-The pair must use one scenario ID and byte-identical source/test mechanism. Direct control tests must independently demonstrate that the claim-facing assertion is non-discriminating and the collateral assertion is the sole `BC` failure source.
+Direct controls must demonstrate that the claim-facing assertion is non-discriminating and the collateral assertion is the sole `BC` failure source.
 
-Falsify or redesign the family if the claim-facing assertion fails on base, the collateral assertion is not the sole failure, either observer returns error/timeout, any nested method does not accept, or the collateral behavior is materially part of the declared claim.
+Falsify or redesign the family if the claim-facing assertion fails on base, the collateral assertion is not the sole failure, either observer returns error/timeout, any nested method does not accept, or collateral behavior is materially part of the declared claim.
 
-## 13. Fixture-manifest binding
+## 13. Declared witness-test localization
+
+A separate versioned declaration can bind one claim to exact standard-library unittest logical-test selectors before selector execution.
+
+```text
+research/DW-001/schema/claim-witness-declaration.schema.json
+research/DW-001/schema/claim-witness-localization.schema.json
+src/deltawitness/claim_witness.py
+```
+
+The declaration fixes:
+
+- source specification digest and claim ID;
+- adapter and adapter version;
+- ordered unique selectors;
+- adapter-derived commands;
+- one aggregate rule;
+- declaration digest.
+
+The runner reconstructs exact `BC` and `CC` Git states from the verified report, executes each selector through typed receipts, and emits:
+
+- `discriminating` for typed assertion failure in `BC` and pass in `CC`;
+- `non_discriminating` for pass in both states;
+- `candidate_invalid` when `CC` does not pass;
+- `indeterminate` for error, timeout, missing selector, malformed/contradictory receipt, or unsupported semantics.
+
+Per-selector evidence remains visible. Incomplete evidence is never converted into non-discrimination.
+
+A valid localization proves only that exact predeclared test identities exhibited recorded transitions under exact Git states. It does not prove that the operator selected the semantically correct tests or that those tests are strong enough.
+
+## 14. Weak-proxy-oracle strength negative control
+
+The fixed task asks for administrator-only authorization and a viewer-denial regression test.
+
+Base:
+
+```python
+def is_admin(user):
+    return user.get("role")
+```
+
+Candidate:
+
+```python
+def is_admin(user):
+    return user.get("role") == "admin"
+```
+
+Declared selector:
+
+```text
+test_access.AccessTests.test_viewer_result_is_boolean
+```
+
+Declared assertion:
+
+```python
+self.assertIsInstance(is_admin({"role": "viewer"}), bool)
+```
+
+The selector genuinely fails on base and passes on candidate. Under both observers:
+
+```text
+BB/BC/CB/CC = pass/fail/pass/pass
+M0/M1/M2/M3 = accept/accept/accept/accept
+localization = supported / discriminating
+```
+
+Fixed mutant:
+
+```python
+def is_admin(user):
+    return bool(user.get("role"))
+```
+
+The mutant passes the declared selector while authorizing a viewer. A separately fixed hidden development claim check passes on candidate and fails on mutant.
+
+Exactly five typed controls are fixed before execution:
+
+```text
+base      + declared selector = fail
+candidate + declared selector = pass
+mutant    + declared selector = pass
+candidate + hidden claim      = pass
+mutant    + hidden claim      = fail
+```
+
+The resulting challenge binds verified descriptor, identity, matrix, projection, declaration, localization, fixed task, candidate, mutant, tests, controls, finding, and limitations.
+
+```text
+research/DW-001/WEAK_ORACLE_CHALLENGE.md
+research/DW-001/schema/weak-oracle-challenge.schema.json
+src/deltawitness/dw001_oracle_challenge.py
+```
+
+The expected result is a limitation:
+
+```text
+typed assertion failure
+    + canonical four-state witness
+    + exact declared-selector fail-to-pass localization
+    != sufficient oracle strength
+```
+
+Falsify or redesign the challenge if the selector is not genuinely fail-to-pass, current localization does not support it, the mutant fails the selector, the hidden check passes on mutant, candidate or mutant contains confounding changes, or repeated clean execution changes stable challenge semantics.
+
+The hidden check is fixed development evidence, not a general oracle. One mutant does not define mutation adequacy or a mutation score.
+
+## 15. Fixture-manifest binding
 
 Scenario-manifest v1 predates fixture identity and has no fixture-identity digest field. Its existing fields and digest semantics are not silently repurposed.
 
@@ -267,82 +378,57 @@ src/deltawitness/dw001_fixture_binding.py
 research/DW-001/FIXTURE_MANIFEST_BINDING.md
 ```
 
-The binding builder accepts one independently verified descriptor, identity, and manifest and derives every relation value.
+The builder accepts one independently verified descriptor, identity, and manifest and derives every relation value.
 
-Binding v1 checks:
+Binding v1 checks study/scenario identity, descriptor-to-identity relations, owned-synthetic provenance, exact commits, path categories, observer, command, timeout, state and method semantics, false-assurance family, and specification path/digest relations.
 
-- study and scenario identity;
-- descriptor-to-identity family, generator, template, observer, path, state, and method agreement;
-- owned-synthetic manifest provenance;
-- exact base and candidate commits;
-- path categories;
-- observer arm, command, and timeout;
-- state applicability, outcomes, and failure causes;
-- nested-method decisions and reasons;
-- false-assurance family;
-- specification path membership and descriptor-derived specification digest.
+`relation_scope` separates verified relations, manifest-owned governance fields, and fixture-only values absent from manifest v1.
 
-`relation_scope` separates verified relations, manifest-owned governance fields, and fixture-only values absent from manifest v1. Partition, review, authorization, and denominator eligibility remain manifest-owned; tree IDs and specification SHA remain fixture-only.
+The verifier re-verifies all sources, validates strict structure, recomputes `binding_sha256`, derives the canonical binding again, and requires exact equality.
 
-The verifier re-verifies all sources, validates strict structure, recomputes `binding_sha256`, derives the canonical binding again, and requires exact canonical equality.
+A valid binding cannot authorize execution, create denominator eligibility, authenticate a producer, prove creation time, establish oracle relevance or strength, or establish tree-to-commit correspondence without the separately verified repository.
 
-A valid binding cannot authorize execution, make a development scenario denominator-eligible, authenticate a producer, prove creation time, establish oracle relevance, or establish tree-to-commit correspondence without the separately verified repository.
-
-## 14. Scenario-manifest contract
+## 16. Scenario-manifest contract
 
 ```text
 research/DW-001/schema/scenario-manifest.schema.json
 src/deltawitness/dw001_contracts.py
 ```
 
-A manifest fixes:
-
-- study, scenario, and partition identifiers;
-- development or committed-holdout partition lock;
-- public-safe ownership, license, and authorization provenance;
-- exact base and candidate commits;
-- disjoint prefix-free path categories;
-- execution and observer requirements;
-- state applicability, expected observations, and failure causes;
-- nested-method expected decisions;
-- false-assurance mechanism and environment assumptions;
-- reviewer identity, independence disclosure, decision, and rationale;
-- `manifest_sha256`.
+A manifest fixes study/scenario/partition identity, partition lock, public-safe provenance, exact Git endpoints, disjoint paths, execution and observer requirements, state and method ground truth, mechanism and environment assumptions, reviewer records, and `manifest_sha256`.
 
 Stored method labels and denominator eligibility are recomputed. Development manifests are never primary-denominator eligible.
 
 A holdout manifest requires `holdout_committed`, a 64-character commitment digest, and scope `dw001-holdout-index-v1`. An internal digest does not establish that commitment predates execution.
 
-## 15. Result-record contract
+## 17. Result-record contract
 
 ```text
 research/DW-001/schema/result-record.schema.json
 src/deltawitness/dw001_contracts.py
 ```
 
-A result records the exact manifest and partition; protocol, implementation, generator, and baseline identities; source-report, witness, and projection digests; observer arm; exclusions; deviations; expected and observed decisions; concordance; denominator membership; costs or explicit missingness; and `result_sha256`.
+A result records the exact manifest and partition; protocol, implementation, generator, and baseline identities; source report, witness, and projection digests; observer arm; exclusions; deviations; expected and observed decisions; concordance; denominator membership; costs or explicit missingness; and `result_sha256`.
 
 Excluded results remain recorded and ineligible. Applied deviations require approval. Exploratory-only, excluded, or results-visible deviations cannot silently preserve confirmatory eligibility.
 
 Measured costs require finite nonnegative values. Missing costs are explicit and never encoded as zero.
 
-## 16. Result cross-artifact verification
+## 18. Result cross-artifact verification
 
-`verify_result_against_sources` independently verifies manifest, projection, and result semantics and digests, then checks scenario, partition, Git endpoints, observer arm, applicability, source digests, expected and observed decisions, concordance, and denominator membership.
+`verify_result_against_sources` independently verifies manifest, projection, and result semantics and digests, then checks scenario, partition, Git endpoints, observer, applicability, source digests, decisions, concordance, and denominator membership.
 
-Malformed source objects return typed invalid diagnostics before relational dereference.
+Malformed sources return typed invalid diagnostics before relational dereference. The source report remains separately required because the result verifier does not possess its bytes.
 
-The source report remains separately required because the result verifier does not possess its bytes.
-
-Complete contract details:
+Complete details:
 
 ```text
 research/DW-001/STUDY_CONTRACTS.md
 ```
 
-## 17. Decision-equivalence execution
+## 19. Development execution
 
-For one generated development scenario and one observer arm:
+For one generated development scenario and observer arm:
 
 1. validate and retain the descriptor;
 2. materialize into a disposable literal destination;
@@ -352,133 +438,170 @@ For one generated development scenario and one observer arm:
 6. execute one complete four-state matrix;
 7. write, strict-decode, and verify the report;
 8. project `M0` through `M3`;
-9. independently verify the projection;
-10. construct and verify the result against sources;
-11. retain the complete chain and separately trusted expected digests.
+9. verify the projection;
+10. optionally execute a predeclared selector localization;
+11. optionally execute a fixed negative-control challenge;
+12. construct and verify the result against sources;
+13. retain the complete chain and separately trusted expected digests.
 
-This controls decision drift across nested methods. It does not make synthetic probes representative.
+This controls decision drift and exposes specific limitations. It does not make synthetic probes representative.
 
-### 17.1 Paired observer execution
+Paired observer probes must fix one scenario and identical mechanism bytes while allowing only declared observer-derived fields to differ.
 
-A paired observer probe requires two separately configured homogeneous reports. Before execution, the pair must fix:
+Oracle-relevance controls must directly establish which assertion is the sole suite-level failure source.
 
-- one scenario ID;
-- one family and control role;
-- identical base and candidate source/test bytes;
-- identical paths, generator, template, and timeout;
-- observer-specific command, expected state, failure cause, method, specification, and digest fields.
+Weak-oracle controls must freeze task, selector, candidate, mutant, hidden check, and outcomes before execution.
 
-### 17.2 Oracle negative-control execution
-
-The unrelated-assertion control additionally requires direct, separately executed checks that:
-
-- the claim-facing test passes on base and candidate source bytes;
-- the complete candidate suite fails on base;
-- removing the exact collateral assertion makes the candidate suite pass on base;
-- both observer arms retain the same mechanism and scenario identity.
-
-These direct controls are part of the fixture's mechanism proof. They are not a general oracle-analysis method.
-
-## 18. Cost execution
+## 20. Cost execution
 
 Native method cost must be measured separately from decision-equivalence projection. A cost run executes only states required by that method.
 
-The frozen protocol must define method order, cache policy, timing boundaries, state and command counts, wall-clock and CPU measurement, peak resources where supported, repetition, and partial-run accounting.
+The frozen ecological protocol must define method order, cache policy, timing boundaries, state and command counts, wall-clock and CPU measurement, peak resources where supported, repetition, and partial-run accounting.
 
-A projected full-matrix run must not be presented as native runtime for `M0`, `M1`, or `M2`.
+A projected full-matrix run must not be presented as native runtime for `M0`, `M1`, or `M2`. Fixed synthetic challenge counts must not be extrapolated to ecological repositories.
 
-## 19. Development-pilot boundary
+## 21. Development boundary and completed mechanism pilot
 
-Before freeze, development material may be used only to:
+Development material may be used to:
 
 - test construction, schemas, and cross-artifact contracts;
-- estimate applicability and invalid-hybrid frequency;
-- estimate execution and review cost;
+- estimate mechanism-level feasibility and costs;
 - test baseline feasibility;
 - design a precision target without holdout inspection;
-- refine exclusions, deviations, and review procedures;
+- refine exclusions, deviations, review procedures, and containment requirements;
 - demonstrate known method limitations through explicit negative controls.
 
 Development artifacts remain labeled `development`, outside the primary denominator, and permanently separate from holdout material.
 
-The five implemented families are controlled mechanism probes, not a representative corpus. Neither wrong-reason pair is an effectiveness, prevalence, or accuracy estimate.
+The sealed ten-arm five-family development mechanism pilot has been executed and retained:
 
-No effectiveness, superiority, prevalence, or generalization claim may be made from development fixtures.
+```text
+research/DW-001/development-pilot-plan.v1.json
+research/DW-001/development-pilot-archive.v1.json
+research/DW-001/DEVELOPMENT_PILOT_V1.md
+```
 
-## 20. Ground-truth and oracle-review controls
+It executed 40 matrix states, 12 selector states, and five controlled contrasts. It emitted no headline score and prohibited ecological inference.
 
-Ground truth must be fixed without inspecting DeltaWitness outputs.
+That pilot establishes fixed-pipeline behavior only. The later weak-proxy family is a separate inspected development challenge and is not silently added to the historical pilot population.
 
-Every scenario requires state outcomes and causes, applicability, expected decisions for every declared observer arm, a false-assurance mechanism, environment assumptions, reviewed rationale, and reviewer independence disclosure.
+No effectiveness, superiority, prevalence, model-quality, or generalization claim may be made from these development fixtures.
+
+## 22. Ground-truth, selector, and mutation controls
+
+Ground truth must be fixed without inspecting DeltaWitness outcomes.
+
+Every scenario requires state outcomes and causes, applicability, expected method decisions, a false-assurance mechanism, environment assumptions, reviewed rationale, and reviewer independence disclosure.
 
 Generated expectations must verify before execution. Generator determinism does not create reviewer independence.
 
-Failure cause has two evidence layers:
+Failure cause has separate evidence layers:
 
-- runtime typed class emitted by an observer, such as `test_error` or `test_failure`;
-- independently fixed mechanism label for exact fixture bytes, such as `import_error` or `unrelated_assertion`.
+- runtime typed class, such as `test_error` or `test_failure`;
+- independently fixed mechanism label, such as `import_error`;
+- predeclared selector identity and exact outcome transition;
+- separately defined oracle-strength evidence, such as a frozen mutant set.
 
 A mechanism subtype must not be inferred post hoc from a generic runtime result.
 
-A genuine assertion failure does not establish claim relevance. Real-corpus oracle relevance requires a separate frozen review or measurement procedure with its own controls, disagreement handling, and uncertainty. Until such a procedure is accepted, the field must remain unknown rather than inferred from `BC = fail`.
+A genuine assertion failure does not establish claim relevance. A discriminating selector does not establish oracle strength. A killed or surviving single mutant does not establish mutation adequacy.
+
+Any future mutation or coverage study must freeze before outcome inspection:
+
+- mutation operators and scope;
+- mutant generation and deduplication rules;
+- equivalent/invalid mutant handling;
+- coverage targets and collection semantics;
+- positive and negative controls;
+- thresholds, exclusions, and missingness;
+- calibration and policy boundary.
+
+Real-corpus relevance and strength require separate reviewed procedures, disagreement handling, and uncertainty. Where evidence is insufficient, labels remain unknown rather than inferred.
 
 A post-freeze ambiguity becomes an exclusion, deviation, or documented dispute. It is never silently relabeled.
 
-## 21. Freeze checklist
+## 23. Ecological source-universe boundary
+
+The design-only source universe currently records SWE-bench and TDD-Bench Verified as candidate source classes with exact reviewed implementation-repository revisions, repository-level license metadata, known biases, and unresolved blockers.
+
+```text
+research/DW-001/ecological-source-universe.v1.json
+research/DW-001/ECOLOGICAL_SOURCE_UNIVERSE.md
+src/deltawitness/dw001_ecological.py
+```
+
+It keeps:
+
+```text
+execution_authorized  = false
+containment_status    = unaccepted
+sampling_frame_status = unfrozen
+holdout_selected      = false
+holdout_inspected     = false
+```
+
+Repository-level license metadata does not establish dataset-release, underlying-project, patch, test, environment, execution, redistribution, or publication authorization.
+
+A valid source-universe artifact does not authorize dataset download, instance admission, environment construction, repository execution, or ecological inference.
+
+## 24. Freeze checklist
 
 No held-out command may execute until the complete protocol is frozen in one immutable commit. Required items include:
 
 - [ ] accepted scenario taxonomy and generator specification;
-- [ ] accepted descriptor, identity, and fixture-manifest binding contracts;
-- [ ] accepted scenario-manifest and result contracts;
-- [ ] direct-baseline implementation or exact semantic contract;
-- [ ] artifact feasibility, license, language, and safety review;
+- [ ] accepted descriptor, identity, binding, manifest, result, declaration, and localization contracts;
+- [ ] accepted mutation/coverage evidence contract if used in confirmatory analysis;
+- [ ] direct-baseline implementations or exact semantic contracts;
+- [ ] immutable dataset releases and exact instance manifest;
+- [ ] per-instance license, authorization, environment, and publication review;
+- [ ] accepted target population, unit of analysis, sampling frame, and duplicate/cluster handling;
+- [ ] accepted containment environment;
 - [ ] development/holdout split procedure;
-- [ ] independent ground-truth, failure-subtype, and oracle-relevance review procedure;
+- [ ] independent ground-truth, failure-subtype, selector-relevance, and oracle-strength review procedures;
 - [ ] primary and secondary contrasts;
 - [ ] exact denominators;
-- [ ] frozen metrics and interval method;
-- [ ] pilot-informed precision or sample-size target;
+- [ ] frozen metrics, interval method, multiplicity handling, and precision target;
 - [ ] stochastic repetition and aggregation policy;
 - [ ] frozen exclusions and deviations;
-- [ ] environment capture and disposable execution requirements;
 - [ ] privacy, boundary, and publication review;
 - [ ] canonical holdout manifest and expected-label commitment procedure;
 - [ ] public commitment recorded before unblinding;
-- [ ] exact protocol, implementation, generator, schema, and baseline versions pinned.
+- [ ] exact protocol, implementation, generator, schema, baseline, image, and dependency versions pinned.
 
-Passing tests does not freeze a component. All boxes remain open until the complete protocol is accepted together.
+Passing tests or completing a synthetic challenge does not freeze a component. All required boxes remain open until the complete confirmatory protocol is accepted together.
 
-## 22. Holdout commitment
+## 25. Holdout commitment
 
 Before any held-out command:
 
 1. serialize the canonical holdout index and permitted expected-label material;
 2. hash canonical bytes;
-3. record digest, canonicalization, protocol commit, generator commit, artifact schemas, and baselines immutably;
+3. record digest, canonicalization, protocol commit, generator commit, artifact schemas, baselines, environment image, and dependency identities immutably;
 4. retain sensitive material privately where required;
 5. preserve later deviations without rewriting the commitment.
 
-A commit containing only individual manifests, identities, or bindings does not bind undisclosed holdout membership.
+A commit containing only individual manifests, identities, source metadata, or challenge artifacts does not bind undisclosed holdout membership.
 
-## 23. Measurements under consideration
+## 26. Measurements under consideration
 
-The frozen protocol is expected to report explicit all-scenario and applicable-scenario denominators for:
+The frozen ecological protocol is expected to report explicit all-scenario and applicable-scenario denominators for:
 
 - unsafe acceptance on false-assurance cases;
 - valid-patch acceptance and over-refusal;
 - indeterminate, not-applicable, and invalid-hybrid rates;
 - paired increments `M1-M0`, `M2-M1`, and `M3-M2`;
 - assertion-failure versus generic-error classification by observer arm;
-- failure-subtype accuracy only where independently labeled and supported;
-- oracle-relevance warning precision/recall only after a separate reviewed procedure exists;
+- declared-selector localization outcomes;
+- failure-subtype accuracy only where independently labeled;
+- oracle-relevance and mutation-warning performance only after reviewed procedures exist;
+- surviving claim-violating mutants and invalid/equivalent mutant handling;
 - executed-state and command multipliers;
-- wall-clock, CPU, and review cost;
+- wall-clock, CPU, resource, and review costs;
 - reviewer disagreement and adjudication.
 
-No aggregate accuracy score may replace paired contingency tables and four-way outcome flow. Interval method, multiplicity handling, precision target, sampling frame, and primary endpoint remain unfrozen.
+No aggregate accuracy or mutation score may replace paired tables, four-way outcome flow, per-selector evidence, and retained surviving-mutant records. Interval method, multiplicity handling, precision target, sampling frame, and primary endpoint remain unfrozen.
 
-## 24. Falsification and narrowing
+## 27. Falsification and narrowing
 
 Narrow, redesign, or abandon the four-state layer for the tested population if:
 
@@ -489,15 +612,24 @@ Narrow, redesign, or abandon the four-state layer for the tested population if:
 - gains disappear under fair observer and runner controls;
 - cost exceeds evidence value;
 - results are unstable under harmless transformations;
-- independent operators cannot reproduce states, fixtures, bindings, projections, or arithmetic.
+- independent operators cannot reproduce states, fixtures, relations, or arithmetic.
 
 Narrow or redesign typed observation if it does not improve cause separation beyond exit-code baselines or creates unacceptable false indeterminacy.
 
-Narrow or redesign any future oracle-integrity layer if it cannot reject the unrelated-assertion negative control without materially rejecting valid controls, if its labels depend on post-result interpretation, or if an LLM explanation becomes an unverified decision authority.
+Narrow or redesign selector localization if unstable framework identities, changed discovery semantics, or over-refusal exceed its provenance value.
+
+Narrow or redesign any mutation/oracle-integrity layer if it:
+
+- cannot reject the weak-proxy negative control without materially rejecting valid controls;
+- cannot preserve the unrelated-assertion distinction;
+- selects operators, mutants, thresholds, or exclusions after results are visible;
+- hides surviving claim-violating mutants behind one scalar score;
+- treats an LLM explanation as an unverified decision authority;
+- becomes more complex than a stronger direct baseline without incremental evidence.
 
 Negative results are valid and must not trigger post-hoc benchmark repair.
 
-## 25. Independent reproduction
+## 28. Independent reproduction
 
 Issue #4 remains open. The maintainer's second run, another machine controlled by the same workflow, or another run by the same agent process is not independent.
 
@@ -508,25 +640,25 @@ Until qualifying external reproduction is accepted:
 - the roadmap gate remains unchecked;
 - reproduction must cite an exact commit or release.
 
-## 26. Safety and publication
+## 29. Safety and publication
 
 Only synthetic, owned, licensed, or explicitly authorized targets may be used.
 
-The runner and generator are not sandboxes. Execution requires a disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance, not containment.
+The runner and generator are not sandboxes. Execution requires a separately secured disposable, non-sensitive environment without credentials or unrelated data. Environment capture is provenance, not containment.
 
-The generator rejects a symbolic-link final destination but does not establish trust in ancestor paths, mounts, namespaces, Git, Python, kernel, or filesystem.
+Current weak-oracle controls execute only fixed project-owned Python bytes in temporary directories. This does not authorize external repository execution.
 
-Artifacts may expose paths, commands, Git IDs, digests, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, and costs. Every export requires privacy and claim-boundary review.
+Artifacts may expose prompts, paths, commands, selectors, mutant IDs, Git IDs, digests, family labels, observer metadata, reviewer records, authorization references, deviations, exclusions, timings, and costs. Every export requires privacy and claim-boundary review.
 
 Raw tracebacks and command output remain excluded by default. Output digests can still reveal equality or support guessing of low-entropy values.
 
-## 27. Deviation policy
+## 30. Deviation policy
 
 Every post-freeze deviation records stable IDs, affected scenario or method, problem, action, result visibility, confirmatory impact, and approval when applied.
 
-A results-visible applied deviation cannot retain impact `none`. Frozen protocol, partition lock, commitment, or original artifacts must never be rewritten to conceal a deviation.
+A results-visible applied deviation cannot retain impact `none`. Frozen protocol, sampling frame, partition lock, commitment, mutation set, hidden checks, or original artifacts must never be rewritten to conceal a deviation.
 
-## 28. Current status
+## 31. Current status
 
 ### Implemented and synthetically tested
 
@@ -534,48 +666,59 @@ A results-visible applied deviation cannot retain impact `none`. Frozen protocol
 - nested `M0`–`M3` projection with hidden-state isolation;
 - strict report, projection, manifest, result, fixture, and binding verification;
 - exclusions, deviations, denominator, and cost-missingness controls;
-- five fixed owned-synthetic families;
+- six fixed owned-synthetic families;
 - paired exit-code/typed import-error observer contrast;
-- unrelated-assertion oracle-relevance negative control;
-- direct proof that its claim-facing assertion is non-discriminating;
-- direct proof that its collateral assertion is the sole `BC` failure source;
-- exact source/test-byte equality checks across observer arms;
+- unrelated-assertion oracle-relevance negative control and direct collateral ablation;
+- exact declared unittest-selector localization under reconstructed `BC`/`CC` states;
+- weak-proxy oracle-strength negative control with one fixed surviving claim-violating mutant;
+- deterministic integrity-bound weak-oracle challenge artifact;
+- sealed and retained five-family development mechanism pilot;
+- design-only ecological source universe with execution authorization false;
 - descriptor-derived specification verification;
 - malformed-object and recomputed-digest regressions;
-- editable and installed-wheel full-chain smoke validation.
+- editable and installed-wheel full-chain smoke validation on Python 3.11–3.14.
 
 ### Not implemented, authorized, accepted, or frozen
 
-- assertion-weakening, broader setup/dependency, invalid-hybrid, no-op, and stochastic families;
-- a validated claim-to-oracle relevance analyzer;
-- reviewed development corpus or pilot authorization;
-- direct ecological baseline runners;
+- assertion-delta weakening analysis;
+- predeclared mutation operator/set framework and calibrated mutation score;
+- claim-boundary coverage analysis;
+- over-mocking analysis;
+- broader setup/dependency, invalid-hybrid, no-op, and stochastic families;
+- validated claim-to-oracle relevance or strength analyzer;
+- immutable ecological dataset releases and per-instance admission records;
+- accepted sampling frame, reviewer protocol, or containment environment;
+- ecological baseline runners or authorized external execution;
 - holdout corpus and public commitment;
 - aggregation and statistical analysis;
-- precision target;
-- stochastic repetition policy;
-- environmental containment;
+- precision target and stochastic repetition policy;
 - authenticated producers or signed attestations;
 - independent reproduction;
 - confirmatory result.
 
-## 29. Public wording rule
+## 32. Public wording rule
 
 Permitted:
 
-> DeltaWitness is preparing a preregistered comparison of nested patch-evidence methods and observer semantics using deterministic owned-synthetic development probes and explicitly bound artifacts.
+> DeltaWitness is preparing a preregistered comparison of nested patch-evidence methods, observer semantics, and test-integrity signals using deterministic development controls and explicitly bound artifacts.
 
-> One controlled synthetic pair shows that generic typed error evidence can prevent an exit-code-only import failure from being accepted as a semantic fail-to-pass witness.
+> One controlled synthetic pair shows that generic typed error evidence can prevent an exit-code-only import failure from being accepted as semantic fail-to-pass evidence.
 
-> A separate controlled negative case shows that a genuine typed assertion failure and canonical four-state pattern still do not establish that the failing assertion is relevant to the declared claim.
+> A separate negative case shows that typed suite failure and a canonical four-state pattern do not establish that the failing assertion is relevant to the declared claim.
+
+> A further development-only challenge shows one exact declared fail-to-pass selector that a fixed claim-violating mutant survives.
 
 Not permitted from this draft:
 
-> Typed receipts are generally superior or accurately diagnose all test failures.
+> Typed receipts are generally superior or diagnose all failures.
 
-> Four-state replay proves oracle relevance or patch correctness.
+> Selector localization proves semantic relevance.
 
-> DW-001 proves that DeltaWitness is superior.
+> The weak-proxy challenge validates mutation testing or oracle strength.
+
+> Four-state replay proves patch correctness.
+
+> DW-001 proves DeltaWitness is superior.
 
 > DeltaWitness has validated the method on held-out coding-agent patches.
 
