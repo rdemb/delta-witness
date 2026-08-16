@@ -93,17 +93,20 @@ result record
 
 It also retains the sealed plan and complete pilot index.
 
+The expected file and directory set is derived mechanically from the sealed plan. The 84 required JSON files are an exact set, not a minimum. Missing files, duplicate paths, unsafe paths, linked or special filesystem entries, extra directories, and unexpected JSON or non-JSON files all fail closed. Tightening this verifier did not alter the committed archive bytes or either recorded digest.
+
 The archive verifier:
 
 1. strict-decodes every embedded JSON object;
-2. checks sorted unique safe relative paths;
-3. verifies every per-document digest;
-4. reconstructs the complete directory bundle;
-5. reruns all artifact-specific semantic verifiers;
-6. reruns all cross-artifact relation verifiers;
-7. rematerializes every synthetic fixture from its descriptor;
-8. verifies the pilot index and five controlled contrasts;
-9. requires every method to remain outside the primary denominator.
+2. requires exactly the 84 sorted unique safe relative paths derived from the sealed plan;
+3. rejects missing, duplicate, reordered, unsafe, or unexpected archive entries;
+4. verifies every per-document digest;
+5. reconstructs the exact directory bundle and rejects extra files or directories;
+6. reruns all artifact-specific semantic verifiers;
+7. reruns all cross-artifact relation verifiers;
+8. rematerializes every synthetic fixture from its descriptor;
+9. verifies the pilot index and five controlled contrasts;
+10. requires every method to remain outside the primary denominator.
 
 ## 4. Exact case results
 
