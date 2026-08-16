@@ -32,14 +32,27 @@ The roadmap is gated by evidence rather than dates. A checked implementation ite
 
 ## Gate 1: Test-integrity analysis
 
+Implemented mechanism controls:
+
+- [x] Exact predeclared unittest selector localization under bound `BC` and `CC` states
+- [x] Controlled suite-level unrelated-assertion negative control
+- [x] Controlled weak-but-discriminating selector with one fixed surviving claim-violating mutant
+- [x] Controlled typed-receipt versus raw-exit comparison for a fixed import-error mechanism
+- [x] Controlled `M0`–`M3` comparison on fixed synthetic discrimination and regression mechanisms
+
+Unresolved analysis layers:
+
 - [ ] Detect empty and assertion-free test deltas
 - [ ] Detect skipped, disabled, and weakened assertions
 - [ ] Measure patch coverage around the claimed behavior
-- [ ] Measure mutation score around the claimed behavior
+- [ ] Define and measure a predeclared mutation set around the claimed behavior
+- [ ] Calibrate mutation evidence against valid, weak, and ambiguous controls
 - [ ] Identify excessive mocking around the claimed boundary
 - [ ] Repeat flaky tests and report uncertainty
-- [ ] Compare typed receipts against raw exit-code observation
-- [ ] Compare the four-state matrix against two-state fail-to-pass validation
+- [ ] Support framework-specific selector and result adapters beyond stdlib unittest
+- [ ] Quantify false positives, false negatives, applicability, and cost before any blocker or score
+
+A checked negative control documents one limitation and the machinery needed to reproduce it. It does not complete Gate 1, validate oracle adequacy, or authorize a merge policy.
 
 ## Gate 2: Bounded intervention analysis
 
@@ -92,8 +105,15 @@ The roadmap is gated by evidence rather than dates. A checked implementation ite
 
 ## Gate 5: Empirical evaluation
 
-- [ ] Reproducible systematic literature-review protocol
-- [ ] Development corpus of synthetic and curated public patches
+- [x] Reproducible initial literature-search log and explicit prior-art boundaries for DW-001 source design
+- [x] Sealed and retained owned-synthetic development mechanism pilot
+- [x] Design-only ecological source universe with execution authorization fixed false
+- [ ] Immutable dataset releases and instance manifests reviewed
+- [ ] Per-instance license, authorization, and environment feasibility review
+- [ ] Accepted ecological unit-of-analysis and sampling-frame contract
+- [ ] Independent ground-truth review and disagreement procedure
+- [ ] Accepted containment environment for external repositories
+- [ ] Development corpus of authorized synthetic and curated public patches
 - [ ] Agent-authored patch sampling protocol
 - [ ] Frozen protocol and held-out evaluation set
 - [ ] Baselines against final-state CI, two-state fail-to-pass, raw exit codes, leave-one-out, delta debugging, mutation testing, and independent semantic verification

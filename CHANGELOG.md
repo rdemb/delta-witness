@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add the fixed `weak-proxy-oracle` DW-001 family as a development-only oracle-strength negative control with one frozen task prompt, candidate, declared selector, claim-violating mutant, and hidden development claim check.
+- Demonstrate one controlled case where both observer arms produce a canonical `pass / fail / pass / pass` matrix, all `M0`–`M3` methods accept, and exact declared-selector localization is `supported` and `discriminating`, while the fixed mutant still passes the declared selector.
+- Execute five shell-free typed mutation controls proving that the selector fails on base, passes on candidate and mutant, and that a separately fixed viewer-denial check passes on candidate and fails on mutant.
+- Add `deltawitness.dw001-weak-oracle-challenge.v1` with exact task, source, selector, candidate, mutant, hidden-check, invocation, receipt, finding, limitation, semantic-digest, and complete-report boundaries.
+- Reconstruct the complete challenge from independently verified descriptor, identity, matrix, projection, declaration, and localization sources so recomputed unkeyed digests cannot hide source, mutant, control, finding, or denominator substitution.
+- Preserve stable challenge semantics across repeated clean runs by binding deterministic projection/localization evidence views rather than volatile timestamps and durations.
+- Exercise the complete weak-oracle chain from editable and force-reinstalled wheel packages on Python 3.11–3.14.
+- Document that a genuine typed and localized fail-to-pass selector does not establish oracle strength, mutation adequacy, ecological agent quality, or merge authorization.
+- Add a deterministic design-only DW-001 ecological source-universe contract for SWE-bench and TDD-Bench Verified with exact implementation-repository commits, repository-level license metadata, known biases, and unresolved source, instance, authorization, environment, containment, review, and sampling blockers.
+- Keep ecological execution authorization, sampling-frame freeze, holdout selection, and holdout inspection false; a repository-level license or public benchmark label cannot silently authorize instance execution.
 - Add a sealed `deltawitness.dw001-development-pilot-plan.v1` contract for exactly ten development-only arms derived from five fixed owned-synthetic families and both supported observer protocols.
 - Execute and retain one canonical synthetic mechanism pilot with 40 matrix states, 12 declared-selector states, 52 commands, complete case tables, five controlled contrasts, explicit cost fields, and no headline score or ecological inference.
 - Add a staging-to-self-verification-to-publication runner that rejects plan drift, unexpected method or localization outcomes, partial output, non-empty or linked destinations, malformed artifacts, and primary-denominator eligibility.
@@ -37,7 +47,7 @@
 - Reject mismatched commits, paths, observer arms, commands, state semantics, method decisions, family labels, malformed objects, private paths, and recomputed-digest relation substitutions.
 - Bind fixture identity specification SHA-256 to the exact descriptor-derived specification bytes instead of accepting a self-consistent substituted digest.
 - Exercise fixture binding construction and verification from editable and installed-wheel packages on Python 3.11–3.14.
-- Add a versioned DW-001 scenario taxonomy that separates five implemented deterministic mechanism probes from required but unsupported future families.
+- Add a versioned DW-001 scenario taxonomy that separates six implemented deterministic mechanism probes from required but unsupported future families while preserving the sealed five-family pilot population.
 - Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
 - Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
 - Require equivalent descriptors to reproduce identical base/head commits and trees across clean directories under the supported Git object model.
@@ -51,12 +61,12 @@
 - Prevent partition relabeling, denominator drift, unapproved deviations, exclusion-with-eligibility, wrong manifest/projection links, and non-finite cost values from being hidden by recomputed unkeyed digests.
 - Reject results-visible applied deviations that attempt to retain confirmatory eligibility, and preflight malformed source artifacts before cross-artifact dereferencing.
 - Add strict JSON Schemas for scenario manifests and result records while retaining the Python semantic verifier as authoritative for relational and cross-artifact invariants.
-- Document the study-contract integrity, privacy, authentication, protocol-freeze, and publication boundaries without authorizing a development pilot or held-out execution.
+- Document the study-contract integrity, privacy, authentication, protocol-freeze, and publication boundaries without authorizing ecological or held-out execution.
 - Add deterministic DW-001 projections for nested final-state, fail-to-pass, regression-preservation, and four-state method predicates from one integrity-verified matrix report.
 - Keep observer semantics as a separate controlled factor by rejecting mixed-observer source reports and recording explicit exit-code and typed-receipt arms.
 - Preserve `accept`, `reject`, `indeterminate`, and independently declared `not_applicable` outcomes without exposing hidden states to weaker projected methods.
 - Recompute projection applicability, shared state slices, claim decisions, method decisions, and reason codes before accepting `projection_sha256`; a recomputed unkeyed digest cannot hide semantic inconsistency.
-- Add the draft DW-001 development-pilot protocol, projection schema, integrity boundary, and adversarial regression fixtures without freezing the protocol or authorizing held-out execution.
+- Add the draft DW-001 protocol, projection schema, integrity boundary, and adversarial regression fixtures without freezing the protocol or authorizing held-out execution.
 - Reject duplicate object keys at every nesting level when loading matrix and influence reports.
 - Convert malformed UTF-8 report bytes into fail-closed `ReportError` outcomes before digest verification.
 - Preserve existing report schemas, canonical bytes, semantic digests, and valid-report behavior.

@@ -4,9 +4,9 @@
 
 **Counterfactual verification and exact patch influence for AI-generated code changes.**
 
-DeltaWitness is an open research prototype for checking whether a software patch produced the behavioral change claimed by its tests, and for measuring how each changed code path influences that declared witness. It does not trust a green final-state run or an agent's narrative by itself.
+DeltaWitness is an open research prototype for checking whether a software patch produced the behavioral change claimed by its tests, for localizing exact declared witness-test transitions, and for measuring how each changed code path influences that declared witness. It does not trust a green final-state run, a raw nonzero exit, a test-suite aggregate, or an agent's narrative by itself.
 
-**Current status:** pre-alpha research software (`v0.0.3`). It is not a formal proof system, a security certification product, a code-review replacement, or a sandbox for untrusted code.
+**Current status:** pre-alpha research software (`v0.0.3` plus unreleased DW-001 research infrastructure). It is not a formal proof system, a security certification product, a code-review replacement, a complete oracle analyzer, or a sandbox for untrusted code.
 
 ## The problem
 
@@ -15,12 +15,14 @@ A coding agent can modify production code, modify tests, run the resulting suite
 - the candidate test would have detected the original defect;
 - the implementation change caused the observed improvement;
 - the original suite still passes against the candidate implementation;
-- the agent did not weaken, skip, or replace the relevant oracle;
+- the agent did not weaken, skip, replace, or misdirect the relevant oracle;
 - a nonzero test-runner exit came from an assertion rather than collection, import, setup, or infrastructure failure;
+- the assertion that caused suite failure belongs to the test declared for the claim;
+- an exact declared fail-to-pass test is strong enough to reject plausible incorrect implementations;
 - every implementation file changed by the patch contributed to the declared result;
 - two changes are alternatives, jointly necessary, redundant, or mutually compensating.
 
-DeltaWitness moves the first layers of this decision out of the agent's narrative and into deterministic Git replay, typed execution evidence, and bounded interventional analysis.
+DeltaWitness moves the first layers of this decision out of the agent's narrative and into deterministic Git replay, typed execution evidence, exact selector provenance, bounded negative controls, and exhaustive path-level intervention analysis.
 
 ## Layer 1: four-state change witness
 
@@ -42,7 +44,7 @@ candidate_candidate  pass
 
 This pattern is consistent with the candidate witness exposing the old behavior, the candidate implementation satisfying that witness, and the original suite remaining valid against the candidate implementation. The interpretation is only as strong as the declared command and its outcome classification.
 
-DeltaWitness calls the resulting artifact a **change witness**. It is bounded evidence about declared commits, paths, commands, and observations. It is not proof of full correctness, security, completeness, minimality, or causal necessity.
+DeltaWitness calls the resulting artifact a **change witness**. It is bounded evidence about declared commits, paths, commands, and observations. It is not proof of full correctness, security, completeness, minimality, oracle adequacy, or causal necessity.
 
 ## Layer 2: typed outcome semantics
 
@@ -65,15 +67,72 @@ receipt test_failure + configured fail exit code -> fail
 
 Import errors, discovery failures, no tests, all-skipped execution, unexpected successes, malformed or missing receipts, binding mismatches, and receipt/exit contradictions become `error`, making the report incomplete rather than creating a false regression witness.
 
-The first built-in producer supports Python's standard-library `unittest`:
+The built-in producer supports Python's standard-library `unittest` discovery and exact repeated logical-test selection:
 
 ```bash
 deltawitness-unittest --start-directory tests
+deltawitness-unittest --start-directory tests \
+  --test-name test_access.AccessTests.test_viewer_is_denied
 ```
 
 Read the complete protocol and its non-claims in [Outcome Receipt Protocol v1](docs/OUTCOME_RECEIPT_V1.md).
 
-## Layer 3: exact patch influence
+## Layer 3: declared witness-test provenance
+
+DW-001 research infrastructure can bind one claim to exact predeclared standard-library unittest selectors and replay those selectors under the exact `base_candidate` and `candidate_candidate` states reconstructed from a verified matrix report.
+
+A selector is classified as:
+
+- `discriminating`: typed assertion failure in `BC`, pass in `CC`;
+- `non_discriminating`: pass in both states;
+- `candidate_invalid`: `CC` does not pass;
+- `indeterminate`: error, timeout, missing selector, malformed or contradictory receipt, or unsupported selection semantics.
+
+The declaration binds claim, specification, adapter, selectors, and adapter-derived commands. The localization artifact binds exact Git states, invocation-bound receipts, per-selector outcomes, aggregate status, semantic digest, and complete-report digest.
+
+This layer addresses **which declared logical test produced the transition**. It does not establish that the selected test expresses the intended behavior or rejects plausible incorrect implementations.
+
+## Development negative controls for oracle interpretation
+
+### Unrelated suite assertion
+
+A fixed owned-synthetic control produces a canonical four-state witness and genuine typed assertion failure, but the suite fails only because of a collateral assertion. The claim-facing selector passes on base and candidate. Exact selector localization exposes that mismatch.
+
+This demonstrates:
+
+```text
+typed suite failure
+    + canonical four-state witness
+    != claim-oracle relevance
+```
+
+### Weak but genuinely discriminating selector
+
+A second fixed control goes further. Its exact declared selector genuinely fails on base, passes on candidate, and localizes as `discriminating`. The selector asserts only that `is_admin(viewer)` returns a Boolean.
+
+A fixed mutant:
+
+```python
+def is_admin(user):
+    return bool(user.get("role"))
+```
+
+also passes that selector while authorizing a viewer. A separately fixed development claim check passes on the candidate and rejects the mutant.
+
+This demonstrates one controlled limitation:
+
+```text
+typed assertion failure
+    + canonical four-state witness
+    + exact declared-selector fail-to-pass
+    != sufficient oracle strength
+```
+
+The integrity-bound challenge executes five fixed typed controls and reconstructs its complete semantics from verified matrix, projection, declaration, and localization sources. It is an owned-synthetic agent-workflow surrogate, not an evaluation of any named model, a mutation score, or a complete test-integrity method.
+
+Read [DW-001 Weak-Proxy-Oracle Challenge v1](research/DW-001/WEAK_ORACLE_CHALLENGE.md).
+
+## Layer 4: exact patch influence
 
 A valid full patch can still contain collateral or interacting changes. For patches with at most eight changed code paths, `deltawitness influence` enumerates every coalition exactly.
 
@@ -84,7 +143,7 @@ For each subset of changed code paths, DeltaWitness:
 3. overlays only the selected candidate code paths;
 4. evaluates the implementation under base tests;
 5. evaluates the same implementation under candidate tests;
-6. records exact trees, commits, observer evidence, and a coalition status.
+6. records exact trees, commits, observer evidence, and coalition status.
 
 A coalition is:
 
@@ -105,7 +164,7 @@ For a complete table, DeltaWitness reports:
 - exact rational Shapley allocation of the endpoint witness change;
 - exact normalized Banzhaf influence;
 - exact pairwise Banzhaf interaction;
-- whether the witness predicate is monotone over the observed path interventions.
+- whether the witness predicate is monotone over observed path interventions.
 
 Example interpretation:
 
@@ -130,13 +189,31 @@ A four-state report records:
 - immutable base and candidate commit IDs;
 - exact tree IDs for all four states;
 - deterministic synthetic commit IDs for the two hybrid states;
-- the specification digest and explicit path classification;
+- specification digest and explicit path classification;
 - every expected and observed state result;
 - exit codes, timeout status, durations, and output digests;
 - observer identifier and deterministic invocation binding;
 - typed receipt outcome, producer, aggregate counts, digest, and stable observer error code when enabled;
-- a stable witness digest over the semantic outcome;
-- a report digest over the complete JSON document.
+- stable witness digest over semantic outcome;
+- report digest over the complete JSON document.
+
+A selector-localization artifact additionally records:
+
+- one predeclared claim and ordered selector set;
+- adapter-derived selector commands;
+- exact `BC` and `CC` tree and commit identities;
+- per-selector typed receipts and classifications;
+- aggregate localization status;
+- semantic and complete-report digests.
+
+The weak-oracle challenge additionally records:
+
+- fixed task, declared selector, candidate, mutant, and hidden development check identities;
+- exact source and test digests;
+- five ordered typed control executions;
+- current matrix/projection/localization evidence bindings;
+- one development-only limitation finding;
+- semantic and complete-report digests.
 
 An influence report additionally records:
 
@@ -146,11 +223,11 @@ An influence report additionally records:
 - endpoint anchor checks;
 - complete coalition-level claim observations;
 - exact rational attribution metrics when available;
-- a semantic influence digest and a complete report digest.
+- semantic influence digest and complete report digest.
 
 Hybrid and intervention states are represented as synthetic commits rather than dirty worktrees. Commands that inspect `HEAD` therefore see a recorded commit identity. Git subprocesses use a reduced environment that rejects process-level repository redirection and replacement-object overrides. Changed submodule and changed symbolic-link entries are rejected before hybrid-state materialization. Repository-local attributes and filters remain a documented limitation.
 
-Raw command output is excluded by default. Local absolute repository and specification paths are not written to reports. Command arrays, claim descriptions, environment-variable names, output digests, selected repository paths, and receipt metadata are recorded; every exported report remains review-required before publication.
+Raw command output is excluded by default. Local absolute repository and specification paths are not written to reports. Command arrays, claim descriptions, selectors, prompts, environment-variable names, output digests, repository paths, mutant IDs, and receipt metadata can be recorded; every exported artifact remains review-required before publication.
 
 ## Quick start
 
@@ -198,10 +275,10 @@ deltawitness influence \
 
 The influence command currently requires:
 
-- the canonical `pass / fail / pass / pass` expectation pattern;
-- a complete, supported four-state witness;
+- canonical `pass / fail / pass / pass` expectations;
+- a complete supported four-state witness;
 - no more than eight changed code paths;
-- exact exhaustive execution of all `2^n` coalitions;
+- exhaustive execution of all `2^n` coalitions;
 - complete endpoint consistency before metrics are released.
 
 By default, reports are written inside the repository's private Git metadata directory:
@@ -230,7 +307,6 @@ code = ["src/**", "pyproject.toml"]
 tests = ["tests/**"]
 documentation = ["README.md", "docs/**"]
 
-# Host environment variables are not inherited unless named here.
 [execution]
 pass_env = []
 
@@ -240,8 +316,6 @@ description = "The candidate witness must expose the defect before the patch and
 observer = "outcome-receipt-v1"
 command = ["deltawitness-unittest", "--start-directory", "tests"]
 timeout_seconds = 300
-
-# The receipt and process exit must agree.
 pass_exit_codes = [0]
 fail_exit_codes = [1]
 
@@ -252,11 +326,11 @@ candidate_base = "pass"
 candidate_candidate = "pass"
 ```
 
-Every changed path must match exactly one declared category. Every matrix expectation must be explicit. Pass and fail exit-code sets must be disjoint. Timeouts, unclassified return codes, invalid receipts, and inconclusive receipt outcomes produce `INCOMPLETE`, even when an expectation is `any`. Ambiguous configuration fails closed.
+Every changed path must match exactly one declared category. Every expectation must be explicit. Pass and fail exit-code sets must be disjoint. Timeouts, unclassified return codes, invalid receipts, and inconclusive receipt outcomes produce `INCOMPLETE`, even when an expectation is `any`. Ambiguous configuration fails closed.
 
-Dependency manifests, build scripts, generated-code inputs, and configuration that can influence execution should be classified as `code`, not `documentation`. The influence endpoint anchors are designed to detect some misclassification, but they cannot prove that every hidden dependency has been categorized correctly.
+Dependency manifests, build scripts, generated-code inputs, and execution-sensitive configuration should be classified as `code`, not `documentation`. Endpoint anchors detect some misclassification but cannot prove every hidden dependency has been categorized correctly.
 
-Projects that do not use a receipt adapter may omit `observer`; `exit-code-v1` remains the default. A project-specific adapter should derive results from a structured framework API rather than terminal text and must follow the protocol's privacy and consistency rules.
+Projects that do not use a receipt adapter may omit `observer`; `exit-code-v1` remains the default. A project-specific adapter should derive results from a structured framework API rather than terminal text and must follow protocol privacy and consistency rules.
 
 CLI exit codes:
 
@@ -272,29 +346,33 @@ Exact patch influence is intentionally exponential:
 n changed code paths -> 2^n coalitions -> 2 test worlds per coalition
 ```
 
-At the current hard cap of eight paths, one claim requires up to 512 coalition command executions in addition to the canonical four-state matrix. The exact mode is designed for small, high-value patches where complete interaction structure matters more than throughput.
+At the hard cap of eight paths, one claim requires up to 512 coalition command executions in addition to the canonical matrix. Exact mode is designed for small, high-value patches where complete interaction structure matters more than throughput.
 
 DeltaWitness does not silently approximate larger patches. Future work may add explicitly labeled sampling and confidence intervals, but approximate results must remain distinguishable from exact enumeration.
 
+Selector localization and the weak-oracle challenge are separate development APIs rather than implicit additions to the core CLI policy. The weak-oracle challenge uses exactly five fixed controls and does not define a general mutation workload.
+
 ## Safety model
 
-DeltaWitness executes commands from the specification without a shell, with a sanitized environment and isolated temporary home and cache directories. It still runs with the current user's filesystem permissions and does not isolate the network.
+DeltaWitness executes declared commands without a shell, with a sanitized environment and isolated temporary home and cache directories. It still runs with the current user's filesystem permissions and does not isolate the network.
 
-Use it only with code and commands you trust. Never place secrets directly in a command array. Values passed through `execution.pass_env` are not written to the report, but a command can still print or otherwise expose them. Output digests can fingerprint low-entropy sensitive values and are not a safe substitute for review.
+Use it only with code and commands you trust. Never place secrets directly in a command array. Values passed through `execution.pass_env` are not written to reports, but a command can still print or otherwise expose them. Output digests can fingerprint low-entropy sensitive values and are not a substitute for review.
 
 A receipt binding prevents accidental cross-state reuse; it does not authenticate the producer. A malicious command can read its binding and forge a syntactically valid receipt. Producer signing, environment provenance, and containment remain separate future layers.
 
-Exact coalition enumeration multiplies command execution. Run influence analysis only in a disposable, resource-bounded environment when the repository or command is not fully trusted.
+Exact coalition enumeration multiplies command execution. Run influence analysis only in a separately secured, disposable, resource-bounded environment when the repository or command is not fully trusted.
 
-For untrusted repositories, use a disposable virtual machine or a separately secured container without production credentials. Read [THREAT_MODEL.md](THREAT_MODEL.md) before use.
+The weak-oracle challenge executes only fixed project-owned bytes in temporary directories. That does not make DeltaWitness safe for external or untrusted patches. No VPS or credential-bearing environment should be used as an ad hoc sandbox.
+
+Read [THREAT_MODEL.md](THREAT_MODEL.md) before use.
 
 ## Research boundary
 
-Fail-to-pass validation, delta debugging, patch minimization, automated patch assessment, program slicing, mutation testing, cooperative-game attribution, and test-code co-evolution are established areas. DeltaWitness does not currently claim scientific novelty.
+Fail-to-pass validation, selector execution, delta debugging, patch minimization, automated patch assessment, program slicing, mutation testing, cooperative-game attribution, test-code co-evolution, weak or partial oracles, hidden tests, coverage, and assertion-quality analysis are established areas. DeltaWitness does not currently claim scientific novelty.
 
-The provisional contribution under evaluation is narrower: a Git-native four-state replay, exact hybrid-state identities, typed and invocation-bound outcomes, exhaustive dual-test-world path interventions, endpoint consistency checks, exact non-monotonic attribution, and portable integrity-verifiable reports.
+The provisional contribution under evaluation is narrower: a Git-native four-state replay, exact hybrid-state identities, typed invocation-bound outcomes, exact declared-selector provenance, integrity-bound negative controls for oracle interpretation, exhaustive dual-test-world path interventions, endpoint consistency, exact non-monotonic attribution, and portable verifiable artifacts.
 
-The project must still demonstrate through literature review, falsifiable benchmarks, held-out evaluation, external reproduction, and technical review that this combination adds useful evidence beyond existing methods.
+The project must still demonstrate through systematic literature review, frozen baselines, authorized ecological data, calibrated mutation/coverage studies, held-out evaluation, external reproduction, and technical review that this combination adds useful evidence beyond existing methods.
 
 See:
 
@@ -302,6 +380,7 @@ See:
 - [Research Note 001](docs/RESEARCH_NOTE_001_TYPED_FAILURES.md)
 - [Research Note 002](docs/RESEARCH_NOTE_002_EXACT_PATCH_INFLUENCE.md)
 - [DW-001 protocol](research/DW-001/PROTOCOL.md)
+- [DW-001 Weak-Proxy-Oracle Challenge](research/DW-001/WEAK_ORACLE_CHALLENGE.md)
 
 ## Current limitations
 
@@ -311,21 +390,25 @@ The prototype intentionally supports a narrow case:
 - candidate test changes are required;
 - changed submodule and changed symbolic-link entries are rejected;
 - dependency, toolchain, generated-file, unchanged-submodule, unchanged-symbolic-link, and cross-repository state are not yet fully modeled or cryptographically bound;
-- repository-local Git attributes, filters, checkout transformations, and the shared object database can still affect materialized worktrees;
-- commands can still access the host filesystem and network;
+- repository-local Git attributes, filters, checkout transformations, and the shared object database can still affect worktrees;
+- commands can access the host filesystem and network;
 - nondeterministic tests are observed only once;
-- `exit-code-v1` can still confuse assertion failure with collection, import, setup, teardown, or infrastructure failure;
+- `exit-code-v1` can confuse assertion failure with collection, import, setup, teardown, or infrastructure failure;
 - `outcome-receipt-v1` requires a cooperating producer and does not authenticate it;
-- the built-in typed producer currently supports only standard-library `unittest` discovery;
+- built-in typed selection currently supports only standard-library `unittest`;
 - typed outcomes do not establish oracle relevance or strength;
+- selector localization proves exact declared transition, not semantic intent;
+- the weak-oracle challenge uses one fixed mutant and hidden check, not a calibrated mutation set or score;
 - exact influence uses whole changed paths as intervention units, so results depend on path grouping;
 - documentation changes are held at candidate state and must pass endpoint consistency checks;
 - any indeterminate coalition withholds all exact attribution metrics;
 - exact influence is capped at eight changed code paths;
 - Shapley and Banzhaf values describe the declared Boolean witness game, not universal semantic importance;
-- weak assertions, excessive mocking, semantic overfitting, environment drift, and production behavior remain outside the current proof boundary;
+- weak assertions, excessive mocking, semantic overfitting, environment drift, and production behavior remain outside the current validated boundary;
 - synthetic commits are local Git objects and are not pushed automatically;
-- a matching matrix and stable influence map can still support a misleading or incomplete claim.
+- a matching matrix, discriminating selector, and stable influence map can still support a misleading or incomplete claim;
+- the fixed synthetic development pilot and challenges are not ecological agent evidence;
+- independent reproduction remains incomplete.
 
 ## Project principles
 
