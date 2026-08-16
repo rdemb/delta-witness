@@ -134,6 +134,7 @@ _FAILURE_CAUSES = {
     "none",
     "assertion_failure",
     "test_failure_untyped",
+    "import_error",
     "timeout",
     "unknown_error",
 }
@@ -377,7 +378,6 @@ def _check_relations(
     _equal("scenario manifest.paths", manifest["paths"], descriptor["paths"])
 
     execution = _obj(manifest["execution"], "scenario manifest.execution")
-    # Report the semantic arm mismatch before derivative command differences.
     for field in ("observer", "observer_id", "command", "timeout_seconds"):
         _equal(
             f"scenario manifest.execution.{field}",
