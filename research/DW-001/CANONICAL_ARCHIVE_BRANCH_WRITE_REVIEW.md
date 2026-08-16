@@ -50,17 +50,20 @@ archive_sha256     = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fc
 semantic_sha256    = bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
 ```
 
-Latest complete validation before this record update:
+Documentation-head validation used to close this review:
 
 ```text
-workflow run       = 31956817507
-run number         = 217
-validated head     = 48d98833a3f6bfd57f245c743915d73d57d9d074
+workflow run       = 31957066090
+run number         = 218
+validated head     = a67c74865686ac0c3695353cbc24a09bd4e73495
 Python 3.11 tests  = 224 / 224
 Python matrix      = 3.11, 3.12, 3.13, 3.14 success
+archive Git blob   = 65f3034b56dc2eb523018d68ff09d0e2e4cd54e4
+archive_sha256     = 3b992d67281693143a4e7bea920d1829f9b675eda592993db0e234239fcf4b06
+semantic_sha256    = bd3c40d62e3d5695271db06f3bec476b4b9cd94442fd7171e1a03c70a74db5ef
 ```
 
-Because this record update creates a later documentation-only head, the actual merge gate is the subsequent final CI run recorded in PR #29. That run must retain the same archive Git blob and both canonical digests.
+The CI run triggered by this checklist-closure commit is the final merge gate and is recorded in PR #29. It must retain the same archive blob and both canonical digests.
 
 ## Threat-model amendment
 
@@ -119,10 +122,8 @@ The exact-file-set boundary additionally rejects any undeclared note, log, JSON 
 - [x] temporary write job and `contents: write` removed;
 - [x] final workflow permissions restored to `contents: read`;
 - [x] final PR diff, changed-file list, comments, reviews, and unresolved review threads checked before merge;
-- [ ] documentation-only final-head CI passed on Python 3.11–3.14;
-- [ ] canonical archive blob and both digests rechecked at the final head.
-
-The final two boxes are closed only after the CI run triggered by this exact record update succeeds.
+- [x] documentation-head CI passed on Python 3.11–3.14;
+- [x] canonical archive blob and both digests rechecked at that validated head.
 
 ## Current permission state
 
