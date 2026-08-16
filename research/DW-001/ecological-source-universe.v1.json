@@ -1,0 +1,112 @@
+{
+  "decisions": {
+    "candidate_sources_only": true,
+    "containment_required": true,
+    "containment_status": "unaccepted",
+    "development_holdout_split_status": "unfrozen",
+    "license_and_authorization_status": "pending",
+    "no_ecological_execution": true,
+    "no_holdout_inspection": true,
+    "no_holdout_selection": true,
+    "precision_target_status": "unfrozen",
+    "review_protocol_status": "unfrozen",
+    "sampling_frame_status": "unfrozen",
+    "target_population_status": "unfrozen",
+    "unit_of_analysis_status": "unfrozen"
+  },
+  "design_id": "DW-001-ECOLOGICAL-DESIGN-V1",
+  "execution_authorized": false,
+  "holdout_inspected": false,
+  "holdout_selected": false,
+  "reviewed_main_sha": "6dada3bdde890eafe287cf6abdae76aaf7940cbb",
+  "schema_version": "deltawitness.dw001-ecological-source-universe.v1",
+  "sources": [
+    {
+      "artifact_scope": [
+        "issue_text",
+        "repository_identity",
+        "base_commit",
+        "gold_patch",
+        "test_patch",
+        "FAIL_TO_PASS",
+        "PASS_TO_PASS",
+        "environment_metadata"
+      ],
+      "authorization_review_status": "pending",
+      "blocking_questions": [
+        "Pin one immutable dataset release and digest rather than repository main.",
+        "Review every selected instance repository license and test/patch provenance.",
+        "Define authorization for executing historical repository code and tests.",
+        "Accept a disposable containment profile before any instance execution.",
+        "Define environment reconstruction and uncontrolled-network policy.",
+        "Define repository-clustered sampling and development/holdout leakage controls."
+      ],
+      "containment_status": "unaccepted",
+      "dataset_reference_status": "unpinned",
+      "environment_feasibility": "unreviewed",
+      "execution_authorized": false,
+      "known_biases": [
+        "benchmark curation and solvability filtering",
+        "repository and issue-selection bias",
+        "Python-project concentration",
+        "human gold-patch and test provenance",
+        "repository and issue-lineage clustering",
+        "benchmark contamination and memorization risk"
+      ],
+      "license_review_status": "repository_reviewed_instances_pending",
+      "order": 1,
+      "paper_reference": "arXiv:2310.06770",
+      "repository": "SWE-bench/SWE-bench",
+      "repository_commit_sha": "ca6e4e0d252f32f8762625b73575d5dee49d0a5a",
+      "repository_license_spdx": "MIT",
+      "source_id": "swe-bench",
+      "source_type": "public_benchmark_candidate",
+      "target_population_relation": "Curated real-world GitHub issue-resolution benchmark; relation to coding-agent patches generally is not established."
+    },
+    {
+      "artifact_scope": [
+        "issue_text",
+        "repository_identity",
+        "base_commit",
+        "gold_patch",
+        "generated_or_gold_test_patch",
+        "fail_to_pass_evidence",
+        "isolated_relevant_test_execution",
+        "change_coverage_metadata"
+      ],
+      "authorization_review_status": "pending",
+      "blocking_questions": [
+        "Pin one immutable dataset artifact and digest, not only repository code.",
+        "Review licenses and authorization for every underlying project instance.",
+        "Separate human-authored, generated, transformed, and uncertain test provenance.",
+        "Map isolated relevant-test semantics to DW-001 claims without relabeling outcomes.",
+        "Accept containment and environment reconstruction before execution.",
+        "Define whether the benchmark can support patch-method inference or only test-generation inference."
+      ],
+      "containment_status": "unaccepted",
+      "dataset_reference_status": "unpinned",
+      "environment_feasibility": "unreviewed",
+      "execution_authorized": false,
+      "known_biases": [
+        "human verification and benchmark inclusion filtering",
+        "focus on test generation before issue resolution",
+        "source-benchmark and language composition constraints",
+        "gold-patch and generated-test provenance heterogeneity",
+        "repository and issue-lineage clustering",
+        "coverage and relevant-test harness selection effects"
+      ],
+      "license_review_status": "repository_reviewed_instances_pending",
+      "order": 2,
+      "paper_reference": "arXiv:2412.02883",
+      "repository": "IBM/TDD-Bench-Verified",
+      "repository_commit_sha": "3df8be066e486789d0b8e0d2865a3a4422b4560f",
+      "repository_license_spdx": "Apache-2.0",
+      "source_id": "tdd-bench-verified",
+      "source_type": "public_benchmark_candidate",
+      "target_population_relation": "Human-filtered test-generation benchmark derived from real issues; relation to deployed coding-agent patch workflows is not established."
+    }
+  ],
+  "status": "design_only",
+  "study_id": "DW-001",
+  "universe_sha256": "efab47a0f2a2bcd69665b9284927742cfbc4a1fb69a505377102b70536dd0dcb"
+}
