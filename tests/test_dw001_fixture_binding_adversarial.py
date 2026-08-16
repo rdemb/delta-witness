@@ -233,8 +233,11 @@ class DW001FixtureManifestBindingAdversarialTests(unittest.TestCase):
     def test_private_or_absolute_path_fields_are_rejected_after_resigning(self) -> None:
         descriptor, identity, manifest = artifacts()
         binding = build_fixture_manifest_binding(descriptor, identity, manifest)
+        private_root = "/" + "private"
         tampered = deepcopy(binding)
-        tampered["specification"]["path"] = "/home/private/deltawitness.toml"
+        tampered["specification"]["path"] = (
+            f"{private_root}/fixture/deltawitness.toml"
+        )
         tampered["binding_sha256"] = compute_fixture_manifest_binding_sha256(
             tampered
         )
@@ -252,7 +255,7 @@ class DW001FixtureManifestBindingAdversarialTests(unittest.TestCase):
         )
 
         extra = deepcopy(binding)
-        extra["local_path"] = "/home/private/repository"
+        extra["local_path"] = f"{private_root}/fixture/repository"
         extra["binding_sha256"] = compute_fixture_manifest_binding_sha256(extra)
         valid, errors = verify_fixture_manifest_binding_document(
             extra,
