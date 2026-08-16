@@ -1,8 +1,8 @@
 """Public DW-001 synthetic-fixture API with fail-closed safety checks.
 
 The original deterministic generator core remains responsible for the first
-three owned-synthetic families. A separate fixed observer-probe adapter adds the
-wrong-reason import-failure family without accepting free-form source or test
+three owned-synthetic families. Fixed wrong-reason adapters add controlled
+observer and oracle-relevance probes without accepting free-form source or test
 bytes. This public boundary dispatches by verified family identifier, rejects
 symbolic-link destinations, and binds specification digests to descriptor-
 derived bytes.
@@ -22,13 +22,20 @@ FIXTURE_DESCRIPTOR_SCHEMA_VERSION = _core.FIXTURE_DESCRIPTOR_SCHEMA_VERSION
 FIXTURE_IDENTITY_SCHEMA_VERSION = _core.FIXTURE_IDENTITY_SCHEMA_VERSION
 GENERATOR_ID = _core.GENERATOR_ID
 GENERATOR_VERSION = _core.GENERATOR_VERSION
-SUPPORTED_FAMILIES = (*_core.SUPPORTED_FAMILIES, _wrong_reason.FAMILY_ID)
+SUPPORTED_FAMILIES = (
+    *_core.SUPPORTED_FAMILIES,
+    *_wrong_reason.SUPPORTED_FAMILIES,
+)
 compute_fixture_descriptor_sha256 = _core.compute_fixture_descriptor_sha256
 compute_fixture_identity_sha256 = _core.compute_fixture_identity_sha256
 
 
 def _family(document: object) -> object:
     return document.get("family_id") if isinstance(document, dict) else None
+
+
+def _is_wrong_reason_family(document: object) -> bool:
+    return _family(document) in _wrong_reason.SUPPORTED_FAMILIES
 
 
 def build_fixture_descriptor(
@@ -39,9 +46,10 @@ def build_fixture_descriptor(
 ) -> dict[str, Any]:
     """Build one canonical descriptor for a supported fixed family."""
 
-    if family_id == _wrong_reason.FAMILY_ID:
+    if family_id in _wrong_reason.SUPPORTED_FAMILIES:
         return _wrong_reason.build_descriptor(
             scenario_id=scenario_id,
+            family_id=family_id,
             observer=observer,
         )
     return _core.build_fixture_descriptor(
@@ -56,7 +64,7 @@ def verify_fixture_descriptor_document(
 ) -> tuple[bool, tuple[str, ...]]:
     """Verify a descriptor using the exact family implementation."""
 
-    if _family(document) == _wrong_reason.FAMILY_ID:
+    if _is_wrong_reason_family(document):
         return _wrong_reason.verify_descriptor(document)
     return _core.verify_fixture_descriptor_document(document)
 
@@ -83,7 +91,7 @@ def verify_fixture_identity_document(
 ) -> tuple[bool, tuple[str, ...]]:
     """Verify identity semantics plus descriptor-derived specification bytes."""
 
-    if _family(descriptor) == _wrong_reason.FAMILY_ID:
+    if _is_wrong_reason_family(descriptor):
         return _wrong_reason.verify_identity(identity, descriptor)
 
     valid, errors = _core.verify_fixture_identity_document(
@@ -126,8 +134,11 @@ def materialize_synthetic_fixture(
     """Materialize a verified fixed family into a literal destination."""
 
     normalized_destination = _destination(destination)
-    if _family(document) == _wrong_reason.FAMILY_ID:
-        identity = _wrong_reason.materialize(document, normalized_destination)
+    if _is_wrong_reason_family(document):
+        identity = _wrong_reason.materialize(
+            document,
+            normalized_destination,
+        )
     else:
         identity = _core.materialize_synthetic_fixture(
             document,
@@ -159,7 +170,7 @@ def verify_materialized_fixture(
     )
     if not identity_valid:
         return False, identity_errors
-    if _family(descriptor) == _wrong_reason.FAMILY_ID:
+    if _is_wrong_reason_family(descriptor):
         return _wrong_reason.verify_materialized(
             identity,
             descriptor,
