@@ -249,7 +249,7 @@ class DW001WeakProxyOracleTests(unittest.TestCase):
                 )
                 self.assertEqual(localization["aggregate_status"], "supported")
                 self.assertEqual(
-                    localization["selectors"][0]["status"],
+                    localization["selectors"][0]["classification"],
                     "discriminating",
                 )
 
