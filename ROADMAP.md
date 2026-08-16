@@ -32,27 +32,34 @@ The roadmap is gated by evidence rather than dates. A checked implementation ite
 
 ## Gate 1: Test-integrity analysis
 
-Implemented mechanism controls:
+Implemented mechanism and pre-execution controls:
 
 - [x] Exact predeclared unittest selector localization under bound `BC` and `CC` states
 - [x] Controlled suite-level unrelated-assertion negative control
 - [x] Controlled weak-but-discriminating selector with one fixed surviving claim-violating mutant
 - [x] Controlled typed-receipt versus raw-exit comparison for a fixed import-error mechanism
 - [x] Controlled `M0`–`M3` comparison on fixed synthetic discrimination and regression mechanisms
+- [x] Frozen outcome-blind minimal stdlib-AST mutation operator set
+- [x] Exact mutation target and deterministic mutant identities
+- [x] Explicit duplicate, invalid, and not-applicable generation records
+- [x] Paired strong-oracle and weak-proxy profiles over identical source and generic mutants
+- [x] Historical weak-proxy mutant excluded from generic-operator generalization
 
 Unresolved analysis layers:
 
+- [ ] Execute the frozen claim-scoped mutation catalog under both frozen profiles
+- [ ] Retain typed killed, survived, invalid, equivalent-review-required, and indeterminate outcomes
+- [ ] Calibrate mutation evidence against valid, weak, and ambiguous controls
 - [ ] Detect empty and assertion-free test deltas
 - [ ] Detect skipped, disabled, and weakened assertions
 - [ ] Measure patch coverage around the claimed behavior
-- [ ] Define and measure a predeclared mutation set around the claimed behavior
-- [ ] Calibrate mutation evidence against valid, weak, and ambiguous controls
+- [ ] Compare mutation evidence with fixed-mutant, coverage-only, and established mutation-tool baselines
 - [ ] Identify excessive mocking around the claimed boundary
 - [ ] Repeat flaky tests and report uncertainty
 - [ ] Support framework-specific selector and result adapters beyond stdlib unittest
 - [ ] Quantify false positives, false negatives, applicability, and cost before any blocker or score
 
-A checked negative control documents one limitation and the machinery needed to reproduce it. It does not complete Gate 1, validate oracle adequacy, or authorize a merge policy.
+A checked negative control or pre-execution plan documents one limitation or freezes one experimental input. It does not complete Gate 1, validate oracle adequacy, establish mutation adequacy, or authorize a merge policy.
 
 ## Gate 2: Bounded intervention analysis
 
