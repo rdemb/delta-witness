@@ -1,8 +1,8 @@
 # DW-001 Deterministic Synthetic Fixture Generator v1
 
-**Status:** development-pilot infrastructure; not frozen; no pilot or held-out execution authorized.
+**Status:** development research infrastructure; not frozen; no held-out execution authorized.
 
-The generator converts one strict DW-001 fixture descriptor into an owned-synthetic Git repository and a public-safe fixture identity. It exists to make a small set of controlled scenario mechanisms reproducible and auditable before a development pilot.
+The generator converts one strict DW-001 fixture descriptor into an owned-synthetic Git repository and a public-safe fixture identity. It exists to make a small set of controlled scenario mechanisms and known limitations reproducible and auditable before ecological execution.
 
 ## Artifact chain
 
@@ -16,12 +16,20 @@ fixture descriptor
     -> DW-001 nested-method projection
 ```
 
+Optional later development layers may consume the verified chain:
+
+```text
+claim-witness declaration and localization
+weak-oracle mutation-control challenge
+```
+
 Schemas:
 
 ```text
 research/DW-001/schema/fixture-descriptor.schema.json
 research/DW-001/schema/fixture-identity.schema.json
 research/DW-001/schema/fixture-manifest-binding.schema.json
+research/DW-001/schema/weak-oracle-challenge.schema.json
 ```
 
 Implementation:
@@ -29,10 +37,14 @@ Implementation:
 ```text
 src/deltawitness/_dw001_scenarios.py
 src/deltawitness/_dw001_wrong_reason.py
+src/deltawitness/_dw001_weak_proxy.py
 src/deltawitness/dw001_scenarios.py
+src/deltawitness/dw001_oracle_challenge.py
 ```
 
-The original internal generator implements the first three fixed families. The separate wrong-reason adapter implements controlled import-error and unrelated-assertion probes without accepting arbitrary code or test bytes. The public module dispatches by verified family identifier, binds specification bytes to the descriptor, and applies fail-closed destination checks.
+The original internal generator implements the first three fixed families. The wrong-reason adapter implements import-error and unrelated-assertion probes. The weak-proxy adapter implements one oracle-strength negative control. None accepts arbitrary code, test, prompt, or mutant bytes.
+
+The public module dispatches by verified family identifier, binds specification bytes to the descriptor, and applies fail-closed destination checks.
 
 ## Descriptor contract
 
@@ -67,6 +79,8 @@ version = 1
 
 The supported-family registry is implementation-controlled. During pre-freeze development, adding a family expands the v1 schema enum but does not reinterpret existing artifacts. Older verifiers may reject newer-family artifacts. Every study result must retain the exact generator, schema, and implementation commit; version strings alone do not authenticate code or freeze semantics.
 
+The committed ten-arm development mechanism pilot remains fixed to the five families in its sealed plan. The later weak-proxy family is not silently added to that historical archive.
+
 ## Supported fixed families
 
 Generator v1 currently supports:
@@ -75,15 +89,16 @@ Generator v1 currently supports:
 - `non-discriminating-candidate-test`;
 - `candidate-regression-against-base-tests`;
 - `wrong-reason-base-import-failure`;
-- `wrong-reason-unrelated-assertion`.
+- `wrong-reason-unrelated-assertion`;
+- `weak-proxy-oracle`.
 
 The first three families use one fixed role-check template and have observer-independent pass/fail state patterns, with failure-cause precision changing between `O0` and `O1` where applicable.
 
-The two wrong-reason families are fixed negative or contrast probes. They accept no caller-provided source, test, claim, or collateral behavior bytes.
+The two wrong-reason families are fixed observer or oracle-relevance controls. The weak-proxy family is a fixed oracle-strength control. They accept no caller-provided source, test, claim, prompt, collateral behavior, hidden check, or mutant bytes.
 
 ## Wrong-reason import observer pair
 
-The import family uses a fixed candidate-introduced symbol and fixed candidate tests that import that symbol before any intended assertion executes. Source and test bytes, family, control role, paths, timeout, generator, template, and scenario identity are held constant across observer arms. Observer, observer ID, command, derived state semantics, derived method semantics, descriptor digest, specification bytes, and resulting Git identities differ as required by the observer contract.
+The import family uses a fixed candidate-introduced symbol and candidate tests that import that symbol before any intended assertion executes. Source and test bytes, family, control role, paths, timeout, generator, template, and scenario identity are held constant across observer arms. Observer-derived specification and Git identities may differ.
 
 Under `exit-code-v1`:
 
@@ -104,7 +119,7 @@ M0 / M1 / M2 / M3 = accept / indeterminate / indeterminate / indeterminate
 
 `import_error` is fixed pre-execution ground truth for the exact synthetic bytes. Receipt v1 records only generic `test_error`; it does not claim import, setup, collection, dependency, or infrastructure subtype attribution.
 
-## Unrelated-assertion oracle negative control
+## Unrelated-assertion oracle-relevance negative control
 
 The unrelated-assertion family uses fixed source and test bytes with two behavior dimensions:
 
@@ -113,27 +128,19 @@ claim-facing behavior: is_admin(viewer)
 collateral behavior:   version_label()
 ```
 
-Base code:
-
-- preserves the buggy non-empty-role authorization rule;
-- returns `v1` from `version_label()`.
-
-Candidate code:
-
-- repairs the authorization rule;
-- changes `version_label()` to `v2`.
+Base code keeps the buggy authorization rule and returns `v1` from `version_label()`. Candidate code repairs the authorization rule and returns `v2`.
 
 Candidate tests include:
 
 1. a claim-facing viewer test that asserts only that the result is a Boolean and therefore passes on both implementations;
 2. a separate assertion that `version_label() == "v2"`, which fails only on the base.
 
-Normative controls require:
+Normative direct controls require:
 
-- the claim-facing test to pass independently against both source versions;
+- the claim-facing test to pass against both source versions;
 - the complete candidate suite to fail against base code;
 - the same suite with the exact collateral assertion removed to pass against base code;
-- the collateral assertion therefore to be the sole source of `BC = fail`;
+- the collateral assertion to be the sole source of `BC = fail`;
 - byte-identical source and test mechanism across observer arms.
 
 Expected under `exit-code-v1`:
@@ -155,7 +162,78 @@ receipt errors      = 0
 M0 / M1 / M2 / M3 = accept / accept / accept / accept
 ```
 
-This is an intentionally successful current-method witness and an intentionally negative oracle-relevance control. It demonstrates that correctly typed assertion failure and canonical four-state replay still do not identify which assertion caused the failure or whether it is relevant to the declared claim.
+This is a negative control for suite-level failure provenance. Declared-selector localization later identifies that the claim-facing selector is not the source of fail-to-pass discrimination.
+
+## Weak-proxy oracle-strength negative control
+
+The weak-proxy family fixes a task prompt, base, candidate, candidate tests, one claim-violating mutant, and one hidden development claim check.
+
+Base implementation:
+
+```python
+def is_admin(user):
+    return user.get("role")
+```
+
+Candidate implementation:
+
+```python
+def is_admin(user):
+    return user.get("role") == "admin"
+```
+
+Declared selector:
+
+```text
+test_access.AccessTests.test_viewer_result_is_boolean
+```
+
+Declared assertion:
+
+```python
+self.assertIsInstance(is_admin({"role": "viewer"}), bool)
+```
+
+This selector genuinely fails on base and passes on candidate, so both the canonical matrix and declared-selector localization accept it.
+
+Fixed mutant:
+
+```python
+def is_admin(user):
+    return bool(user.get("role"))
+```
+
+The mutant also returns a Boolean and therefore survives the declared selector while authorizing a viewer. A separately fixed hidden development check requires viewer denial and rejects the mutant.
+
+Expected current evidence under both observers:
+
+```text
+BB / BC / CB / CC  = pass / fail / pass / pass
+M0 / M1 / M2 / M3 = accept / accept / accept / accept
+localization       = supported / discriminating
+```
+
+Expected fixed mutation controls:
+
+```text
+base      + declared selector = fail
+candidate + declared selector = pass
+mutant    + declared selector = pass
+candidate + hidden claim      = pass
+mutant    + hidden claim      = fail
+```
+
+The challenge executes the five controls through `outcome-receipt-v1`, binds exact source/test digests and invocation semantics, and emits a deterministic integrity-verifiable artifact.
+
+Complete boundary:
+
+```text
+research/DW-001/WEAK_ORACLE_CHALLENGE.md
+research/DW-001/schema/weak-oracle-challenge.schema.json
+src/deltawitness/dw001_oracle_challenge.py
+```
+
+The hidden check is fixed mechanism evidence, not a general oracle. One surviving mutant does not define mutation adequacy, a mutation score, or ecological agent quality.
 
 ## Deterministic Git construction
 
@@ -170,13 +248,13 @@ For a validated supported descriptor, the generator:
 7. stages literal known paths without a shell;
 8. creates base and candidate commits with fixed author, committer, timestamps, and deterministic messages;
 9. records exact base/head commit and tree IDs;
-10. records SHA-256 of the specification bytes derived from the descriptor;
+10. records SHA-256 of descriptor-derived specification bytes;
 11. requires a clean generated repository;
 12. emits an identity without absolute destination, username, host environment, or raw command output.
 
 Two materializations of the same descriptor in separate clean directories must emit byte-equivalent identities and identical Git objects under the supported Git object model.
 
-Paired observer probes intentionally generate different specification bytes because command and observer differ. Complete commit identities therefore need not match across observer arms. Normative tests compare the underlying base/candidate source and test blobs directly and require byte identity.
+Paired observer probes intentionally generate different specification bytes because command and observer differ. Complete commit identities therefore need not match across observer arms. Normative tests compare underlying source and test blobs directly where observer-only equivalence is claimed.
 
 ## Fixture identity
 
@@ -195,48 +273,56 @@ The public identity binds:
 
 `verify_materialized_fixture` additionally checks that the supplied repository:
 
-- is a literal directory rather than a symlink;
+- is a literal directory rather than a symbolic link;
 - is clean;
 - has the recorded candidate `HEAD`;
 - contains the recorded base and candidate trees;
 - retains base ancestry;
 - contains specification bytes matching the recorded digest.
 
-## Matrix and observer integration
+## Matrix, localization, and challenge integration
 
-Normative integration does not project an in-memory report representation directly. It:
+Normative matrix integration:
 
 1. runs the generated repository through `verify_repository`;
-2. writes the matrix report into private Git metadata;
-3. reloads it through the strict UTF-8 JSON loader;
+2. writes the report into private Git metadata;
+3. reloads through strict UTF-8 JSON decoding;
 4. verifies semantic and complete-report digests;
-5. projects `M0` through `M3` from the decoded artifact;
-6. compares observed states and method decisions with descriptor ground truth.
+5. projects `M0` through `M3`;
+6. compares observed states and decisions with descriptor ground truth.
 
-For the import-error pair, integration additionally requires:
+The import-error pair additionally checks the O0/O1 failure/error contrast and indeterminate precedence.
 
-- one scenario ID across `O0` and `O1`;
-- byte-identical source and test mechanisms;
-- `O0` to expose a complete canonical-looking witness;
-- `O1` to record `test_error`, zero assertion failures, at least one error, and incomplete evidence;
-- `M0` to remain unchanged while `M1`–`M3` become indeterminate;
-- valid descriptor, identity, materialized repository, manifest, binding, report, and projection artifacts under each arm.
+The unrelated-assertion pair additionally checks direct collateral ablation and declared-selector mismatch.
 
-For the unrelated-assertion pair, integration additionally requires:
+The weak-proxy challenge additionally checks:
 
-- one scenario ID and byte-identical mechanism across arms;
-- direct execution controls proving the claim-facing assertion is non-discriminating;
-- direct execution controls proving the collateral assertion is the sole `BC` failure source;
-- `O0` to record untyped failure and `O1` to record typed assertion failure without errors;
-- both reports to remain complete and supported;
-- all nested methods to accept under both observers;
-- valid descriptor, identity, materialized repository, manifest, binding, report, and projection artifacts under each arm.
+- canonical matrix support under both observer arms;
+- typed assertion failure under O1;
+- exact selector localization as `supported` and `discriminating`;
+- five fixed mutation-control executions;
+- candidate/mutant/test/hidden-check digests;
+- deterministic semantic challenge bytes across clean runs;
+- rejection of source, mutant, control, finding, or denominator substitution after digest recomputation.
 
 ## Packaged smoke boundary
 
-CI executes both contrast families from the editable installation and again after force-reinstalling the built wheel. The installed-package smoke reconstructs the complete owned-synthetic path rather than importing symbols only.
+CI executes complete fixture and challenge paths from the editable installation and after force-reinstalling the built wheel on Python 3.11–3.14.
 
-The smoke confirms packaging and public API reachability. It is not an independent reproduction because it uses the same repository, workflow, fixtures, and development process.
+The weak-proxy smoke reconstructs:
+
+```text
+descriptor
+    -> repository and identity
+    -> manifest and binding
+    -> matrix report
+    -> projection
+    -> declaration and localization
+    -> fixed mutation controls
+    -> challenge verification
+```
+
+Packaged smoke confirms installation and public API reachability. It is not independent reproduction because it uses the same repository, fixtures, workflow, and development process.
 
 ## Destination safety
 
@@ -249,65 +335,67 @@ It rejects files, non-empty directories, symbolic-link destinations, and unsuppo
 
 A failed Git or filesystem operation may leave newly created synthetic content in a previously absent or empty destination. Callers must use a disposable location and remove it after review.
 
-The boundary does not prove that every ancestor directory is free of links, mount redirection, namespace changes, or hostile filesystem behavior. Destination ancestry remains an operator trust assumption.
+The boundary does not prove that every ancestor is free of links, mount redirection, namespace changes, or hostile filesystem behavior. Destination ancestry remains an operator trust assumption.
 
 ## Environment and residual trust
 
-The generator is shell-free but still trusts:
+The generator and challenge are shell-free but still trust:
 
-- the `git` executable resolved from `PATH`;
-- Python runtime behavior;
-- operating-system and filesystem semantics;
-- SHA-1 object-format support in the installed Git;
-- the operator-supplied destination ancestry;
-- the current unsandboxed process and host.
+- the `git` and Python executables resolved from `PATH`;
+- Python and unittest semantics;
+- operating-system and filesystem behavior;
+- SHA-1 object-format support in installed Git;
+- operator-supplied destination ancestry;
+- the unsandboxed host process.
 
-The identity does not hash or attest Git, Python, dependencies, kernel, filesystem, locale, hardware, or container image. Equivalent Git identities are not complete environment equivalence.
+Fixture identity does not hash or attest Git, Python, dependencies, kernel, filesystem, locale, hardware, or container image. Equivalent Git identities are not complete environment equivalence.
 
-The built-in unittest adapter executes inside tested Python import and assertion semantics. A malicious repository can influence it. The receipt binding is visible and unsigned.
+The receipt binding is visible to tested code and receipts are unsigned. A malicious repository could influence the adapter. The fixed challenge uses only project-owned bytes; it does not make the runner safe for external code.
 
 ## Privacy and publication
 
-The generator uses only project-owned synthetic source and test bytes. Public fixture artifacts omit:
+Public fixture and challenge artifacts omit:
 
 - absolute paths;
 - usernames and home directories;
 - credentials and environment values;
 - raw process output and tracebacks;
 - private repository names;
-- external endpoints.
+- external endpoints;
+- model credentials or private prompts.
 
-Scenario IDs, family labels, paths, commands, Git identities, observer metadata, aggregate counts, and digests remain publication metadata requiring review.
+Scenario IDs, family labels, prompts, selectors, paths, commands, Git identities, observer metadata, aggregate counts, and digests remain publication metadata requiring review.
 
 Raw failure narratives remain excluded by default. Output digests can still fingerprint low-entropy values and are not a redaction mechanism.
 
 ## Prior-art boundary
 
-Structured test reports, framework-native result objects, fail-to-pass validation, the test-oracle problem, mutation testing, assertion adequacy, and coincidental correctness are established.
+Structured test reports, framework-native result objects, fail-to-pass validation, the test-oracle problem, mutation testing, mutation adequacy, weak and partial oracles, hidden tests, assertion quality, coverage, and coincidental correctness are established.
 
-No novelty claim is made for distinguishing assertion failure from test error or for constructing an unrelated failing assertion. The narrower purpose of these fixtures is to place both positive evidence and known limitations inside the same deterministic, Git-native, integrity-bound study pipeline.
+No novelty claim is made for distinguishing failure from error, localizing a test selector, constructing a weak assertion, or killing and surviving mutants. The narrower purpose is to place positive evidence and known limitations inside one deterministic, Git-native, typed, integrity-bound study pipeline.
+
+Whether that integration is scientifically novel or practically superior remains unestablished.
 
 ## Non-goals
 
-Generator v1 does not:
+Generator v1 and the weak-oracle challenge do not:
 
-- support arbitrary source blobs or caller-provided executable code;
+- support arbitrary source blobs, tests, prompts, or mutants;
 - model every issue #2 family;
 - infer import-error subtype from receipt v1;
-- infer claim-oracle relevance from an assertion failure;
+- infer claim relevance or strength from assertion failure;
+- define a mutation score or coverage criterion;
 - generate realistic multi-package dependency environments;
 - estimate mechanism prevalence, observer accuracy, or oracle-analysis accuracy;
-- establish cross-platform Git identity equivalence;
-- authenticate producer, reviewer, or agent identity;
+- establish cross-platform environment equivalence;
+- authenticate producer, reviewer, model, or agent identity;
 - provide containment;
-- authorize pilot or holdout execution.
+- authorize ecological or held-out execution.
 
 ## Claim boundary
 
-A valid fixture identity shows that one supported descriptor was deterministically materialized into recorded synthetic Git and specification identities and can be checked through the binding, matrix, and projection pipeline.
+A valid fixture identity shows only that one supported descriptor was deterministically materialized into recorded synthetic Git and specification identities.
 
-The import-error pair establishes one controlled case where preserving generic test-error evidence changes nested-method decisions relative to exit-code-only classification.
+The import-error pair establishes one controlled observer-classification difference. The unrelated-assertion pair establishes one suite-level oracle-relevance limitation. The weak-proxy challenge establishes one case where current typed, four-state, and declared-selector evidence accepts a selector that one fixed claim-violating mutant survives.
 
-The unrelated-assertion pair establishes one controlled case where both observer arms and all state-set methods accept even though the sole failing assertion is collateral and the claim-facing assertion is non-discriminating.
-
-Neither result establishes representativeness, prevalence, complete failure diagnosis, oracle adequacy, general observer or method superiority, protocol freeze, empirical effectiveness, or any confirmatory conclusion.
+These results do not establish representativeness, prevalence, complete failure diagnosis, oracle adequacy, mutation adequacy, general observer or method superiority, protocol freeze, ecological effectiveness, or any confirmatory conclusion.
