@@ -12,7 +12,8 @@ from deltawitness.dw001_scenarios import (
     verify_fixture_identity_document,
     verify_materialized_fixture,
 )
-from deltawitness.matrix import report_to_dict, verify_repository
+from deltawitness.matrix import verify_repository, write_report
+from deltawitness.reporting import load_report, verify_report_document
 
 
 CLAIM_ID = "role-check-regression"
@@ -58,4 +59,10 @@ def fixture_case(
             identity["git"]["head_commit_sha"],
             config,
         )
-        yield repository, config, report_to_dict(report), descriptor
+        report_path = repository / ".git" / "deltawitness" / "claim-witness-source.json"
+        write_report(report, report_path)
+        decoded = load_report(report_path)
+        valid, errors = verify_report_document(decoded)
+        if not valid:
+            raise AssertionError(errors)
+        yield repository, config, decoded, descriptor
