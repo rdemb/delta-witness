@@ -28,7 +28,16 @@ from dw001_binding_support import manifest_from_fixture
 
 
 _FAMILY = "wrong-reason-base-import-failure"
+_SCENARIO_ID = "wrong-reason-import-001"
 _SCHEMA_DIR = Path(__file__).resolve().parents[1] / "research" / "DW-001" / "schema"
+_OBSERVER_DERIVED_FIELDS = {
+    "observer",
+    "observer_id",
+    "command",
+    "expected_states",
+    "expected_methods",
+    "descriptor_sha256",
+}
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -67,7 +76,7 @@ def _run_arm(
     dict[str, object],
 ]:
     descriptor = build_fixture_descriptor(
-        scenario_id=f"wrong-reason-import-{observer}",
+        scenario_id=_SCENARIO_ID,
         family_id=_FAMILY,
         observer=observer,
     )
@@ -134,17 +143,29 @@ class DW001WrongReasonImportTests(unittest.TestCase):
                 name,
             )
 
-    def test_descriptor_semantics_depend_on_observer_without_free_form_labels(self) -> None:
+    def test_descriptor_semantics_depend_only_on_observer_contract(self) -> None:
         exit_descriptor = build_fixture_descriptor(
-            scenario_id="wrong-reason-descriptor-exit",
+            scenario_id="wrong-reason-descriptor-001",
             family_id=_FAMILY,
             observer="exit-code-v1",
         )
         typed_descriptor = build_fixture_descriptor(
-            scenario_id="wrong-reason-descriptor-typed",
+            scenario_id="wrong-reason-descriptor-001",
             family_id=_FAMILY,
             observer="outcome-receipt-v1",
         )
+
+        exit_common = {
+            key: value
+            for key, value in exit_descriptor.items()
+            if key not in _OBSERVER_DERIVED_FIELDS
+        }
+        typed_common = {
+            key: value
+            for key, value in typed_descriptor.items()
+            if key not in _OBSERVER_DERIVED_FIELDS
+        }
+        self.assertEqual(exit_common, typed_common)
 
         self.assertEqual(
             [state["expected_observed"] for state in exit_descriptor["expected_states"]],
@@ -257,7 +278,7 @@ class DW001WrongReasonImportTests(unittest.TestCase):
     def test_observer_arms_keep_identical_source_and_test_mechanism(self) -> None:
         descriptors = {
             observer: build_fixture_descriptor(
-                scenario_id=f"wrong-reason-bytes-{observer}",
+                scenario_id="wrong-reason-bytes-001",
                 family_id=_FAMILY,
                 observer=observer,
             )
