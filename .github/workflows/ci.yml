@@ -77,8 +77,8 @@ jobs:
           echo "::error title=DeltaWitness end-to-end demo failed::$diagnostic"
           exit 1
 
-      - name: Build wheel without dependency resolution
-        run: python -m pip wheel --no-deps --no-build-isolation . --wheel-dir dist
+      - name: Build wheel without project dependency resolution
+        run: python -m pip wheel --no-deps . --wheel-dir dist
 
       - name: Verify built wheel, entry points, and DW-001 APIs
         run: |
