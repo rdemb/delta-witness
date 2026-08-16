@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add `deltawitness.dw001-fixture-manifest-binding.v1` as a strict relation among one verified fixture descriptor, fixture identity, and scenario manifest without mutating any issued v1 source schema.
+- Derive fixture-manifest bindings only from independently verified source artifacts and recompute the complete relation before accepting `binding_sha256`.
+- Separate verified relations, manifest-owned governance fields, and fixture-only Git/specification fields in a machine-readable scope contract.
+- Reject mismatched commits, paths, observer arms, commands, state semantics, method decisions, family labels, malformed objects, private paths, and recomputed-digest relation substitutions.
+- Bind fixture identity specification SHA-256 to the exact descriptor-derived specification bytes instead of accepting a self-consistent substituted digest.
+- Exercise fixture binding construction and verification from editable and installed-wheel packages on Python 3.11–3.14.
 - Add a versioned DW-001 scenario taxonomy that separates three implemented deterministic mechanism probes from required but unsupported future families.
 - Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
 - Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
