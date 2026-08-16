@@ -4,7 +4,7 @@
 
 **Study identifier:** `DW-001`.
 
-**Implementation anchor for this draft:** `c8dbb48b70f6d79484f886590433fce922a1b8cd` plus the reviewed commits on `research/dw-001-projection-v1`.
+**Implementation base for this draft:** `3cc9db11bd00678403479b6ed086ecb2a446517e`; the projector, independent semantic verifier, schema, and tests on `research/dw-001-projection-v1` remain unfrozen until review and merge.
 
 This document is a protocol candidate, not a preregistration. It may be revised during design review and development-pilot work. No held-out scenario may be executed until the freeze checklist in Section 14 is complete and the frozen protocol, generator, manifests, metrics, exclusions, and commitment digest are recorded in an immutable commit.
 
@@ -109,6 +109,8 @@ The v1 projector accepts only a DeltaWitness matrix report that:
 
 The projector validates the complete source report before exposing any method decision. Validation of hidden-state integrity is not permission for a method predicate to consume the hidden state's outcome.
 
+The study pipeline must retain the strict-decoded source report. A standalone projection records the source report and witness digests, but it does not contain the source report bytes and cannot independently prove correspondence to them. Source-report verification and projection verification are separate mandatory checks.
+
 ## 7. Decision semantics
 
 Every method produces exactly one primary decision:
@@ -152,10 +154,22 @@ The deterministic projection schema is:
 research/DW-001/schema/projection.schema.json
 ```
 
-The implementation is:
+The projection producer and source-report validator are:
+
+```text
+src/deltawitness/_dw001_projection.py
+```
+
+The public API and independent fail-closed semantic verifier are:
 
 ```text
 src/deltawitness/dw001.py
+```
+
+The verifier trust boundary is documented in:
+
+```text
+research/DW-001/PROJECTION_INTEGRITY.md
 ```
 
 A projection records:
@@ -172,17 +186,18 @@ A projection records:
 
 The projection has no timestamp. Re-projecting the same source report, scenario identifier, and applicability declaration must produce identical bytes under canonical serialization.
 
-The digest is unkeyed. It detects modification only when compared with a separately trusted value and does not authenticate the producer.
+The digest is unkeyed. It detects modification only when compared with a separately trusted value and does not authenticate the producer. A caller can recompute an unkeyed digest after modifying an artifact, so `verify_projection_document` must independently recompute applicability, state-slice consistency, claim decisions, method decisions, and reason codes before accepting the digest.
 
 ## 10. Decision-equivalence execution
 
 For the primary detection comparison:
 
 1. execute the complete four-state matrix once for one observer arm;
-2. integrity-verify the source report;
+2. strict-decode and integrity-verify the source report;
 3. project `M0` through `M3` from the same immutable observations;
-4. prevent every method payload from including undeclared states;
-5. retain the source report and projection digests.
+4. independently verify the projection semantics and projection digest;
+5. prevent every method payload from including undeclared states;
+6. retain the source report and projection digests and compare the recorded source identity with the retained source report.
 
 This controls run-to-run drift across nested state-set methods.
 
@@ -357,8 +372,10 @@ The frozen protocol and commitment digest must never be rewritten to conceal a d
 - explicit `accept`, `reject`, `indeterminate`, and `not_applicable` decisions;
 - method-specific hidden-state isolation;
 - deterministic projection digest;
+- independent fail-closed semantic revalidation of serialized projections;
+- shared-state equality checks across nested methods;
 - machine-readable projection schema;
-- truth-table, confound, applicability, integrity, and tamper tests.
+- truth-table, confound, applicability, integrity, recomputed-digest, and tamper tests.
 
 ### Not implemented or frozen
 
