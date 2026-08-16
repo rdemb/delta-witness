@@ -20,7 +20,9 @@ state identity
 
 Version `0.0.3` advances through **bounded intervention influence**. It does not claim to solve oracle relevance, full patch causality, environment reproducibility, producer authentication, or authorization.
 
-The core deliberately excludes an LLM judge. Models may help design claims, generate candidate tests, or review reports outside the trust path, but verification decisions are currently derived from explicit configuration, immutable Git objects, process observations, strict receipt semantics, exact coalition enumeration, and deterministic arithmetic.
+The DW-001 research-support path adds deterministic baseline projection, scenario governance contracts, owned-synthetic fixture identity, and explicit cross-artifact relations. Those layers make a future empirical comparison auditable; they do not advance the core assurance claim beyond the evidence produced by the underlying matrix and observer.
+
+The core deliberately excludes an LLM judge. Models may help design claims, generate candidate tests, or review reports outside the trust path, but verification decisions are currently derived from explicit configuration, immutable Git objects, process observations, strict receipt semantics, exact coalition enumeration, deterministic arithmetic, and versioned study contracts.
 
 ## Canonical four-state trust path
 
@@ -207,7 +209,56 @@ This is not a filesystem, network, process, or resource sandbox. Exact influence
 
 The current environment record does not bind the operating-system image, executable binaries, dependency trees, kernel, locale database, hardware, or network responses. Reproducible containment remains a later layer.
 
-## Report schemas
+## DW-001 research artifact path
+
+DW-001 uses separate artifacts for generation identity, pre-execution study governance, measured observations, and post-execution results:
+
+```text
+fixture descriptor
+    -> deterministic owned-synthetic repository
+    -> fixture identity
+    -> fixture-manifest binding
+    -> scenario manifest
+    -> strict matrix report
+    -> nested-method projection
+    -> result record
+```
+
+### Fixture descriptor and identity
+
+The descriptor fixes one supported synthetic family, generator/template version, observer arm, command, timeout, paths, expected state semantics, and expected `M0`–`M3` decisions. Its verifier recomputes method decisions from expected states.
+
+The generator creates exact base and candidate commits and trees from fixed project-owned bytes. The identity records those Git objects and the specification digest. Public identity verification also recomputes the specification bytes implied by the descriptor. Repository correspondence remains a separate materialized-fixture check.
+
+### Fixture-manifest binding
+
+Scenario-manifest v1 predates the generator and does not contain a fixture-identity digest. The separate binding preserves that issued contract while checking the fields the descriptor, identity, and manifest share.
+
+The builder accepts only independently verified sources and derives all relation fields. The verifier:
+
+1. re-verifies the descriptor, identity, and manifest;
+2. validates exact binding fields and canonical tuple order;
+3. recomputes `binding_sha256`;
+4. re-derives the canonical binding from the supplied sources;
+5. requires exact canonical equality.
+
+`relation_scope` distinguishes:
+
+- relations verified across artifacts;
+- governance values owned by the manifest, including partition and review;
+- fixture-only values absent from manifest v1, including tree IDs and specification SHA.
+
+A valid binding cannot make a development scenario denominator-eligible, authenticate a producer, prove when an artifact was created, or establish tree-to-commit correspondence without the separately verified repository.
+
+### Scenario manifest, projection, and result
+
+The scenario manifest fixes pre-execution ground truth, applicability, partition, provenance, reviewer declarations, and expected method outcomes. Stored method labels and denominator eligibility are recomputed.
+
+The projection exposes each nested baseline only to its declared state slice while retaining a reference to the verified source report. The result binds expected and observed decisions, source digests, exclusions, deviations, denominator membership, and explicit cost or missingness.
+
+These contracts are research controls. They do not establish empirical effectiveness until a frozen protocol is executed on a committed evaluation population.
+
+## Report and study schemas
 
 ### Canonical matrix report
 
@@ -239,6 +290,19 @@ Schema `deltawitness.patch-influence.v1` records:
 
 No source code or raw receipt narrative is recorded. Raw process output remains excluded unless explicitly requested.
 
+### DW-001 study artifacts
+
+DW-001 adds strict structural schemas and independent semantic verifiers for:
+
+- nested-method projection;
+- fixture descriptor;
+- fixture identity;
+- fixture-manifest binding;
+- scenario manifest;
+- result record.
+
+The JSON Schemas define interoperability boundaries. Python verifiers remain authoritative for relational invariants, semantic recomputation, and cross-artifact correspondence. Existing v1 source schemas are not mutated when a new relation is introduced.
+
 ## Integrity model
 
 Canonical reports carry:
@@ -251,9 +315,11 @@ Influence reports carry:
 - `influence_sha256` over exact intervention semantics, Git identities, observer evidence, anchors, statuses, and metrics;
 - `report_sha256` over the complete JSON document.
 
-`deltawitness verify-report` recalculates the applicable semantic digest and the full-report digest.
+DW-001 artifacts carry their own canonical unkeyed digests, including descriptor, identity, binding, projection, manifest, and result digests.
 
-All digests are unkeyed. An attacker who can replace a report can recompute them. They detect modification only when compared with a separately trusted value and do not authenticate the producer. Signing and standard attestations remain future work.
+`deltawitness verify-report` recalculates the applicable matrix or influence semantic digest and the full-report digest. DW-001 public verifiers separately recompute their structural, semantic, and supplied cross-artifact invariants.
+
+All digests are unkeyed. An attacker who can replace a complete artifact chain can recompute them. They detect modification only when compared with separately trusted values or source artifacts and do not authenticate a producer. Signing and standard attestations remain future work.
 
 Output digests can fingerprint low-entropy sensitive values. They are evidence fields, not a redaction mechanism.
 
@@ -266,7 +332,9 @@ DeltaWitness intentionally refuses to let one signal substitute silently for ano
 - typed outcomes do not prove oracle relevance;
 - an exact coalition table does not prove tests cover the intended behavior;
 - a Shapley value does not prove semantic causality;
-- a report digest does not authenticate the producer;
+- a fixture identity does not prove environment reproducibility;
+- a fixture-manifest binding does not validate reviewer or authorization claims;
+- a report or study-artifact digest does not authenticate the producer;
 - a matching witness does not authorize deployment;
 - a supported patch does not establish production safety.
 
