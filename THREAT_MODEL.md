@@ -2,7 +2,7 @@
 
 ## Protected claims
 
-DeltaWitness currently supports two narrow classes of statement.
+DeltaWitness currently supports three narrow classes of statement.
 
 ### Canonical change witness
 
@@ -14,7 +14,11 @@ When a typed observer is enabled, the statement is further bounded by the semant
 
 > For a bounded set of changed code paths, under the recorded test worlds and exact intervention states, selecting or removing each path changes the declared Boolean witness according to the complete coalition table and released attribution metrics.
 
-Neither statement establishes full program correctness, universal causality, vulnerability removal, production safety, or authorization to deploy.
+### DW-001 baseline projection
+
+> Given one integrity-verified schema `0.3` matrix report, one homogeneous observer arm, a scenario identifier, and an independently declared applicability annotation, the projection records deterministic decisions for the nested `M0_FINAL`, `M1_F2P`, `M2_F2P_P2P`, and `M3_FOUR_STATE` predicates without exposing undeclared state observations to weaker methods.
+
+None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, empirical superiority, or authorization to deploy.
 
 ## Assets
 
@@ -28,7 +32,11 @@ The current design aims to protect:
 - deterministic path ordering and coalition identities;
 - endpoint consistency between canonical and influence analyses;
 - exactness of released coalition metrics;
-- report integrity after generation;
+- integrity and semantic consistency of matrix, influence, and DW-001 projection artifacts;
+- hidden-state isolation between nested DW-001 methods;
+- homogeneous observer-arm separation in DW-001 projections;
+- explicit separation between independently declared non-applicability and observed execution failure;
+- source-report identities recorded by each projection;
 - host environment variables from accidental inheritance;
 - raw command output from accidental publication by default;
 - separation between consecutive claims and coalitions.
@@ -58,9 +66,14 @@ The model includes:
 - background processes or persistent external effects that survive worktree resets;
 - one claim or coalition contaminating a later execution through generated files or shared services;
 - command output containing credentials or private data;
-- tampering with generated reports or attribution metrics;
-- misuse of Shapley, Banzhaf, or interaction values as proof of correctness, blame, or business value;
-- sensitive command arguments, repository paths, or low-entropy output being exposed through a report;
+- tampering with generated reports, attribution metrics, or projected method decisions;
+- recomputing an unkeyed projection digest after changing applicability, a claim decision, a method decision, or a shared state slice;
+- leaking a hidden matrix state into a weaker projected method;
+- mixing exit-code and typed-receipt observers inside one projected comparison arm;
+- labeling an execution error as `not_applicable` after observing the result;
+- replacing both a source report and its projection while recomputing all unkeyed digests;
+- misuse of Shapley, Banzhaf, interaction, or projected baseline decisions as proof of correctness, blame, or business value;
+- sensitive command arguments, repository paths, scenario identifiers, applicability reasons, or low-entropy output being exposed through an artifact;
 - unrecorded toolchain, dependency, operating-system, or external-service drift;
 - malicious repository content executed with the operator's privileges.
 
@@ -113,15 +126,29 @@ The model includes:
 34. Shapley, Banzhaf, and interaction values are computed with exact rational arithmetic before decimal rendering.
 35. Exact metrics, anchors, coalition identities, Git objects, and observer evidence are included in `influence_sha256`.
 
+### DW-001 projection
+
+36. Projection starts from a schema `0.3` matrix report whose semantic and complete-report digests verify.
+37. Every source claim uses the canonical DW-001 expectations and one homogeneous supported observer arm.
+38. The ordered method state sets are fixed as `CC`, `BC+CC`, `BC+CB+CC`, and `BB+BC+CB+CC`.
+39. Each method payload contains only its declared required state observations.
+40. `not_applicable` comes only from an external state-to-reason declaration and is never inferred from execution output.
+41. For applicable methods, an indeterminate required state takes precedence over a contradictory complete state.
+42. The projection verifier requires exact root and nested field sets, canonical identifiers, ordered methods, and ordered state slices.
+43. The verifier independently recomputes claim decisions, method decisions, reason codes, contradicted states, indeterminate states, and applicability partitions before accepting the projection digest.
+44. A state shared by multiple nested methods must have an identical serialized observation in every method that exposes it.
+45. `projection_sha256` covers the complete projection with its own field normalized to `null`.
+46. A standalone projection cannot prove correspondence to source-report bytes; the retained source report must be strict-decoded, verified separately, and compared with the projection's recorded source identity.
+
 ### Execution and publication
 
-36. Commands execute without a shell.
-37. The full host environment is not inherited.
-38. Raw output is excluded unless explicitly requested.
-39. Absolute repository and specification paths are excluded from reports.
-40. Default reports are stored in private Git metadata rather than the working tree.
-41. Ambiguous configuration and harness errors stop the analysis.
-42. Semantic and complete-report digests are independently verifiable.
+47. Commands execute without a shell.
+48. The full host environment is not inherited.
+49. Raw output is excluded unless explicitly requested.
+50. Absolute repository and specification paths are excluded from reports.
+51. Default reports are stored in private Git metadata rather than the working tree.
+52. Ambiguous configuration and harness errors stop the analysis.
+53. Semantic and complete-artifact digests are independently verifiable within their documented boundaries.
 
 ## Residual risks
 
@@ -184,6 +211,16 @@ Candidate documentation changes are held constant so the full coalition matches 
 
 Execution-sensitive configuration should be classified as code. Classification policy remains an operator responsibility.
 
+### DW-001 projections are controlled ablations, not source attestations
+
+A projection intentionally copies only the state slices needed by each nested method. Its semantic verifier can prove internal consistency of the serialized projection, but it cannot reconstruct omitted source-report fields or prove that the recorded source digests correspond to retained source bytes.
+
+The source matrix report and projection must therefore be verified separately and linked through a trusted comparison of their recorded digests. An attacker able to replace both artifacts can recompute all current unkeyed digests.
+
+Scenario identifiers and non-applicability reasons also require a separately governed manifest. A projection verifier cannot determine whether ground truth was frozen independently, relabeled after observing results, or authorized for use in a held-out study.
+
+The current protocol is a development-pilot draft. Projection conformance does not authorize held-out execution or establish empirical effectiveness.
+
 ### Nondeterminism
 
 Version `0.0.3` executes each state once. A flaky test can produce an unstable coalition table and misleading exact metrics even though enumeration is combinatorially complete.
@@ -196,17 +233,17 @@ At eight code paths and one claim, influence analysis can invoke 512 coalition c
 
 The current implementation has per-command timeouts but does not impose complete CPU, memory, process-count, storage, or network limits.
 
-### Report integrity is not authentication
+### Report and projection integrity are not authentication
 
-`witness_sha256`, `influence_sha256`, and `report_sha256` are unkeyed. They detect modification only when compared with separately trusted values. An attacker who can replace a report can recompute all digests.
+`witness_sha256`, `influence_sha256`, `report_sha256`, and `projection_sha256` are unkeyed. They detect modification only when compared with separately trusted values. An attacker who can replace an artifact can recompute its digests.
 
 Signing, DSSE, in-toto statements, Sigstore, environment provenance, and producer identity remain future layers.
 
 ### Publication metadata can still be sensitive
 
-Reports record declared commands, changed paths, claim descriptions, Git object IDs, observer metadata, selected path coalitions, output digests, and aggregate counts. Command arguments must not contain secrets. Output and receipt digests can reveal equality and can be brute-forced when the underlying value has low entropy.
+Reports and projections can record declared commands, changed paths, claim descriptions, Git object IDs, observer metadata, selected path coalitions, scenario identifiers, applicability reasons, output digests, and aggregate counts. Command arguments and scenario metadata must not contain secrets. Output and receipt digests can reveal equality and can be brute-forced when the underlying value has low entropy.
 
-Every exported report requires human review.
+Every exported artifact requires human review.
 
 ## Safe operation
 
@@ -216,5 +253,8 @@ Every exported report requires human review.
 - Classify every execution-sensitive manifest, configuration file, generated-code input, and build script as code.
 - Review endpoint anchors and every indeterminate coalition before interpreting influence.
 - Treat exact influence as exact enumeration over declared path units, not proof of full causality.
-- Review every report before publication, especially reports generated with `--include-output`.
-- Never interpret `SUPPORTED_IN_SCOPE` or `ATTRIBUTION_AVAILABLE` as proof that a patch is correct, secure, complete, minimal, production-ready, or authorized for deployment.
+- Strict-decode and verify the source matrix report and DW-001 projection separately; compare the retained source report digest with the projection's recorded source identity.
+- Treat scenario applicability as externally governed ground truth, not a value inferred from a failed command.
+- Do not execute a DW-001 holdout while the protocol is marked draft or before the frozen commitment procedure is complete.
+- Review every report and projection before publication, especially artifacts generated with `--include-output` or containing non-public scenario metadata.
+- Never interpret `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, or a projected `accept` decision as proof that a patch is correct, secure, complete, minimal, empirically superior, production-ready, or authorized for deployment.
