@@ -1,7 +1,9 @@
-"""Deterministic baseline projection for the DW-001 preregistration study.
+"""Internal DW-001 projection producer and source-report validator.
 
 This module never executes repository code. It projects nested method decisions
-from one already-produced, integrity-verified four-state matrix report.
+from one already-produced, integrity-verified four-state matrix report. Public
+projection verification lives exclusively in :mod:`deltawitness.dw001` and
+recomputes the complete serialized semantics before accepting a digest.
 """
 
 from __future__ import annotations
@@ -94,15 +96,6 @@ _STATE_FIELDS = {
     "receipt_producer",
     "receipt_counts",
     "observation_error",
-}
-_PROJECTION_FIELDS = {
-    "schema_version",
-    "study_id",
-    "scenario_id",
-    "source",
-    "applicability",
-    "methods",
-    "projection_sha256",
 }
 _SCENARIO_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 _HEX_PATTERN = re.compile(r"[0-9a-f]+\Z")
@@ -488,33 +481,6 @@ def compute_projection_sha256(document: dict[str, Any]) -> str:
     normalized = dict(document)
     normalized["projection_sha256"] = None
     return sha256_document(normalized)
-
-
-def verify_projection_document(document: object) -> tuple[bool, tuple[str, ...]]:
-    if not isinstance(document, dict):
-        raise DW001ProjectionError("Projection root must be a JSON object")
-    errors: list[str] = []
-    actual_fields = set(document)
-    if actual_fields != _PROJECTION_FIELDS:
-        errors.append(
-            "projection field mismatch: "
-            f"missing={sorted(_PROJECTION_FIELDS - actual_fields)}, "
-            f"extra={sorted(actual_fields - _PROJECTION_FIELDS)}"
-        )
-    if document.get("schema_version") != PROJECTION_SCHEMA_VERSION:
-        errors.append("projection schema_version is missing or unsupported")
-    if document.get("study_id") != STUDY_ID:
-        errors.append("projection study_id is missing or invalid")
-    expected = document.get("projection_sha256")
-    if not isinstance(expected, str):
-        errors.append("projection_sha256 is missing or invalid")
-    else:
-        observed = compute_projection_sha256(document)
-        if observed != expected:
-            errors.append(
-                f"projection digest mismatch: expected {expected}, computed {observed}"
-            )
-    return not errors, tuple(errors)
 
 
 def project_baselines(
