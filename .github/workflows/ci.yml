@@ -39,10 +39,11 @@ jobs:
       - name: Install without dependency resolution
         run: python -m pip install --no-deps -e .
 
-      - name: Smoke-test editable entry points
+      - name: Smoke-test editable entry points and DW-001 API
         run: |
           deltawitness --version
           deltawitness-unittest --help >/dev/null
+          python -c "from deltawitness.dw001 import project_baselines, verify_projection_document"
 
       - name: Validate public tree
         run: python scripts/validate_public_tree.py
@@ -75,8 +76,9 @@ jobs:
       - name: Build wheel
         run: python -m pip wheel --no-deps . --wheel-dir dist
 
-      - name: Verify built wheel and entry points
+      - name: Verify built wheel, entry points, and DW-001 API
         run: |
           python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
           deltawitness --version
           deltawitness-unittest --help >/dev/null
+          python -c "from deltawitness.dw001 import project_baselines, verify_projection_document"

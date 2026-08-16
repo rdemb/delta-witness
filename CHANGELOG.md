@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add deterministic DW-001 projections for nested final-state, fail-to-pass, regression-preservation, and four-state method predicates from one integrity-verified matrix report.
+- Keep observer semantics as a separate controlled factor by rejecting mixed-observer source reports and recording explicit exit-code and typed-receipt arms.
+- Preserve `accept`, `reject`, `indeterminate`, and independently declared `not_applicable` outcomes without exposing hidden states to weaker projected methods.
+- Recompute projection applicability, shared state slices, claim decisions, method decisions, and reason codes before accepting `projection_sha256`; a recomputed unkeyed digest cannot hide semantic inconsistency.
+- Add the draft DW-001 development-pilot protocol, projection schema, integrity boundary, and adversarial regression fixtures without freezing the protocol or authorizing held-out execution.
 - Reject duplicate object keys at every nesting level when loading matrix and influence reports.
 - Convert malformed UTF-8 report bytes into fail-closed `ReportError` outcomes before digest verification.
 - Preserve existing report schemas, canonical bytes, semantic digests, and valid-report behavior.
