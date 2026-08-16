@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import json
 from pathlib import Path
+import tempfile
 import unittest
 
 from deltawitness.claim_witness import (
@@ -177,7 +178,10 @@ class DW001DevelopmentPilotPlanTests(unittest.TestCase):
                     observer=observer,
                 )
                 spec_sha256 = compute_fixture_specification_sha256(descriptor)
-                self.assertEqual(case["descriptor_sha256"], descriptor["descriptor_sha256"])
+                self.assertEqual(
+                    case["descriptor_sha256"],
+                    descriptor["descriptor_sha256"],
+                )
                 self.assertEqual(case["spec_sha256"], spec_sha256)
                 self.assertEqual(case["control_role"], descriptor["control_role"])
                 self.assertEqual(case["observer_id"], descriptor["observer_id"])
@@ -241,7 +245,9 @@ class DW001DevelopmentPilotPlanTests(unittest.TestCase):
             with self.subTest(error=expected_error):
                 tampered = deepcopy(self._plan())
                 mutator(tampered)
-                tampered["plan_sha256"] = compute_development_pilot_plan_sha256(tampered)
+                tampered["plan_sha256"] = compute_development_pilot_plan_sha256(
+                    tampered
+                )
                 valid, errors = verify_development_pilot_plan_document(tampered)
                 self.assertFalse(valid)
                 self.assertTrue(
@@ -258,7 +264,9 @@ class DW001DevelopmentPilotPlanTests(unittest.TestCase):
             with self.subTest(field=field):
                 tampered = deepcopy(plan)
                 tampered[field] = value
-                tampered["plan_sha256"] = compute_development_pilot_plan_sha256(tampered)
+                tampered["plan_sha256"] = compute_development_pilot_plan_sha256(
+                    tampered
+                )
                 valid, errors = verify_development_pilot_plan_document(tampered)
                 self.assertFalse(valid)
                 self.assertTrue(any(field in error for error in errors), errors)
@@ -274,7 +282,10 @@ class DW001DevelopmentPilotPlanTests(unittest.TestCase):
         plan = self._plan()
         schema = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 
-        self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
+        self.assertEqual(
+            schema["$schema"],
+            "https://json-schema.org/draft/2020-12/schema",
+        )
         self.assertIs(schema["additionalProperties"], False)
         self.assertEqual(set(schema["required"]), set(plan))
         self.assertEqual(set(schema["properties"]), set(plan))
@@ -283,9 +294,17 @@ class DW001DevelopmentPilotPlanTests(unittest.TestCase):
             PLAN_SCHEMA_VERSION,
         )
 
-    def test_unimplemented_runner_refuses_execution(self) -> None:
-        with self.assertRaises(Exception):
-            run_development_pilot(self._plan(), Path("unused-output"))
+    def test_runner_rejects_tampered_plan_before_creating_output(self) -> None:
+        tampered = deepcopy(self._plan())
+        tampered["case_arms"][0]["family_id"] = (
+            "non-discriminating-candidate-test"
+        )
+        tampered["plan_sha256"] = compute_development_pilot_plan_sha256(tampered)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "output"
+            with self.assertRaisesRegex(Exception, "plan verification"):
+                run_development_pilot(tampered, output)
+            self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":
