@@ -2,71 +2,136 @@
 
 ## Unreleased
 
-### Claim-scoped statement-coverage baseline
-
-- Add `deltawitness.dw001-statement-coverage-result.v1` as a strict development-only direct-baseline contract over the exact frozen mutation plan, catalog, source target, selector profiles, and mutation-result semantic digest.
-- Add `deltawitness.statement-trace-receipt.v1`, a bounded invocation-bound trace artifact for one exact relative source path, symbol, source digest, and target-line set.
-- Add the `stdlib-statement-trace-v1` adapter using current-thread `sys.settrace` call and line events for fixed project-owned Python fixtures.
-- Execute the exact strong authorization selectors and weak Boolean-proxy selector against the same unmutated candidate source.
-- Record per-selector typed outcomes, target-function call count, covered target-line set, per-line hit counts, trace status, trace diagnostics, and trace digest.
-- Derive profile union and intersection line sets independently from raw hit-count magnitude; hit counts remain diagnostics because profile selector counts differ.
-- Compare the statement signatures with the independently verified frozen claim-scoped mutation result.
-- Retain complete preregistration-divergent coverage signatures as valid negative results with `analysis.status = unexpected`.
-- Preserve missing, malformed, unavailable, or failed trace evidence as `indeterminate`; it is never converted into an empty covered-line set.
-- Recompute selector, profile, comparison, analysis, policy, cost, semantic-digest, and complete-report relations before accepting the artifact.
-- Keep quality score, headline score, universal threshold, merge-blocker authorization, ecological inference, holdout selection, primary-denominator eligibility, and coverage/mutation superiority claims null or false.
-- Add adversarial tests for duplicate keys, symbolic links, target substitution, line-set drift, hit-count drift, indeterminate evidence, non-finite values, policy drift, and recomputed-digest tampering.
-- Add direct probe regressions for both normal dual-receipt production and fail-closed `producer_error` plus bound indeterminate trace fallback.
-- Fix trace-receipt serialization to append a byte newline to canonical JSON bytes rather than concatenating text and bytes; the former implementation raised `TypeError` and prevented both normal and fallback trace receipts.
-- Exercise the complete statement-coverage path from editable and force-reinstalled wheel packages on Python 3.11–3.14.
-- Document the direct prior-art boundary, execution model, privacy boundary, falsification criteria, and narrow current observation that both fixed profiles cover the same target statement while the frozen mutation table distinguishes them.
-
-### Claim-scoped mutation result
-
 - Add `deltawitness.dw001-claim-scoped-mutation-result.v1` as a strict development-only result contract over the exact frozen mutation plan and catalog.
-- Execute only the candidate baseline, three generic generated mutants, and the separately labeled historical PR #34 control through 25 invocation-bound typed selector commands.
+- Execute only the candidate baseline, three generic generated mutants, and the separately labeled historical PR #34 control through two strong selectors, one weak selector, and two reference selectors each, for 25 shell-free typed commands.
 - Retain duplicate, invalid, and not-applicable generation records with explicit zero-command non-execution reasons and exclude them from killed/survived denominators.
-- Store frozen expected evidence separately from observed evidence and recompute selector, profile, reference, record, summary, and analysis concordance.
-- Retain complete preregistration-divergent observations as negative results rather than converting them into harness errors.
-- Continue to reject malformed, substituted, contradictory, aggregate-inconsistent, non-finite, or digest-tampered evidence even when labelled unexpected.
-- Separate stable result semantics from runtime diagnostics through semantic and complete-report digests.
-- Keep mutation score, thresholds, merge blockers, holdout selection, ecological inference, and primary-denominator eligibility disabled.
-
-### Claim-scoped mutation design
-
-- Add deterministic pre-execution mutation plan and mutant catalog contracts for one fixed project-owned Python source and one exact AST return-expression target.
-- Freeze three outcome-blind generic operators before mutation-test outcomes: return `False`, return `True`, and replace one `==` comparison with `!=`.
-- Retain generated, duplicate, not-applicable, and invalid mutation records with exact source, AST, target, and mutant identities.
-- Freeze paired strong-authorization and weak-Boolean-proxy selector profiles over the same source and generic mutants.
-- Keep the previously observed `nonempty-role-boolean-v1` mutant as a separately labelled historical control outside generic-operator evidence.
-
-### DW-001 selector and oracle controls
-
-- Add exact declared unittest-selector localization under reconstructed `base_candidate` and `candidate_candidate` states.
-- Add the fixed import-error observer contrast showing that raw exit codes can accept a pre-assertion error as fail-to-pass while typed receipts preserve incomplete evidence.
-- Add the unrelated-assertion negative control showing that genuine typed suite failure does not establish claim relevance.
-- Add the weak-proxy negative control showing that a genuine typed, localized fail-to-pass selector can still admit a fixed claim-violating mutant.
-- Add strict fixture, identity, fixture-manifest binding, scenario-manifest, result-record, projection, localization, challenge, pilot-plan, pilot-index, pilot-archive, and ecological-source-universe contracts.
-- Execute and retain the sealed five-family, ten-arm owned-synthetic development mechanism pilot without headline score or ecological inference.
+- Store preregistered `expected_observed` and actual `observed` evidence separately for every selector, plus expected/observed profile and reference outcomes and recomputed concordance at selector, profile, reference, and record levels.
+- Preserve complete invocation-bound preregistration-divergent observations as valid negative results with `analysis.status = unexpected` instead of converting them into harness errors.
+- Continue to reject malformed, source-substituted, selector-substituted, command-substituted, binding-substituted, receipt-contradictory, aggregate-inconsistent, non-finite, or digest-tampered evidence even when it is labeled unexpected.
+- Recompute candidate validity, generic killed/survived/indeterminate counts, claim-violation counts, unexpected-observation counts, and affected record IDs from the complete table.
+- Separate stable mutation-result semantics from runtime diagnostics through `semantic_sha256` and complete `report_sha256` digests.
+- Keep mutation score, headline score, universal threshold, merge-blocker authorization, ecological inference, holdout selection, primary-denominator eligibility, and generic-operator generalization null or false.
+- Exercise the complete mutation-result path from editable and force-reinstalled wheel packages on Python 3.11–3.14 and document its architecture, threat, protocol, privacy, falsification, and claim boundaries.
+- Add `deltawitness.dw001-claim-scoped-mutation-plan.v1` as a deterministic pre-execution contract that freezes one fixed Python source scope, one exact AST return-expression target, three outcome-blind generic mutation operators, paired strong/weak selector profiles, and future outcome semantics before any mutation test result is observed.
+- Add `deltawitness.dw001-claim-scoped-mutant-catalog.v1` with exact target and mutant identities plus explicit `generated`, `duplicate`, `not_applicable`, and `invalid` records; duplicate, unsupported, and compile-invalid mutations remain visible instead of being silently dropped or counted.
+- Bind semantic AST identities through a versioned canonical representation that omits empty optional fields and source locations while retaining source-byte and exact target-position identities, and pin the resulting plan, target, mutant, and catalog digests across Python 3.11–3.14.
+- Keep the previously observed `nonempty-role-boolean-v1` weak-proxy mutant as a separately labeled historical challenge control, excluded from the generic operator set and from any future operator-generalization claim.
+- Freeze paired `strong-authorization-oracle-v1` and `weak-boolean-proxy-v1` profiles over the same candidate source and generic mutant catalog while retaining complete per-mutant tables and prohibiting execution authorization, holdout selection, headline scores, universal thresholds, merge blockers, and primary-denominator eligibility.
+- Exercise the committed mutation plan and catalog from editable and force-reinstalled wheel packages on Python 3.11–3.14 without executing mutants, tests against mutants, external repositories, or third-party mutation engines.
+- Add the fixed `weak-proxy-oracle` DW-001 family as a development-only oracle-strength negative control with one frozen task prompt, candidate, declared selector, claim-violating mutant, and hidden development claim check.
+- Demonstrate one controlled case where both observer arms produce a canonical `pass / fail / pass / pass` matrix, all `M0`–`M3` methods accept, and exact declared-selector localization is `supported` and `discriminating`, while the fixed mutant still passes the declared selector.
+- Execute five shell-free typed mutation controls proving that the selector fails on base, passes on candidate and mutant, and that a separately fixed viewer-denial check passes on candidate and fails on mutant.
+- Add `deltawitness.dw001-weak-oracle-challenge.v1` with exact task, source, selector, candidate, mutant, hidden-check, invocation, receipt, finding, limitation, semantic-digest, and complete-report boundaries.
+- Reconstruct the complete challenge from independently verified descriptor, identity, matrix, projection, declaration, and localization sources so recomputed unkeyed digests cannot hide source, mutant, control, finding, or denominator substitution.
+- Preserve stable challenge semantics across repeated clean runs by binding deterministic projection/localization evidence views rather than volatile timestamps and durations.
+- Exercise the complete weak-oracle chain from editable and force-reinstalled wheel packages on Python 3.11–3.14.
+- Document that a genuine typed and localized fail-to-pass selector does not establish oracle strength, mutation adequacy, ecological agent quality, or merge authorization.
+- Add a deterministic design-only DW-001 ecological source-universe contract for SWE-bench and TDD-Bench Verified with exact implementation-repository commits, repository-level license metadata, known biases, and unresolved source, instance, authorization, environment, containment, review, and sampling blockers.
+- Keep ecological execution authorization, sampling-frame freeze, holdout selection, and holdout inspection false; a repository-level license or public benchmark label cannot silently authorize instance execution.
+- Add a sealed `deltawitness.dw001-development-pilot-plan.v1` contract for exactly ten development-only arms derived from five fixed owned-synthetic families and both supported observer protocols.
+- Execute and retain one canonical synthetic mechanism pilot with 40 matrix states, 12 declared-selector states, 52 commands, complete case tables, five controlled contrasts, explicit cost fields, and no headline score or ecological inference.
+- Add a staging-to-self-verification-to-publication runner that rejects plan drift, unexpected method or localization outcomes, partial output, non-empty or linked destinations, malformed artifacts, and primary-denominator eligibility.
+- Add strict development-pilot index and canonical text-archive schemas, stable semantic and complete digests, reconstructed-bundle verification, and deterministic fixture rematerialization.
+- Require pilot directories and archives to equal the exact sealed file set: missing, duplicate, unsafe, symbolic-link, special, unexpected JSON, and unexpected non-JSON entries fail closed.
+- Commit the exact canonical plan and 84-file development archive with recorded plan, semantic, archive, workflow, commit, and Git-blob identities.
+- Normalize matrix report dataclass containers to strict-decoded JSON array shapes before projection without changing canonical JSON bytes or digest semantics.
+- Record and remove the separately reviewed one-time artifact transport and branch-scoped archive write; the final CI workflow retains `contents: read` only.
+- Add versioned declared logical-test witness localization for exact standard-library `unittest` selectors under the recorded `base_candidate` and `candidate_candidate` states, while leaving the canonical four-state matrix unchanged.
+- Add `deltawitness.claim-witness-declaration.v1` with ordered unique selectors, adapter-derived canonical commands, source specification and claim bindings, a fixed aggregate rule, and semantic digest verification.
+- Add `deltawitness.claim-witness-localization.v1` with exact Git state identities, invocation-bound typed receipts, per-selector `discriminating`, `non_discriminating`, `candidate_invalid`, and `indeterminate` outcomes, plus semantic and complete-report digests.
+- Extend the built-in unittest receipt producer with exact repeated `--test-name` selection through framework APIs; missing selectors remain typed errors and normal selector receipts must represent exactly one logical test.
+- Require the `unittest-test-id-v1` adapter to derive selector commands, use producer `deltawitness-unittest`, bind producer version to the report tool version, and reject selector, command, claim, specification, observer, receipt, tree, commit, and source-report substitutions after digest recomputation.
+- Deterministically reconstruct exact synthetic `BB`, `BC`, `CB`, and `CC` Git objects from base/head commits and current path classification before localization, allowing equivalent fresh checkouts with different directory names to verify the same source report without weakening commit checks.
+- Add direct positive, negative, import-error, missing-selector, candidate-invalid, malformed-input, NaN, receipt-cardinality, producer-substitution, Git-state, invocation-binding, schema, privacy, and fresh-checkout regressions.
+- Exercise the complete declaration, source matrix, state reconstruction, selector execution, receipt verification, localization, and report verification path from editable and force-reinstalled wheel packages on Python 3.11–3.14.
+- Document that a valid localization report proves only which operator-declared selectors were requested and their exact `BC`/`CC` typed outcomes; it does not prove selector relevance, oracle adequacy, mutation strength, or merge authorization.
+- Add the fixed `wrong-reason-unrelated-assertion` DW-001 family as an oracle-relevance negative control with identical scenario identity and source/test mechanism across exit-code and typed-receipt arms.
+- Prove directly that the claim-facing viewer assertion passes on both base and candidate implementations while a separate collateral `version_label == "v2"` assertion is the sole source of `BC = fail`.
+- Demonstrate one controlled limitation where `O0_EXIT_CODE` records `test_failure_untyped`, `O1_TYPED_RECEIPT` records a genuine `test_failure` with assertion failures and zero errors, and both observers still yield a complete accepted `M0`–`M3` witness.
+- Keep outcome semantics and oracle relevance as separate layers: typed assertion failure does not identify which assertion witnessed the declared claim or establish oracle adequacy.
+- Extend the pre-freeze fixture descriptor, identity, and binding family enums without rewriting existing artifacts; exact verifier and schema commits remain required until protocol freeze.
+- Exercise the unrelated-assertion control through descriptor, identity, materialized repository, manifest, fixture-manifest binding, strict report, projection, editable install, and installed wheel.
+- Add the fixed `wrong-reason-base-import-failure` DW-001 family as a paired observer probe with identical source/test mechanism and scenario identity across exit-code and typed-receipt arms.
+- Demonstrate one controlled case where `exit-code-v1` treats a pre-assertion import error as semantic `fail`, producing a complete accepted `M0`–`M3` witness, while `outcome-receipt-v1` preserves generic `test_error` evidence and makes `M1`–`M3` indeterminate.
+- Keep runtime and ground-truth layers explicit: receipt v1 reports generic `test_error`; `import_error` is fixed pre-execution ground truth for the exact owned-synthetic bytes and is not inferred from the receipt.
+- Require observer-pair tests to hold scenario ID and source/test bytes constant and allow only declared observer-derived descriptor fields to differ.
+- Extend pre-freeze fixture descriptor, identity, and binding family/cause enums while preserving existing artifact validity and digest meaning; exact verifier commits remain mandatory for reproduction.
+- Exercise the paired observer probe through descriptor, identity, materialized repository, manifest, fixture-manifest binding, strict matrix report, projection, editable install, and installed wheel.
+- Add `deltawitness.dw001-fixture-manifest-binding.v1` as a strict relation among one verified fixture descriptor, fixture identity, and scenario manifest without mutating any issued scenario-manifest v1 fields.
+- Derive fixture-manifest bindings only from independently verified source artifacts and recompute the complete relation before accepting `binding_sha256`.
+- Separate verified relations, manifest-owned governance fields, and fixture-only Git/specification fields in a machine-readable scope contract.
+- Reject mismatched commits, paths, observer arms, commands, state semantics, method decisions, family labels, malformed objects, private paths, and recomputed-digest relation substitutions.
+- Bind fixture identity specification SHA-256 to the exact descriptor-derived specification bytes instead of accepting a self-consistent substituted digest.
+- Exercise fixture binding construction and verification from editable and installed-wheel packages on Python 3.11–3.14.
+- Add a versioned DW-001 scenario taxonomy that separates six implemented deterministic mechanism probes from required but unsupported future families while preserving the sealed five-family pilot population.
+- Add strict fixture-descriptor and fixture-identity schemas with semantic recomputation of expected nested-method decisions.
+- Add a shell-free owned-synthetic Python/Git generator with fixed bytes, Git metadata, timestamps, messages, SHA-1 object identities, and specification digests.
+- Require equivalent descriptors to reproduce identical base/head commits and trees across clean directories under the supported Git object model.
+- Reject unsupported descriptors, non-empty destinations, and symbolic-link destination paths before synthetic fixture materialization.
+- Verify generated repositories against recorded commit, tree, ancestry, cleanliness, and specification identities, and exercise the strict matrix-report-to-projection artifact chain.
+- Exclude absolute destinations, usernames, environment values, and raw Git output from public fixture identities while retaining explicit residual trust boundaries.
+- Add versioned DW-001 scenario-manifest and result-record contracts for pre-execution ground truth and post-execution evidence.
+- Recompute method ground truth from ordered state applicability and expected outcomes instead of trusting stored labels.
+- Bind result records explicitly to the supplied scenario manifest and DW-001 projection, including scenario, partition, Git endpoints, observer arm, applicability, source digests, decisions, concordance, and denominator membership.
+- Add development and committed-holdout partition locks, public-safe provenance fields, reviewer independence disclosures, exclusions, protocol deviations, and explicit cost missingness.
+- Prevent partition relabeling, denominator drift, unapproved deviations, exclusion-with-eligibility, wrong manifest/projection links, and non-finite cost values from being hidden by recomputed unkeyed digests.
+- Reject results-visible applied deviations that attempt to retain confirmatory eligibility, and preflight malformed source artifacts before cross-artifact dereferencing.
+- Add strict JSON Schemas for scenario manifests and result records while retaining the Python semantic verifier as authoritative for relational and cross-artifact invariants.
+- Document the study-contract integrity, privacy, authentication, protocol-freeze, and publication boundaries without authorizing ecological or held-out execution.
+- Add deterministic DW-001 projections for nested final-state, fail-to-pass, regression-preservation, and four-state method predicates from one integrity-verified matrix report.
+- Keep observer semantics as a separate controlled factor by rejecting mixed-observer source reports and recording explicit exit-code and typed-receipt arms.
+- Preserve `accept`, `reject`, `indeterminate`, and independently declared `not_applicable` outcomes without exposing hidden states to weaker projected methods.
+- Recompute projection applicability, shared state slices, claim decisions, method decisions, and reason codes before accepting `projection_sha256`; a recomputed unkeyed digest cannot hide semantic inconsistency.
+- Add the draft DW-001 protocol, projection schema, integrity boundary, and adversarial regression fixtures without freezing the protocol or authorizing held-out execution.
+- Reject duplicate object keys at every nesting level when loading matrix and influence reports.
+- Convert malformed UTF-8 report bytes into fail-closed `ReportError` outcomes before digest verification.
+- Preserve existing report schemas, canonical bytes, semantic digests, and valid-report behavior.
+- Reject ancestor/descendant changed-path sets from file-to-directory or directory-to-file transitions before matrix or influence materialization.
+- Preserve CLI outcome semantics for influence prerequisites: complete-but-unsupported witnesses return `1`, while incomplete or unsafe execution remains `2`.
+- Keep patch-influence report schemas, digest algorithms, coalition metrics, and public claim boundaries unchanged.
 
 ## 0.0.3 - 2026-08-15
 
 - Added `deltawitness influence` for exhaustive intervention analysis of patches with at most eight changed code paths.
-- Added exact evaluation of every path coalition under both base and candidate test worlds.
-- Added endpoint anchors, complete/unsupported/indeterminate coalition semantics, deterministic Git identities, minimal sufficient coalitions, necessity, sufficiency, marginal swings, exact rational Shapley allocation, normalized Banzhaf influence, pairwise interaction, and monotonicity diagnostics.
-- Withhold all exact attribution when the coalition table is incomplete or endpoint semantics are inconsistent.
-- Added the exact patch-influence schema, semantic and complete-report integrity verification, end-to-end fixtures, documentation, threat boundaries, and public demonstration.
+- Added exact evaluation of every code-path coalition under both base and candidate test worlds.
+- Added `supported`, `unsupported`, and `indeterminate` coalition semantics that preserve incomplete execution instead of treating it as negative evidence.
+- Added mandatory endpoint anchors against the canonical four-state matrix and withheld attribution when held-constant paths alter endpoint semantics.
+- Added exact Git tree and deterministic synthetic commit identities for every intervention state.
+- Added every inclusion-minimal witness-sufficient coalition, global necessity, full-context necessity, standalone sufficiency, and paths absent from every minimal coalition.
+- Added positive and negative marginal swing counts without assuming monotonicity.
+- Added exact rational Shapley allocation, normalized Banzhaf influence, pairwise Banzhaf interaction, and an efficiency residual.
+- Added report schema `deltawitness.patch-influence.v1` with `influence_sha256` and complete-report integrity verification.
+- Added shared claim-state observation logic used by both canonical and intervention execution.
+- Added synthetic mathematical fixtures for collateral, alternative, jointly necessary, and non-monotonic path structures.
+- Added end-to-end fixtures for collateral changes, invalid partial import graphs, execution-sensitive documentation, and report tampering.
+- Expanded the self-contained demonstration to run typed four-state verification, exact influence analysis, and integrity verification without dirtying the repository.
+- Added the Exact Patch Influence protocol, architecture, threat model, evaluation hypotheses, prior-art boundary, and falsification criteria.
 
 ## 0.0.2 - 2026-08-15
 
-- Added the optional invocation-bound `outcome-receipt-v1` observer.
-- Added dual-channel receipt and exit-code consistency checks.
-- Added a built-in standard-library unittest receipt producer distinguishing assertion failure from generic test error, empty discovery, ineffective all-skipped execution, and unexpected success.
-- Added strict bounded duplicate-key-safe receipt parsing and schema `0.3` observer evidence.
-- Rejected changed symbolic-link entries before counterfactual state construction.
+- Rejected changed symbolic-link entries before counterfactual hybrid-state materialization.
+- Added the optional `outcome-receipt-v1` observer for typed test outcomes.
+- Added deterministic invocation bindings over claim, command, specification, state, tree, and commit identities.
+- Added strict, bounded, duplicate-key-safe JSON receipt parsing with regular-file and symbolic-link checks.
+- Added dual-channel consistency checks between receipt semantics and configured process exit codes.
+- Added a built-in standard-library `unittest` receipt producer that distinguishes assertion failures from test errors, empty discovery, ineffective all-skipped execution, and unexpected successes.
+- Added aggregate logical-test accounting that handles multiple failing subtests conservatively.
+- Added report schema `0.3` with observer protocol, binding, receipt digest, producer, counts, outcome, and stable observer-error fields.
+- Bound typed observer evidence into the semantic witness digest while preserving integrity verification for earlier schema `0.2` reports.
+- Added adversarial tests for missing, malformed, oversized, state-mismatched, contradictory, and symbolic-link receipts.
+- Added protocol, architecture, threat-model, roadmap, and public claim-boundary documentation.
 
 ## 0.0.1 - 2026-08-15
 
-- Added the initial four-state Git matrix.
-- Added NUL-safe changed-path parsing, explicit exclusive path classification, ancestry checks, changed-submodule rejection, exact state tree IDs, deterministic synthetic hybrid commits, per-claim restoration, reduced execution environments, raw-output exclusion, and semantic plus complete report digests.
-- Added the initial self-contained demo, test suite, architecture, threat model, research boundary, and publication policy.
+- Added the initial four-state counterfactual matrix.
+- Added NUL-safe Git path parsing and explicit change classification.
+- Added ancestry checks and changed-submodule rejection.
+- Added exact tree IDs and deterministic synthetic commits for hybrid states.
+- Added per-claim state restoration to prevent cross-claim contamination.
+- Added sanitized command environments and raw-output exclusion by default.
+- Added stable witness and exact report digests with an integrity-verification command.
+- Added a self-contained demo, tests, threat model, research boundary, and publication policy.
+- Added option-safe Git ref resolution and portable hashing for non-UTF-8 Git path bytes.
+- Added explicit, disjoint pass/fail exit-code classes and incomplete-run handling.
+- Moved the default report into private Git metadata to preserve working-tree cleanliness.
+- Reduced the Git subprocess environment, disabled replacement objects, and rejected unsafe cross-platform changed paths.
