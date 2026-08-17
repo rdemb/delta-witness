@@ -48,7 +48,10 @@ def _strict_equal(expected: object, actual: object) -> bool:
         return False
     if isinstance(expected, dict):
         assert isinstance(actual, dict)
-        return list(expected) == list(actual) and all(
+        # JSON object member order is non-semantic. Lists below remain exact
+        # and order-sensitive because profile, interpreter, and evidence order
+        # is part of the reviewed contract.
+        return set(expected) == set(actual) and all(
             _strict_equal(expected[key], actual[key]) for key in expected
         )
     if isinstance(expected, list):
@@ -73,12 +76,15 @@ def _first_difference(
         )
     if isinstance(expected, dict):
         assert isinstance(actual, dict)
-        if list(expected) != list(actual):
+        expected_keys = set(expected)
+        actual_keys = set(actual)
+        if expected_keys != actual_keys:
             return (
-                f"{path}: key order or membership mismatch; "
-                f"expected {list(expected)!r}, observed {list(actual)!r}"
+                f"{path}: key membership mismatch; "
+                f"missing={sorted(expected_keys - actual_keys)!r}, "
+                f"extra={sorted(actual_keys - expected_keys)!r}"
             )
-        for key in expected:
+        for key in sorted(expected_keys):
             if not _strict_equal(expected[key], actual[key]):
                 return _first_difference(
                     expected[key],
