@@ -679,3 +679,98 @@ Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, 
 - Do not interpret fixed synthetic evidence as ecological effectiveness or holdout evidence.
 - Do not run a DW-001 holdout while protocol and authorization gates are incomplete.
 - Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, discriminating selector, valid fixture/binding, verified synthetic pilot, source-universe record, compiled mutant catalog, typed mutation result, statement-coverage result, or one fixed mutation challenge as full correctness, oracle adequacy, coverage adequacy, general effectiveness, production readiness, or deployment authorization.
+
+## Coverage.py direct-baseline extension
+
+This addendum is normative for the optional development-only `coveragepy-public-api-v1` comparator. It does not add a generally supported product statement class and therefore does not change the count above. The complete, more detailed boundary is recorded in `research/DW-001/COVERAGEPY_THREAT_BOUNDARY_V1.md`.
+
+### Protected statement
+
+> Given the exact verified mutation plan, mutant catalog, frozen mutation-result semantic identity, frozen stdlib statement-result semantic identity, candidate source, target, and selector profiles, the direct baseline records invocation-bound typed selector outcomes and exact Coverage.py statement, arc, branch-stat, and static-context evidence; derives profile set signatures; and compares those signatures with the frozen stdlib and mutation evidence while preserving expected, unexpected, and indeterminate outcomes separately.
+
+This statement is restricted to fixed project-owned synthetic bytes and does not establish coverage adequacy, oracle strength, mutation adequacy, method superiority, ecological effectiveness, external-execution safety, or deployment readiness.
+
+### Additional assets and adversaries
+
+The extension additionally protects:
+
+- exact Coverage.py package, version, selected universal-wheel filename and digest, upstream source commit, tag object, license, Trusted Publishing metadata, and distribution-manifest identity;
+- the base package's dependency-free path and the research-extra-only dependency boundary;
+- separation between networked artifact acquisition and network-free measurement;
+- disabled ambient configuration, plug-ins, auto-start, persistent data files, concurrency, and subprocess coverage;
+- one exact static context per selector and the shared binding across typed and Coverage.py receipts;
+- exact executable, executed, missing, target, arc, branch-stat, context, profile, comparison, cost, semantic-digest, and report-digest relations;
+- non-publication of raw `.coverage` SQLite data, source/test bodies, raw output, tracebacks, absolute paths, credentials, and environment values.
+
+The extension includes threats from substituted package or artifact identity, post-verification environment modification, ambient Coverage configuration or startup, plug-in activation, pre-existing active collection, context cross-contamination, persistent or linked data files, forged visible bindings, malformed or contradictory statement/arc evidence, unavailable measurement represented as empty evidence, invented missing-branch arc identities, and overstatement of one synthetic result.
+
+### Coverage.py direct-baseline invariants
+
+272. The base project dependency list remains empty; Coverage.py is declared only in the optional `research` extra and exact hash-locked research requirements file.
+273. The selected artifact is exactly `coverage-7.15.2-py3-none-any.whl` with SHA-256 `eb6bcae8d1a9d305351ecb108232441d11c5cfe9de840a04388ba5d2db8d735c`.
+274. The exact distribution manifest is semantically reconstructed and digest-verified before use.
+275. Artifact verification accepts only one bounded regular non-link file with the exact selected filename and digest.
+276. Installation after artifact verification uses `--no-index --no-deps`; package-manager and network operations are absent during measurement.
+277. Importing the base package, provenance contract, or result verifier does not import Coverage.py.
+278. Missing Coverage.py leaves the base product usable and makes direct measurement indeterminate rather than substituting another implementation.
+279. The exact mutation plan, catalog, mutation result, and stdlib statement result pass their authoritative verifiers and equal the frozen semantic identities before Coverage.py execution.
+280. Only the exact project-owned candidate source, target, two profiles, and three selectors execute.
+281. Each selector runs in its own disposable directory and child process through a shell-free command and reduced environment.
+282. Each selector receives one unique deterministic static context and one invocation binding shared by the typed outcome receipt and Coverage.py receipt.
+283. Normal selector pass/fail requires typed receipt/process agreement for exactly one logical test; timeout or receipt error cannot become complete measurement.
+284. Complete measurement requires exact Coverage.py distribution and module version identity.
+285. `data_file=None`, `auto_data=False`, `timid=True`, `branch=True`, `config_file=False`, `concurrency=None`, `check_preimported=False`, `messages=False`, and an empty plug-in set are fixed.
+286. Coverage-prefixed ambient environment variables and a pre-existing active collector prevent complete measurement.
+287. The Coverage.py receipt is a bounded regular non-link strict UTF-8 JSON document with exact fields, duplicate-key rejection, non-finite-value rejection, binding equality, and a recomputed digest.
+288. Target and measured-file paths are normalized, relative, contained, regular, non-link, and restricted to the exact frozen target.
+289. Complete statement evidence uses sorted unique positive executable, executed, missing, measured, and target line sets.
+290. Executed statements are a subset of executable statements; missing equals executable minus executed; measured lines equal executed lines.
+291. Target statement sets are independently reconstructed from the exact target-line set.
+292. Complete arc evidence uses sorted unique integer pairs and preserves Coverage.py negative entry/exit sentinels without relabeling them as source lines.
+293. Context arcs are a subset of all arcs; target arcs are reconstructed from arcs touching the exact target-line set.
+294. Branch statistics use sorted unique source lines and nonnegative integer totals/taken counts with taken not exceeding total.
+295. Missing-branch counts are reconstructed from branch statistics.
+296. Exact missing-branch arc identities remain null and explicitly `unavailable-public-api`; they cannot be invented.
+297. Measured contexts contain only the exact selector context; every measured line is bound exactly once to that context.
+298. Query-context lines and arcs equal the retained statement and context-arc evidence.
+299. An indeterminate receipt retains a stable diagnostic and null measurement evidence, never complete empty sets.
+300. A complete measured empty set remains distinct from unavailable or indeterminate measurement.
+301. Complete preregistration-divergent evidence remains `unexpected`; malformed, contradictory, substituted, or ambiguous evidence fails closed or remains `indeterminate` as declared.
+302. Selector status, expected/observed concordance, statement concordance, branch completeness, context partition, and costs are independently derived.
+303. Profile statement and arc unions/intersections are derived only from complete ordered selector records; incomplete profiles expose null aggregate sets.
+304. Profile discrimination compares exact set relations and never hit counts, magnitude, or a scalar score.
+305. Mutation discrimination is derived only from the independently verified generic-mutant table; historical controls and generation-only records remain excluded.
+306. Stdlib/Coverage.py statement agreement, Coverage.py branch/mutation agreement, incremental branch signal, and incremental mutation signal are independently recomputed.
+307. Analysis status is independently derived as `expected`, `unexpected`, or `indeterminate` without rewriting observations.
+308. Quality score, headline score, universal threshold, merge-blocker authorization, ecological inference, holdout selection, primary-denominator eligibility, and coverage/mutation superiority claims remain null or false.
+309. Process wall, Coverage.py wall, and Coverage.py CPU costs are finite and nonnegative with missingness explicit.
+310. The semantic digest excludes timestamps, runtime identity, output digests, and measured timings while retaining stable source, selector, receipt, Coverage.py, profile, comparison, analysis, and policy relations.
+311. The complete report digest binds the full public-safe report including runtime and cost diagnostics.
+312. Recomputed digests cannot hide source, target, selector, command, context, producer, receipt, statement, arc, aggregate, comparison, analysis, cost, or policy substitution because the verifier reconstructs those relations independently.
+313. Editable and installed-wheel runs reproduce the frozen semantic digest on Python 3.11–3.14.
+314. The optional research extra installs from a clean offline wheelhouse containing only the exact Coverage.py wheel and built DeltaWitness wheel.
+315. Uninstalling Coverage.py leaves the existing base package and stdlib statement baseline functional.
+316. Public artifacts exclude raw `.coverage` data, source/test bodies, raw stdout/stderr, tracebacks, absolute paths, credentials, and environment values.
+317. The result remains development-only and does not authorize external repositories, benchmarks, a holdout, release, deployment, or merge policy.
+
+### Additional residual risks
+
+Pre-install wheel hashing establishes the bytes supplied to the installer, not a signed attestation of later imported runtime bytes after arbitrary environment compromise. Trusted Publishing and transparency metadata strengthen publication provenance but do not establish semantic correctness or safety.
+
+`data_file=None` avoids persistent `.coverage` output but retains Coverage.py and its in-memory SQLite-backed data model in the trusted computing base. Disabling configuration discovery, plug-ins, and auto-start cannot prove absence of modified startup files, import hooks, monkeypatching, filesystem overlays, or package tampering.
+
+Static contexts and invocation bindings are visible identifiers, not authentication. Identical statement and arc sets do not imply identical assertions, inputs, conditions, data flow, side effects, outputs, security properties, or semantic coverage. The frozen straight-line source has entry and exit arcs but no conditional branch point, so the result is not evidence about branch discrimination on conditional control flow.
+
+The selected public API contract retains exact executed arcs and branch statistics but does not claim exact missing-branch arc identities when they are unavailable through that boundary. Hosted CI timings are diagnostics, not performance guarantees or resource bounds. Coverage.py and the runner remain observation mechanisms, not a sandbox.
+
+### Additional safe operation
+
+- Acquire only the exact hash-locked Coverage.py wheel, verify it before offline installation, and keep acquisition separate from measurement.
+- Execute only fixed project-owned synthetic source and tests in disposable nonsensitive environments without credentials.
+- Keep configuration discovery, plug-ins, auto-start, persistent data, concurrency, subprocess coverage, and measurement-time network disabled.
+- Reject ambient or already active Coverage.py state.
+- Verify both typed and Coverage.py receipts, their shared binding, exact selector context, and complete source/target/distribution relations.
+- Preserve missing-versus-empty and expected-versus-unexpected distinctions; never invent unavailable missing-branch arc identities.
+- Never infer oracle strength, coverage adequacy, mutation adequacy, or method superiority from one statement/arc/mutation comparison.
+- Never publish raw `.coverage` data.
+- Keep scores, thresholds, blockers, holdout, ecological inference, external execution, release, deployment, and superiority claims disabled.
