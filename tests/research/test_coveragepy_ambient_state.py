@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import os
 from pathlib import Path
-import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -14,64 +12,43 @@ import coverage
 import deltawitness.coveragepy_probe as coveragepy_probe
 
 
-_SOURCE = """def is_admin(user):
-    return user.get(\"role\") == \"admin\"
-"""
-_TESTS = """import sys
-import unittest
-
-sys.path.insert(0, \"src\")
-from access import is_admin
-
-
-class AccessTests(unittest.TestCase):
-    def test_admin_is_allowed(self):
-        self.assertTrue(is_admin({\"role\": \"admin\"}))
-"""
-_SELECTOR = "test_access.AccessTests.test_admin_is_allowed"
 _CONTEXT_ID = (
     "dw001-coveragepy-v1:strong-authorization-oracle-v1:"
-    f"{_SELECTOR}"
+    "test_access.AccessTests.test_admin_is_allowed"
 )
 _BINDING = "a" * 64
-_SYNTHETIC_MODULES = ("access", "test_access", "tests.test_access")
 
 
 class CoveragePyAmbientStateTests(unittest.TestCase):
-    @staticmethod
-    def _clear_synthetic_modules() -> None:
-        for name in _SYNTHETIC_MODULES:
-            sys.modules.pop(name, None)
+    def _measure_unavailable_boundary(self, root: Path):
+        """Run a passing logical test without importing synthetic modules.
 
-    def _measure(self, root: Path):
+        These tests isolate Coverage.py ambient-state classification itself.
+        Source loading, contexts, and exact selector execution are exercised by
+        the separate public-API child and complete baseline tests.
+        """
+
         (root / "src").mkdir()
-        (root / "tests").mkdir()
         source = root / "src" / "access.py"
-        source.write_text(_SOURCE, encoding="utf-8")
-        (root / "tests" / "test_access.py").write_text(
-            _TESTS,
+        source.write_text(
+            "def is_admin(user):\n    return True\n",
             encoding="utf-8",
         )
-        source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
-        args = argparse.Namespace(
-            start_directory="tests",
-            pattern="test*.py",
-            top_level_directory=None,
-            test_name=[_SELECTOR],
-            verbosity=0,
+        target = {
+            "path": "src/access.py",
+            "symbol": "is_admin",
+            "source_sha256": __import__("hashlib").sha256(
+                source.read_bytes()
+            ).hexdigest(),
+            "target_lines": [2],
+        }
+        suite = unittest.TestSuite(
+            [unittest.FunctionTestCase(lambda: None)]
         )
+        args = argparse.Namespace(verbosity=0)
         previous = Path.cwd()
-        previous_sys_path = list(sys.path)
-        self._clear_synthetic_modules()
         try:
             os.chdir(root)
-            suite = coveragepy_probe._load_suite(args)
-            target = {
-                "path": "src/access.py",
-                "symbol": "is_admin",
-                "source_sha256": source_sha256,
-                "target_lines": [2],
-            }
             return coveragepy_probe._measure(
                 suite=suite,
                 args=args,
@@ -83,55 +60,60 @@ class CoveragePyAmbientStateTests(unittest.TestCase):
                 binding=_BINDING,
             )
         finally:
-            self._clear_synthetic_modules()
-            sys.path[:] = previous_sys_path
             os.chdir(previous)
+
+    def _assert_indeterminate(
+        self,
+        result: unittest.TestResult,
+        receipt: dict[str, object],
+        expected_error: str,
+    ) -> None:
+        self.assertTrue(result.wasSuccessful())
+        self.assertEqual(receipt["measurement_status"], "indeterminate")
+        self.assertEqual(receipt["measurement_error"], expected_error)
+        self.assertIsNone(receipt["measured_files"])
+        self.assertIsNone(receipt["statement_evidence"])
+        self.assertIsNone(receipt["branch_evidence"])
+        self.assertIsNone(receipt["context_evidence"])
 
     def test_coverage_environment_variable_forces_indeterminate_measurement(self) -> None:
         previous = os.environ.get("COVERAGE_RCFILE")
         os.environ["COVERAGE_RCFILE"] = "/tmp/ambient-coveragerc"
         try:
             with tempfile.TemporaryDirectory() as directory:
-                result, receipt = self._measure(Path(directory))
+                result, receipt = self._measure_unavailable_boundary(
+                    Path(directory)
+                )
         finally:
             if previous is None:
                 os.environ.pop("COVERAGE_RCFILE", None)
             else:
                 os.environ["COVERAGE_RCFILE"] = previous
 
-        self.assertTrue(result.wasSuccessful())
-        self.assertEqual(receipt["measurement_status"], "indeterminate")
-        self.assertEqual(
-            receipt["measurement_error"],
+        self._assert_indeterminate(
+            result,
+            receipt,
             "ambient_coverage_environment",
         )
-        self.assertIsNone(receipt["measured_files"])
-        self.assertIsNone(receipt["statement_evidence"])
-        self.assertIsNone(receipt["branch_evidence"])
-        self.assertIsNone(receipt["context_evidence"])
 
     def test_preexisting_active_collector_forces_indeterminate_measurement(self) -> None:
-        # Test the public active-collector signal without installing an actual
-        # process-global trace function that could contaminate later research
-        # tests. The production code still calls Coverage.current() directly.
+        # Test the documented public active-collector signal without installing
+        # a process-global trace function that could contaminate later tests.
         with patch.object(
             coverage.Coverage,
             "current",
             return_value=object(),
         ):
             with tempfile.TemporaryDirectory() as directory:
-                result, receipt = self._measure(Path(directory))
+                result, receipt = self._measure_unavailable_boundary(
+                    Path(directory)
+                )
 
-        self.assertTrue(result.wasSuccessful())
-        self.assertEqual(receipt["measurement_status"], "indeterminate")
-        self.assertEqual(
-            receipt["measurement_error"],
+        self._assert_indeterminate(
+            result,
+            receipt,
             "coveragepy_already_active",
         )
-        self.assertIsNone(receipt["measured_files"])
-        self.assertIsNone(receipt["statement_evidence"])
-        self.assertIsNone(receipt["branch_evidence"])
-        self.assertIsNone(receipt["context_evidence"])
 
 
 if __name__ == "__main__":
