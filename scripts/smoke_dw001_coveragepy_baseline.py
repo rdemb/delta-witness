@@ -37,10 +37,16 @@ def _parser() -> argparse.ArgumentParser:
             "baseline."
         )
     )
-    parser.add_argument(
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument(
         "--emit-json",
         action="store_true",
         help="emit the verified public-safe result as canonical JSON",
+    )
+    output.add_argument(
+        "--semantic-digest",
+        action="store_true",
+        help="emit only the stable semantic SHA-256",
     )
     return parser
 
@@ -128,6 +134,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.emit_json:
         print(canonical_json(result).decode("utf-8"))
+    elif args.semantic_digest:
+        print(result["semantic_sha256"])
     else:
         print(
             "DW-001 Coverage.py baseline smoke passed: "
