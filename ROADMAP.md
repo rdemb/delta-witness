@@ -56,13 +56,22 @@ Implemented mechanism, design, and owned-synthetic result controls:
 - [x] Missing, malformed, or unavailable trace evidence retained as indeterminate rather than empty coverage
 - [x] Hit-count magnitude kept diagnostic and excluded from the primary profile comparison
 - [x] Editable and installed-wheel mutation-result and statement-coverage smokes on Python 3.11–3.14
+- [x] Coverage.py `7.15.2` provenance review with one exact hash-locked universal wheel and research-extra-only dependency boundary
+- [x] Exact Coverage.py executable-statement, arc, branch-stat, and static-context evidence for every frozen selector
+- [x] Independent selector-context partition and cross-contamination verification
+- [x] Exact Coverage.py statement and arc union/intersection comparison for the frozen profiles
+- [x] Direct comparison among stdlib statement, Coverage.py statement, Coverage.py branch/arc, and frozen mutation evidence
+- [x] Complete Coverage.py `expected`, `unexpected`, and `indeterminate` result semantics with measured-empty separation
+- [x] Frozen Coverage.py semantic and complete-report digests with adversarial reconstruction tests
+- [x] Editable, installed-wheel, clean offline research-extra, and dependency-removal reproduction on Python 3.11–3.14
 
 Unresolved analysis layers:
 
 - [ ] Expand calibration beyond one fixed source and three generic operators
 - [ ] Calibrate mutation evidence against a broader set of valid, weak, ambiguous, invalid, and equivalent-review controls
 - [ ] Expand claim-boundary coverage beyond one fixed owned-synthetic target
-- [ ] Compare the stdlib statement baseline with pinned Coverage.py statement and branch coverage
+- [ ] Add frozen conditional-control-flow cases where branch evidence can exercise actual branch points
+- [ ] Compare Coverage.py condition/branch evidence and mutation evidence on a broader frozen control population
 - [ ] Detect empty and assertion-free test deltas
 - [ ] Detect skipped, disabled, and weakened assertions
 - [ ] Compare one fixed mutant, the three-mutant catalog, coverage-only, and changed-symbol mutation sets on a larger frozen control population

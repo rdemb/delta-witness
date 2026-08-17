@@ -611,3 +611,50 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md
 ## Author and license
 
 DeltaWitness is an independent open research project created by **Rafal Dembski**. It is licensed under Apache License 2.0.
+
+## Unreleased DW-001 Coverage.py direct-baseline result
+
+Issue #43 adds one optional, development-only direct comparison against Coverage.py `7.15.2`. Coverage.py is not a base runtime dependency. The base package keeps `dependencies = []`; the exact package is available only through the `research` extra and a hash-locked offline-reproduction path.
+
+Reviewed distribution identity:
+
+```text
+artifact = coverage-7.15.2-py3-none-any.whl
+sha256   = eb6bcae8d1a9d305351ecb108232441d11c5cfe9de840a04388ba5d2db8d735c
+source   = coveragepy/coveragepy@50d865908dfeb21a0bf1e6f05db578c11662f8dd
+license  = Apache-2.0
+```
+
+For the exact frozen owned-synthetic source, target, and selectors:
+
+```text
+strong Coverage.py statement union/intersection = [2] / [2]
+weak Coverage.py statement union/intersection   = [2] / [2]
+
+strong Coverage.py arc union/intersection = [[-1, 2], [2, -1]] / same
+weak Coverage.py arc union/intersection   = [[-1, 2], [2, -1]] / same
+
+stdlib statement distinguishes profiles   = false
+Coverage.py statement distinguishes       = false
+Coverage.py branch/arc distinguishes      = false
+frozen generic mutation table distinguishes = true
+```
+
+Every selector had one exact static measurement context, complete typed outcome evidence, complete Coverage.py evidence, and a valid uncontaminated context partition. The result matched the preregistration and is frozen as:
+
+```text
+semantic_sha256 = ec0c2fdd5ac24ba53eb895d9014aab623d2631125b8512ba0e0cbf5105f21ee8
+report_sha256   = 8b248757374ebff4195bad181ad02bc5b0bfc61fa2e21ebf45549686c33d2c41
+```
+
+This establishes only that, in one exact straight-line project-owned synthetic case, the two frozen selector profiles produced identical target statement and target-related arc sets while the already frozen generic-mutation table differed. It does not establish that coverage is generally insufficient, Coverage.py is weak, mutation testing is generally better or sufficient, oracle strength is complete, a merge blocker is justified, external execution is safe, Gate 0 or Gate 1 is complete, or the project is production-ready or scientifically novel.
+
+The fixed source contains no conditional branch point. Broader conditional-control-flow cases, calibration populations, equivalent-mutant review, error-rate estimation, authorized ecological data, holdout evaluation, external reproduction, and independent technical review remain open.
+
+See:
+
+- [Coverage.py dependency and provenance review](research/DW-001/COVERAGEPY_DEPENDENCY_PROVENANCE_V1.md)
+- [Coverage.py bounded result](research/DW-001/COVERAGEPY_BASELINE_RESULT_V1.md)
+- [Coverage.py threat boundary](research/DW-001/COVERAGEPY_THREAT_BOUNDARY_V1.md)
+- [Coverage.py direct-baseline architecture](docs/ARCHITECTURE.md#coveragepy-direct-baseline-architecture)
+- [Frozen public-safe result](research/DW-001/coveragepy-baseline-result.v1.json)

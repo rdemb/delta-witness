@@ -1,0 +1,7 @@
+# Research-only direct baseline dependency for DW-001 issue #43.
+#
+# The base package remains dependency-free. Reproduction must download the
+# universal pure-Python wheel explicitly, verify its filename and SHA-256, and
+# install it offline with --no-index --no-deps before measurement.
+coverage==7.15.2 \
+    --hash=sha256:eb6bcae8d1a9d305351ecb108232441d11c5cfe9de840a04388ba5d2db8d735c

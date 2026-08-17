@@ -1,0 +1,1720 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rdemb/delta-witness/research/DW-001/schema/coveragepy-baseline-result.schema.json",
+  "title": "DeltaWitness DW-001 Coverage.py Baseline Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "result_id",
+    "partition",
+    "plan_sha256",
+    "catalog_sha256",
+    "mutation_result_semantic_sha256",
+    "stdlib_statement_result_semantic_sha256",
+    "distribution_manifest_sha256",
+    "created_at",
+    "runtime",
+    "adapter",
+    "distribution",
+    "configuration",
+    "source",
+    "profiles",
+    "comparison",
+    "analysis",
+    "policy",
+    "cost",
+    "semantic_sha256",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deltawitness.dw001-coveragepy-baseline-result.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    },
+    "result_id": {
+      "const": "DW-001-COVERAGEPY-BASELINE-RESULT-V1"
+    },
+    "partition": {
+      "const": "development"
+    },
+    "plan_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "catalog_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "mutation_result_semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "stdlib_statement_result_semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "distribution_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "adapter": {
+      "$ref": "#/$defs/adapter"
+    },
+    "distribution": {
+      "$ref": "#/$defs/distributionManifest"
+    },
+    "configuration": {
+      "$ref": "#/$defs/rootConfiguration"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "profiles": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/profile"
+        },
+        {
+          "$ref": "#/$defs/profile"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "comparison": {
+      "$ref": "#/$defs/comparison"
+    },
+    "analysis": {
+      "$ref": "#/$defs/analysis"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "cost": {
+      "$ref": "#/$defs/rootCost"
+    },
+    "semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "report_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonnegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "positiveInteger": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nonnegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "lineArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/positiveInteger"
+      },
+      "uniqueItems": true
+    },
+    "arc": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "integer"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "arcArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/arc"
+      },
+      "uniqueItems": true
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_version",
+        "python_implementation",
+        "python_version",
+        "platform_system"
+      ],
+      "properties": {
+        "tool_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_implementation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform_system": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "coverage_receipt_schema_version",
+        "coverage_producer",
+        "public_api_only",
+        "context_strategy"
+      ],
+      "properties": {
+        "id": {
+          "const": "coveragepy-public-api-v1"
+        },
+        "version": {
+          "const": "1"
+        },
+        "coverage_receipt_schema_version": {
+          "const": "deltawitness.coveragepy-measurement-receipt.v1"
+        },
+        "coverage_producer": {
+          "const": "deltawitness-coveragepy"
+        },
+        "public_api_only": {
+          "const": true
+        },
+        "context_strategy": {
+          "const": "static-selector-context-v1"
+        }
+      }
+    },
+    "distributionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "decision",
+        "package",
+        "version",
+        "dependency_scope",
+        "selected_artifact",
+        "candidate_sdist",
+        "source",
+        "runtime_contract",
+        "manifest_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "deltawitness.coveragepy-distribution-artifact.v1"
+        },
+        "decision": {
+          "const": "GO"
+        },
+        "package": {
+          "const": "coverage"
+        },
+        "version": {
+          "const": "7.15.2"
+        },
+        "dependency_scope": {
+          "const": "research-extra-only"
+        },
+        "selected_artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "filename",
+            "format",
+            "python_tag",
+            "abi_tag",
+            "platform_tag",
+            "sha256",
+            "trusted_publishing",
+            "sigstore_transparency_entry"
+          ],
+          "properties": {
+            "filename": {
+              "const": "coverage-7.15.2-py3-none-any.whl"
+            },
+            "format": {
+              "const": "wheel"
+            },
+            "python_tag": {
+              "const": "py3"
+            },
+            "abi_tag": {
+              "const": "none"
+            },
+            "platform_tag": {
+              "const": "any"
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "trusted_publishing": {
+              "const": true
+            },
+            "sigstore_transparency_entry": {
+              "$ref": "#/$defs/nonnegativeInteger"
+            }
+          }
+        },
+        "candidate_sdist": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "filename",
+            "format",
+            "sha256",
+            "trusted_publishing",
+            "sigstore_transparency_entry",
+            "selected"
+          ],
+          "properties": {
+            "filename": {
+              "const": "coverage-7.15.2.tar.gz"
+            },
+            "format": {
+              "const": "sdist"
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "trusted_publishing": {
+              "const": true
+            },
+            "sigstore_transparency_entry": {
+              "$ref": "#/$defs/nonnegativeInteger"
+            },
+            "selected": {
+              "const": false
+            }
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repository",
+            "commit",
+            "tag",
+            "tag_object",
+            "publication_workflow",
+            "license",
+            "license_file"
+          ],
+          "properties": {
+            "repository": {
+              "const": "coveragepy/coveragepy"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "tag": {
+              "const": "7.15.2"
+            },
+            "tag_object": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "publication_workflow": {
+              "const": ".github/workflows/publish.yml"
+            },
+            "license": {
+              "const": "Apache-2.0"
+            },
+            "license_file": {
+              "const": "LICENSE.txt"
+            }
+          }
+        },
+        "runtime_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum_python",
+            "supported_delta_witness_pythons",
+            "base_runtime_dependency",
+            "measurement_network_allowed",
+            "persistent_data_file_allowed",
+            "ambient_config_allowed",
+            "plugins_allowed",
+            "auto_start_allowed",
+            "subprocess_measurement_allowed",
+            "concurrency_modes",
+            "public_api_only",
+            "selected_tracer"
+          ],
+          "properties": {
+            "minimum_python": {
+              "const": "3.10"
+            },
+            "supported_delta_witness_pythons": {
+              "const": [
+                "3.11",
+                "3.12",
+                "3.13",
+                "3.14"
+              ]
+            },
+            "base_runtime_dependency": {
+              "const": false
+            },
+            "measurement_network_allowed": {
+              "const": false
+            },
+            "persistent_data_file_allowed": {
+              "const": false
+            },
+            "ambient_config_allowed": {
+              "const": false
+            },
+            "plugins_allowed": {
+              "const": false
+            },
+            "auto_start_allowed": {
+              "const": false
+            },
+            "subprocess_measurement_allowed": {
+              "const": false
+            },
+            "concurrency_modes": {
+              "const": []
+            },
+            "public_api_only": {
+              "const": true
+            },
+            "selected_tracer": {
+              "const": "timid-python"
+            }
+          }
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "rootConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_file",
+        "auto_data",
+        "timid",
+        "branch",
+        "config_file",
+        "source_dirs",
+        "concurrency",
+        "check_preimported",
+        "context_strategy",
+        "messages",
+        "plugins",
+        "auto_start",
+        "subprocess_measurement",
+        "network_during_measurement"
+      ],
+      "properties": {
+        "data_file": {
+          "const": null
+        },
+        "auto_data": {
+          "const": false
+        },
+        "timid": {
+          "const": true
+        },
+        "branch": {
+          "const": true
+        },
+        "config_file": {
+          "const": false
+        },
+        "source_dirs": {
+          "const": [
+            "src"
+          ]
+        },
+        "concurrency": {
+          "const": null
+        },
+        "check_preimported": {
+          "const": false
+        },
+        "context_strategy": {
+          "const": "static-selector-context-v1"
+        },
+        "messages": {
+          "const": false
+        },
+        "plugins": {
+          "const": []
+        },
+        "auto_start": {
+          "const": false
+        },
+        "subprocess_measurement": {
+          "const": false
+        },
+        "network_during_measurement": {
+          "const": false
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "path",
+        "symbol",
+        "source_sha256",
+        "ast_sha256",
+        "target_id",
+        "target_lines"
+      ],
+      "properties": {
+        "source_id": {
+          "const": "authorization-predicate-candidate-v1"
+        },
+        "path": {
+          "const": "src/access.py"
+        },
+        "symbol": {
+          "const": "is_admin"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "ast_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_lines": {
+          "const": [
+            2
+          ]
+        }
+      }
+    },
+    "selectorCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "process_wall_seconds",
+        "coverage_wall_seconds",
+        "coverage_cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "measured",
+            "partial"
+          ]
+        },
+        "process_wall_seconds": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "coverage_wall_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_cpu_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "aggregateCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command_count",
+        "selector_count",
+        "process_wall_seconds",
+        "coverage_wall_seconds",
+        "coverage_cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "measured",
+            "partial"
+          ]
+        },
+        "command_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "selector_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "process_wall_seconds": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "coverage_wall_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_cpu_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "rootCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "profile_count",
+        "command_count",
+        "selector_count",
+        "process_wall_seconds",
+        "coverage_wall_seconds",
+        "coverage_cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "measured",
+            "partial"
+          ]
+        },
+        "profile_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "command_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "selector_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "process_wall_seconds": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "coverage_wall_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_cpu_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "typedCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests_run",
+        "passed",
+        "failures",
+        "errors",
+        "skipped",
+        "expected_failures",
+        "unexpected_successes"
+      ],
+      "properties": {
+        "tests_run": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "passed": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "failures": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "errors": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "skipped": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "expected_failures": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "unexpected_successes": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        }
+      }
+    },
+    "receiptDistribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest_sha256",
+        "package",
+        "expected_version",
+        "observed_distribution_name",
+        "observed_distribution_version",
+        "observed_module_version"
+      ],
+      "properties": {
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "package": {
+          "const": "coverage"
+        },
+        "expected_version": {
+          "const": "7.15.2"
+        },
+        "observed_distribution_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observed_distribution_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observed_module_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "receiptConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_file",
+        "auto_data",
+        "timid",
+        "branch",
+        "config_file",
+        "source_dirs",
+        "concurrency",
+        "check_preimported",
+        "context",
+        "messages",
+        "plugins",
+        "auto_start",
+        "subprocess_measurement",
+        "network_during_measurement"
+      ],
+      "properties": {
+        "data_file": {
+          "const": null
+        },
+        "auto_data": {
+          "const": false
+        },
+        "timid": {
+          "const": true
+        },
+        "branch": {
+          "const": true
+        },
+        "config_file": {
+          "const": false
+        },
+        "source_dirs": {
+          "const": [
+            "src"
+          ]
+        },
+        "concurrency": {
+          "const": null
+        },
+        "check_preimported": {
+          "const": false
+        },
+        "context": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "messages": {
+          "const": false
+        },
+        "plugins": {
+          "const": []
+        },
+        "auto_start": {
+          "const": false
+        },
+        "subprocess_measurement": {
+          "const": false
+        },
+        "network_during_measurement": {
+          "const": false
+        }
+      }
+    },
+    "branchStat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "total_exits",
+        "taken_exits"
+      ],
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/positiveInteger"
+        },
+        "total_exits": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "taken_exits": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        }
+      }
+    },
+    "statementEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executable",
+        "executed",
+        "missing",
+        "measured_lines",
+        "target_executable",
+        "target_executed",
+        "target_missing"
+      ],
+      "properties": {
+        "executable": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "executed": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "missing": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "measured_lines": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "target_executable": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "target_executed": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "target_missing": {
+          "$ref": "#/$defs/lineArray"
+        }
+      }
+    },
+    "branchEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "has_arcs",
+        "all_arcs",
+        "context_arcs",
+        "target_arcs",
+        "branch_stats",
+        "target_branch_stats",
+        "missing_branch_count",
+        "target_missing_branch_count",
+        "missing_branch_arcs",
+        "missing_branch_arc_identity_status"
+      ],
+      "properties": {
+        "has_arcs": {
+          "const": true
+        },
+        "all_arcs": {
+          "$ref": "#/$defs/arcArray"
+        },
+        "context_arcs": {
+          "$ref": "#/$defs/arcArray"
+        },
+        "target_arcs": {
+          "$ref": "#/$defs/arcArray"
+        },
+        "branch_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/branchStat"
+          }
+        },
+        "target_branch_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/branchStat"
+          }
+        },
+        "missing_branch_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "target_missing_branch_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "missing_branch_arcs": {
+          "const": null
+        },
+        "missing_branch_arc_identity_status": {
+          "const": "unavailable-public-api"
+        }
+      }
+    },
+    "contextsByLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "contexts"
+      ],
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/positiveInteger"
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "contextEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measured_contexts",
+        "contexts_by_lineno",
+        "query_context",
+        "lines",
+        "arcs",
+        "partition_valid"
+      ],
+      "properties": {
+        "measured_contexts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "uniqueItems": true
+        },
+        "contexts_by_lineno": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextsByLine"
+          }
+        },
+        "query_context": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "lines": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "arcs": {
+          "$ref": "#/$defs/arcArray"
+        },
+        "partition_valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "coverageReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "binding",
+        "producer",
+        "distribution",
+        "configuration",
+        "target",
+        "context",
+        "measurement_status",
+        "measurement_error",
+        "measured_files",
+        "statement_evidence",
+        "branch_evidence",
+        "context_evidence",
+        "cost",
+        "coverage_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "deltawitness.coveragepy-measurement-receipt.v1"
+        },
+        "binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "const": "deltawitness-coveragepy"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "distribution": {
+          "$ref": "#/$defs/receiptDistribution"
+        },
+        "configuration": {
+          "$ref": "#/$defs/receiptConfiguration"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "symbol",
+            "source_sha256",
+            "target_lines"
+          ],
+          "properties": {
+            "path": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "symbol": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "target_lines": {
+              "$ref": "#/$defs/lineArray"
+            }
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "strategy"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "strategy": {
+              "const": "static-selector-context-v1"
+            }
+          }
+        },
+        "measurement_status": {
+          "enum": [
+            "complete",
+            "indeterminate"
+          ]
+        },
+        "measurement_error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measured_files": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/relativePath"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statement_evidence": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/statementEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch_evidence": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/branchEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "context_evidence": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/contextEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "wall_clock_seconds",
+            "cpu_seconds",
+            "missing_reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "measured"
+            },
+            "wall_clock_seconds": {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            "cpu_seconds": {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            "missing_reason": {
+              "const": null
+            }
+          }
+        },
+        "coverage_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "measurement_status": {
+                "const": "complete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "measurement_error": {
+                "const": null
+              },
+              "measured_files": {
+                "type": "array",
+                "minItems": 1
+              },
+              "statement_evidence": {
+                "$ref": "#/$defs/statementEvidence"
+              },
+              "branch_evidence": {
+                "$ref": "#/$defs/branchEvidence"
+              },
+              "context_evidence": {
+                "$ref": "#/$defs/contextEvidence"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "measurement_error": {
+                "type": "string",
+                "minLength": 1
+              },
+              "measured_files": {
+                "const": null
+              },
+              "statement_evidence": {
+                "const": null
+              },
+              "branch_evidence": {
+                "const": null
+              },
+              "context_evidence": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "source_sha256",
+        "test_sha256",
+        "command",
+        "context_id",
+        "expected_observed",
+        "observed",
+        "outcome_concordant",
+        "return_code",
+        "timed_out",
+        "duration_seconds",
+        "stdout_sha256",
+        "stderr_sha256",
+        "invocation_binding",
+        "receipt_sha256",
+        "receipt_outcome",
+        "receipt_producer",
+        "receipt_counts",
+        "observation_error",
+        "coverage_status",
+        "coverage_error",
+        "coverage_receipt",
+        "expected_target_executed",
+        "statement_concordant",
+        "branch_evidence_complete",
+        "context_partition_valid",
+        "concordant",
+        "cost"
+      ],
+      "properties": {
+        "selector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "expected_observed": {
+          "const": "pass"
+        },
+        "observed": {
+          "enum": [
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ]
+        },
+        "outcome_concordant": {
+          "type": "boolean"
+        },
+        "return_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "timed_out": {
+          "type": "boolean"
+        },
+        "duration_seconds": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "stdout_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stderr_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "invocation_binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt_outcome": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "receipt_producer": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version"
+              ],
+              "properties": {
+                "name": {
+                  "const": "deltawitness-unittest"
+                },
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt_counts": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/typedCounts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "coverage_status": {
+          "enum": [
+            "complete",
+            "candidate_invalid",
+            "indeterminate"
+          ]
+        },
+        "coverage_error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "coverage_receipt": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/coverageReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expected_target_executed": {
+          "$ref": "#/$defs/lineArray"
+        },
+        "statement_concordant": {
+          "type": "boolean"
+        },
+        "branch_evidence_complete": {
+          "type": "boolean"
+        },
+        "context_partition_valid": {
+          "type": "boolean"
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/selectorCost"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order",
+        "profile_id",
+        "profile_role",
+        "selectors",
+        "expected_statement_union",
+        "statement_union",
+        "expected_statement_intersection",
+        "statement_intersection",
+        "arc_union",
+        "arc_intersection",
+        "all_selectors_passed",
+        "context_partition_valid",
+        "coverage_status",
+        "concordant",
+        "cost"
+      ],
+      "properties": {
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "profile_id": {
+          "enum": [
+            "strong-authorization-oracle-v1",
+            "weak-boolean-proxy-v1"
+          ]
+        },
+        "profile_role": {
+          "enum": [
+            "positive_control",
+            "negative_control"
+          ]
+        },
+        "selectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selector"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "expected_statement_union": {
+          "const": [
+            2
+          ]
+        },
+        "statement_union": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/lineArray"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expected_statement_intersection": {
+          "const": [
+            2
+          ]
+        },
+        "statement_intersection": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/lineArray"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arc_union": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/arcArray"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arc_intersection": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/arcArray"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "all_selectors_passed": {
+          "type": "boolean"
+        },
+        "context_partition_valid": {
+          "type": "boolean"
+        },
+        "coverage_status": {
+          "enum": [
+            "complete",
+            "candidate_invalid",
+            "indeterminate"
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/aggregateCost"
+        }
+      }
+    },
+    "nullableBoolean": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_stdlib_statement_discriminates_profiles",
+        "stdlib_statement_discriminates_profiles",
+        "expected_coveragepy_statement_discriminates_profiles",
+        "coveragepy_statement_discriminates_profiles",
+        "expected_coveragepy_branch_discriminates_profiles",
+        "coveragepy_branch_discriminates_profiles",
+        "expected_mutation_discriminates_profiles",
+        "mutation_discriminates_profiles",
+        "expected_stdlib_and_coveragepy_statement_agree",
+        "stdlib_and_coveragepy_statement_agree",
+        "expected_coveragepy_branch_and_mutation_agree",
+        "coveragepy_branch_and_mutation_agree",
+        "expected_incremental_branch_signal_observed",
+        "incremental_branch_signal_observed",
+        "expected_incremental_mutation_signal_beyond_coveragepy_observed",
+        "incremental_mutation_signal_beyond_coveragepy_observed",
+        "concordant"
+      ],
+      "properties": {
+        "expected_stdlib_statement_discriminates_profiles": {
+          "const": false
+        },
+        "stdlib_statement_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_coveragepy_statement_discriminates_profiles": {
+          "const": false
+        },
+        "coveragepy_statement_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_coveragepy_branch_discriminates_profiles": {
+          "const": false
+        },
+        "coveragepy_branch_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_mutation_discriminates_profiles": {
+          "const": true
+        },
+        "mutation_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_stdlib_and_coveragepy_statement_agree": {
+          "const": true
+        },
+        "stdlib_and_coveragepy_statement_agree": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_coveragepy_branch_and_mutation_agree": {
+          "const": false
+        },
+        "coveragepy_branch_and_mutation_agree": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_incremental_branch_signal_observed": {
+          "const": false
+        },
+        "incremental_branch_signal_observed": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "expected_incremental_mutation_signal_beyond_coveragepy_observed": {
+          "const": true
+        },
+        "incremental_mutation_signal_beyond_coveragepy_observed": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "unexpected_selector_count",
+        "unexpected_profile_count",
+        "indeterminate_selector_count",
+        "unexpected_profile_ids",
+        "comparison_concordant"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "expected",
+            "unexpected",
+            "indeterminate"
+          ]
+        },
+        "unexpected_selector_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "unexpected_profile_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "indeterminate_selector_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "unexpected_profile_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "comparison_concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality_score",
+        "headline_score",
+        "universal_threshold",
+        "merge_blocker_authorized",
+        "ecological_inference_allowed",
+        "holdout_selected",
+        "primary_denominator_eligible",
+        "coverage_superiority_claim_allowed",
+        "mutation_superiority_claim_allowed"
+      ],
+      "properties": {
+        "quality_score": {
+          "const": null
+        },
+        "headline_score": {
+          "const": null
+        },
+        "universal_threshold": {
+          "const": null
+        },
+        "merge_blocker_authorized": {
+          "const": false
+        },
+        "ecological_inference_allowed": {
+          "const": false
+        },
+        "holdout_selected": {
+          "const": false
+        },
+        "primary_denominator_eligible": {
+          "const": false
+        },
+        "coverage_superiority_claim_allowed": {
+          "const": false
+        },
+        "mutation_superiority_claim_allowed": {
+          "const": false
+        }
+      }
+    }
+  }
+}
