@@ -72,6 +72,18 @@ def _expected_counts(observed: str) -> dict[str, int]:
     raise ValueError(f"unsupported complete observation: {observed!r}")
 
 
+def _expected_process_for_receipt(
+    receipt_outcome: str,
+) -> tuple[str, int, str | None]:
+    """Reconstruct the fixed probe's process classification from one receipt."""
+
+    if receipt_outcome == "passed":
+        return "pass", 0, None
+    if receipt_outcome == "test_failure":
+        return "fail", 1, None
+    return "error", 2, "receipt_exit_mismatch"
+
+
 def _receipt_integrity_errors(
     document: object,
     plan: object,
@@ -162,6 +174,9 @@ def _receipt_integrity_errors(
                 receipt_producer = record.get("receipt_producer")
                 receipt_counts = record.get("receipt_counts")
                 observed = record.get("observed")
+                return_code = record.get("return_code")
+                timed_out = record.get("timed_out")
+                observation_error = record.get("observation_error")
                 expected_producer = {
                     "name": "deltawitness-unittest",
                     "version": __version__,
@@ -185,8 +200,35 @@ def _receipt_integrity_errors(
                             f"{context}.receipt_sha256: required for "
                             f"observed={observed!r}"
                         )
+                    elif observed == "timeout":
+                        if (
+                            timed_out is not True
+                            or return_code is not None
+                            or observation_error is not None
+                        ):
+                            errors.append(
+                                f"{context}: timeout process fields are "
+                                "inconsistent"
+                            )
+                    elif observed == "error":
+                        if timed_out is not False:
+                            errors.append(
+                                f"{context}.timed_out: must be false for error"
+                            )
+                        if not isinstance(observation_error, str) or not (
+                            observation_error
+                        ):
+                            errors.append(
+                                f"{context}.observation_error: must identify "
+                                "the missing or invalid receipt"
+                            )
                     continue
 
+                if timed_out is not False:
+                    errors.append(
+                        f"{context}.timed_out: a retained receipt requires "
+                        "completed execution"
+                    )
                 if receipt_producer != expected_producer:
                     errors.append(
                         f"{context}.receipt_producer: does not match the "
@@ -230,20 +272,33 @@ def _receipt_integrity_errors(
                         "reconstructed typed receipt"
                     )
 
-                if observed in {"pass", "fail"}:
-                    expected_outcome = (
-                        "passed" if observed == "pass" else "test_failure"
+                (
+                    expected_observed,
+                    expected_return_code,
+                    expected_observation_error,
+                ) = _expected_process_for_receipt(receipt_outcome)
+                if observed != expected_observed:
+                    errors.append(
+                        f"{context}.receipt_outcome: inconsistent with "
+                        f"observed={observed!r}"
                     )
-                    expected_counts = _expected_counts(str(observed))
-                    if receipt_outcome != expected_outcome:
-                        errors.append(
-                            f"{context}.receipt_outcome: inconsistent with "
-                            f"observed={observed!r}"
-                        )
+                if return_code != expected_return_code:
+                    errors.append(
+                        f"{context}.return_code: inconsistent with retained "
+                        "typed receipt"
+                    )
+                if observation_error != expected_observation_error:
+                    errors.append(
+                        f"{context}.observation_error: inconsistent with "
+                        "retained typed receipt"
+                    )
+
+                if expected_observed in {"pass", "fail"}:
+                    expected_counts = _expected_counts(expected_observed)
                     if receipt_counts != expected_counts:
                         errors.append(
                             f"{context}.receipt_counts: inconsistent with one "
-                            f"logical observed={observed!r} selector"
+                            f"logical observed={expected_observed!r} selector"
                         )
 
         return tuple(dict.fromkeys(errors))
