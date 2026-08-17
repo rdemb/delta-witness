@@ -124,6 +124,41 @@ class DW001InteractionLatticeSchemaTests(unittest.TestCase):
                     self.assertFalse(definition["additionalProperties"])
                     self.assertTrue(definition["required"])
 
+    def test_enum_members_are_unique_and_canonical(self) -> None:
+        enum_paths = (
+            (
+                self.plan_schema,
+                ("$defs", "profile", "properties", "profile_role", "enum"),
+            ),
+            (
+                self.plan_schema,
+                ("$defs", "profile", "properties", "profile_id", "enum"),
+            ),
+            (
+                self.plan_schema,
+                ("$defs", "operator", "properties", "operator_id", "enum"),
+            ),
+            (
+                self.catalog_schema,
+                ("$defs", "mutant", "properties", "status", "enum"),
+            ),
+            (
+                self.prior_art_schema,
+                ("$defs", "source", "properties", "source_id", "enum"),
+            ),
+        )
+        for schema, path in enum_paths:
+            current: object = schema
+            for part in path:
+                current = current[part]
+            self.assertIsInstance(current, list)
+            values = current
+            self.assertEqual(
+                len(values),
+                len(set(values)),
+                f"duplicate enum members at {'.'.join(path)}",
+            )
+
     def test_plan_schema_freezes_design_only_and_non_policy_fields(self) -> None:
         properties = self.plan_schema["properties"]
         self.assertEqual(properties["execution_authorized"], {"const": False})
