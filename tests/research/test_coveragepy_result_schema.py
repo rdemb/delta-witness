@@ -58,6 +58,29 @@ class CoveragePyResultSchemaTests(unittest.TestCase):
             },
         )
 
+    def test_root_cost_schema_is_one_closed_object_matching_the_result(self) -> None:
+        """Prevent `allOf` from making `profile_count` self-invalid.
+
+        In Draft 2020-12, an `aggregateCost` subschema with
+        `additionalProperties: false` cannot be extended by a sibling `allOf`
+        subschema that introduces `profile_count`. The root cost definition must
+        therefore declare all eight fields in one closed object.
+        """
+
+        schema = load_report(_SCHEMA_PATH)
+        result = load_report(_RESULT_PATH)
+        root_cost = schema["$defs"]["rootCost"]
+
+        self.assertNotIn("allOf", root_cost)
+        self.assertEqual(root_cost["type"], "object")
+        self.assertFalse(root_cost["additionalProperties"])
+        self.assertEqual(set(root_cost["required"]), set(result["cost"]))
+        self.assertEqual(set(root_cost["properties"]), set(result["cost"]))
+        self.assertEqual(
+            root_cost["properties"]["profile_count"],
+            {"$ref": "#/$defs/nonnegativeInteger"},
+        )
+
     def test_schema_requires_exact_nested_objects_and_typed_statuses(self) -> None:
         schema = load_report(_SCHEMA_PATH)
         definitions = schema["$defs"]
