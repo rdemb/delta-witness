@@ -126,7 +126,7 @@ jobs:
   coveragepy-research:
     name: Coverage.py research / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -180,5 +180,64 @@ jobs:
           assert coverage.Coverage.current() is None
           PY
 
-      - name: Run red-first research contract
-        run: python -m unittest discover -s tests/research -v
+      - name: Run research contract and editable baseline smoke
+        run: |
+          python -m unittest discover -s tests/research -v
+          python scripts/smoke_dw001_coveragepy_baseline.py
+
+      - name: Emit reviewed canonical result for freezing
+        if: matrix.python-version == '3.11'
+        run: python scripts/smoke_dw001_coveragepy_baseline.py --emit-json
+
+      - name: Reproduce semantic result from the installed base wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          editable_digest="$(python scripts/smoke_dw001_coveragepy_baseline.py --semantic-digest)"
+          python -m pip wheel --no-deps . --wheel-dir dist
+          python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
+          installed_digest="$(python scripts/smoke_dw001_coveragepy_baseline.py --semantic-digest)"
+          test "$editable_digest" = "$installed_digest"
+          echo "Coverage.py semantic reproduction passed: ${installed_digest}"
+
+      - name: Install the optional research extra from the offline wheelhouse
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheelhouse="${RUNNER_TEMP}/coveragepy-wheelhouse"
+          cp dist/deltawitness-*.whl "$wheelhouse/"
+          venv="${RUNNER_TEMP}/coveragepy-extra-venv"
+          python -m venv "$venv"
+          "$venv/bin/python" -m pip install \
+            --no-index \
+            --find-links "$wheelhouse" \
+            'deltawitness[research]==0.0.3'
+          "$venv/bin/python" - <<'PY'
+          import importlib.metadata
+          import coverage
+          import deltawitness
+
+          assert deltawitness.__version__ == "0.0.3"
+          assert importlib.metadata.version("coverage") == "7.15.2"
+          assert coverage.__version__ == "7.15.2"
+          assert coverage.Coverage.current() is None
+          PY
+
+      - name: Remove Coverage.py and revalidate the base product path
+        run: |
+          python -m pip uninstall --yes coverage
+          python - <<'PY'
+          import importlib.util
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness.coveragepy_contract import (
+              build_coveragepy_distribution_manifest,
+          )
+          from deltawitness.dw001_statement_coverage import (
+              verify_claim_scoped_statement_coverage_document,
+          )
+          assert "coverage" not in sys.modules
+          assert build_coveragepy_distribution_manifest()["version"] == "7.15.2"
+          PY
+          python scripts/smoke_dw001_statement_coverage.py
