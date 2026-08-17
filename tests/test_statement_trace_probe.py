@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -9,6 +11,7 @@ import unittest
 from deltawitness.statement_trace_probe import (
     StatementTraceError,
     TRACE_SCHEMA_VERSION,
+    _target_source,
     build_trace_document,
     compute_trace_sha256,
     load_trace_document,
@@ -148,6 +151,29 @@ class StatementTraceProbeTests(unittest.TestCase):
                     expected_source_sha256=_SOURCE_SHA256,
                     expected_target_lines=_TARGET_LINES,
                 )
+
+    def test_target_source_rejects_a_symbolic_link_before_resolution(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "src").mkdir()
+            source = root / "src" / "real_access.py"
+            source.write_text(
+                "def is_admin(user):\n    return True\n",
+                encoding="utf-8",
+            )
+            linked = root / "src" / "linked_access.py"
+            linked.symlink_to(source.name)
+            source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+            previous = Path.cwd()
+            try:
+                os.chdir(root)
+                with self.assertRaisesRegex(
+                    StatementTraceError,
+                    "regular non-link",
+                ):
+                    _target_source("src/linked_access.py", source_sha256)
+            finally:
+                os.chdir(previous)
 
 
 if __name__ == "__main__":
