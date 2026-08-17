@@ -1,0 +1,54 @@
+{
+  "schema_version": "deltawitness.coveragepy-distribution-artifact.v1",
+  "decision": "GO",
+  "package": "coverage",
+  "version": "7.15.2",
+  "dependency_scope": "research-extra-only",
+  "selected_artifact": {
+    "filename": "coverage-7.15.2-py3-none-any.whl",
+    "format": "wheel",
+    "python_tag": "py3",
+    "abi_tag": "none",
+    "platform_tag": "any",
+    "sha256": "eb6bcae8d1a9d305351ecb108232441d11c5cfe9de840a04388ba5d2db8d735c",
+    "trusted_publishing": true,
+    "sigstore_transparency_entry": 2174723144
+  },
+  "candidate_sdist": {
+    "filename": "coverage-7.15.2.tar.gz",
+    "format": "sdist",
+    "sha256": "3df60dc267f0a2ca23cb7a9ab1109c62b9335ffbf519fcfe167157c28c09b81d",
+    "trusted_publishing": true,
+    "sigstore_transparency_entry": 2174713616,
+    "selected": false
+  },
+  "source": {
+    "repository": "coveragepy/coveragepy",
+    "commit": "50d865908dfeb21a0bf1e6f05db578c11662f8dd",
+    "tag": "7.15.2",
+    "tag_object": "65b67b52df5f060eac5ce1206f2bafc885114da6",
+    "publication_workflow": ".github/workflows/publish.yml",
+    "license": "Apache-2.0",
+    "license_file": "LICENSE.txt"
+  },
+  "runtime_contract": {
+    "minimum_python": "3.10",
+    "supported_delta_witness_pythons": [
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14"
+    ],
+    "base_runtime_dependency": false,
+    "measurement_network_allowed": false,
+    "persistent_data_file_allowed": false,
+    "ambient_config_allowed": false,
+    "plugins_allowed": false,
+    "auto_start_allowed": false,
+    "subprocess_measurement_allowed": false,
+    "concurrency_modes": [],
+    "public_api_only": true,
+    "selected_tracer": "timid-python"
+  },
+  "manifest_sha256": "28f6430e45fcfda973a1fcd57157e2317f096cc2774e8281244eaf18a9d0dd3f"
+}
