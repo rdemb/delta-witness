@@ -36,6 +36,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+research = [
+  "coverage==7.15.2"
+]
+
 [project.scripts]
 deltawitness = "deltawitness.cli:main"
 deltawitness-unittest = "deltawitness.unittest_probe:main"
