@@ -30,6 +30,11 @@ load_trace_document = _implementation.load_trace_document
 validate_trace_document = _implementation.validate_trace_document
 _parser = _implementation._parser
 
+# Private regression seam. Product callers do not provide a suite loader; the
+# facade forwards this alias only so a fail-closed producer-error test can
+# inject one deterministic internal failure without weakening the child API.
+_load_suite = _implementation._load_suite
+
 _TARGET_LOCK = RLock()
 
 
@@ -106,15 +111,18 @@ def _target_source(
 
 
 def run_probe(args: argparse.Namespace) -> int:
-    """Run the private producer with the hardened target resolver installed."""
+    """Run the private producer with hardened and testable internals installed."""
 
     with _TARGET_LOCK:
-        original = _implementation._target_source
+        original_target = _implementation._target_source
+        original_loader = _implementation._load_suite
         _implementation._target_source = _target_source
+        _implementation._load_suite = _load_suite
         try:
             return _implementation.run_probe(args)
         finally:
-            _implementation._target_source = original
+            _implementation._target_source = original_target
+            _implementation._load_suite = original_loader
 
 
 def main(argv: list[str] | None = None) -> int:
