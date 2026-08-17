@@ -40,6 +40,9 @@ The model includes:
 
 - a trace producer that writes malformed, oversized, duplicate-key, linked, stale, or substituted JSON;
 - a trace receipt copied across selectors, profiles, source revisions, targets, or experiments;
+- a valid typed receipt retained beside a contradictory process classification, return code, timeout flag, or observation error;
+- an `error` observation that retains a valid `passed` or `test_failure` receipt after report digests are recomputed;
+- a complete trace that reports positive line evidence with zero matching target-function calls;
 - a target path that is absolute, traverses parents, uses a link, escapes the disposable root, or resolves to different source bytes;
 - target-line identities that are negative, duplicated, unsorted, outside the declared target, or changed after outcomes are visible;
 - line-hit records that are duplicated, unsorted, zero, negative, non-integer, non-finite, or inconsistent with covered lines;
@@ -72,12 +75,12 @@ The model includes:
 7. Commands execute without a shell under the existing reduced process environment.
 8. Each child receives one deterministic invocation binding covering every stable execution relation.
 9. The typed outcome receipt and trace receipt use the same binding.
-10. A normal selector pass/fail requires typed receipt/process agreement.
+10. Every retained typed receipt is independently reconstructed and must agree with the exact fixed producer, process classification, return code, timeout flag, and observation error. Normal pass/fail additionally requires exactly one logical selector test; retained non-pass/fail outcomes remain typed error evidence and cannot be relabelled as pass or fail.
 11. The trace receipt is a bounded regular non-link strict UTF-8 JSON document with exact fields and duplicate-key rejection.
 12. Trace target path is normalized, relative, contained under the disposable root, regular, non-link, and source-digest matched.
 13. A trace call counts only when the resolved code filename and code-object name match the exact target.
 14. A line event counts only when it belongs to the declared target-line set.
-15. `complete` trace status requires a nonnegative call count, null error, and internally consistent line evidence.
+15. `complete` trace status requires a nonnegative call count, null error, and internally consistent line evidence. Any positive line evidence requires at least one matching target-function call; zero calls with empty line evidence remains a valid measured empty set.
 16. `indeterminate` trace status requires null call count, empty line evidence, and a stable non-empty error code.
 17. Missing, malformed, unavailable, or failed tracing becomes indeterminate, never complete empty coverage.
 18. Candidate failure, error, or timeout cannot become ordinary complete selector coverage.
@@ -151,6 +154,8 @@ Selectors, commands, source/test digests, target lines, bindings, receipt metada
 - Execute only fixed owned-synthetic bytes under this baseline.
 - Treat any external repository execution as unauthorized until containment and admission contracts exist.
 - Verify plan, catalog, mutation result, source, target, and selectors before execution.
+- Independently verify both the typed outcome receipt and statement-trace receipt, including their shared binding and exact process/receipt relation.
+- Reject complete positive line evidence unless at least one matching target-function call is retained.
 - Preserve complete unexpected signatures and indeterminate traces.
 - Never convert missing trace evidence to empty coverage.
 - Never infer oracle strength from statement coverage or hit counts alone.
