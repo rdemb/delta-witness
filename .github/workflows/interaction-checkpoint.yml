@@ -1,0 +1,81 @@
+name: Interaction checkpoint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUTF8: "1"
+
+concurrency:
+  group: interaction-checkpoint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reproduce:
+    name: Interaction checkpoint / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Remove ambient Coverage.py and install dependency-free editable package
+        run: |
+          python -m pip uninstall --yes coverage || true
+          python -m pip install --no-deps -e .
+
+      - name: Verify dependency-free checkpoint and public imports
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness.dw001_interaction_lattice_checkpoint import (
+              build_interaction_lattice_result_checkpoint,
+              verify_interaction_lattice_result_checkpoint_document,
+          )
+          from deltawitness.dw001_interaction_lattice_result import (
+              verify_interaction_witness_lattice_result_document,
+          )
+          assert callable(build_interaction_lattice_result_checkpoint)
+          assert callable(verify_interaction_lattice_result_checkpoint_document)
+          assert callable(verify_interaction_witness_lattice_result_document)
+          assert "coverage" not in sys.modules
+          PY
+          python scripts/smoke_dw001_interaction_lattice_plan.py
+          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
+
+      - name: Build and force-reinstall dependency-free wheel
+        run: |
+          python -m pip wheel --no-deps . --wheel-dir dist
+          python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
+
+      - name: Reproduce checkpoint from installed wheel
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          assert "coverage" not in sys.modules
+          PY
+          python scripts/smoke_dw001_interaction_lattice_plan.py
+          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
