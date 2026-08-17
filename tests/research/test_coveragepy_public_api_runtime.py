@@ -35,6 +35,7 @@ _CONTEXT_ID = (
     "test_access.AccessTests.test_admin_is_allowed"
 )
 _BINDING = "a" * 64
+_SYNTHETIC_MODULES = ("access", "test_access", "tests.test_access")
 _DIAGNOSTIC_CHILD = r'''
 import os
 import sys
@@ -75,6 +76,11 @@ class CoveragePyPublicApiRuntimeTests(unittest.TestCase):
             encoding="utf-8",
         )
 
+    @staticmethod
+    def _clear_synthetic_modules() -> None:
+        for name in _SYNTHETIC_MODULES:
+            sys.modules.pop(name, None)
+
     def test_fixed_public_api_measurement_is_complete(self) -> None:
         with tempfile.TemporaryDirectory(
             prefix="deltawitness-coveragepy-api-smoke-"
@@ -91,6 +97,8 @@ class CoveragePyPublicApiRuntimeTests(unittest.TestCase):
                 verbosity=0,
             )
             previous = Path.cwd()
+            previous_sys_path = list(sys.path)
+            self._clear_synthetic_modules()
             try:
                 os.chdir(root)
                 suite = coveragepy_probe._load_suite(args)
@@ -132,6 +140,8 @@ class CoveragePyPublicApiRuntimeTests(unittest.TestCase):
                         binding=_BINDING,
                     )
             finally:
+                self._clear_synthetic_modules()
+                sys.path[:] = previous_sys_path
                 os.chdir(previous)
 
         self.assertTrue(result.wasSuccessful())
