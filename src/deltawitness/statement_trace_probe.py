@@ -62,7 +62,7 @@ def _target_source(
             if stat.S_ISLNK(metadata.st_mode):
                 raise _error(
                     "statement trace target path",
-                    "must contain no symbolic-link component",
+                    "must be a regular non-link path; symbolic-link components are forbidden",
                 )
             if index < len(relative.parts) - 1:
                 if not stat.S_ISDIR(metadata.st_mode):
