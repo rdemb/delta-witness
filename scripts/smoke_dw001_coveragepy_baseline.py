@@ -28,6 +28,9 @@ _PLAN_PATH = (
 _CATALOG_PATH = (
     _ROOT / "research" / "DW-001" / "claim-scoped-mutant-catalog.v1.json"
 )
+_FROZEN_SEMANTIC_SHA256 = (
+    "ec0c2fdd5ac24ba53eb895d9014aab623d2631125b8512ba0e0cbf5105f21ee8"
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -76,6 +79,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     if not valid:
         raise AssertionError(errors)
+    if result["semantic_sha256"] != _FROZEN_SEMANTIC_SHA256:
+        raise AssertionError(
+            "Coverage.py semantic result changed: "
+            f"expected {_FROZEN_SEMANTIC_SHA256}, "
+            f"observed {result['semantic_sha256']}"
+        )
 
     if result["analysis"] != {
         "status": "expected",
