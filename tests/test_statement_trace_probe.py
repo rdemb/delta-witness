@@ -53,6 +53,19 @@ class StatementTraceProbeTests(unittest.TestCase):
         self.assertEqual(complete["schema_version"], TRACE_SCHEMA_VERSION)
         self.assertEqual(_validate(complete), complete)
 
+        measured_empty = build_trace_document(
+            binding=_BINDING,
+            target_path=_TARGET_PATH,
+            target_symbol=_TARGET_SYMBOL,
+            source_sha256=_SOURCE_SHA256,
+            target_lines=_TARGET_LINES,
+            trace_status="complete",
+            function_calls=0,
+            line_hits={},
+            trace_error=None,
+        )
+        self.assertEqual(_validate(measured_empty), measured_empty)
+
         indeterminate = build_trace_document(
             binding=_BINDING,
             target_path=_TARGET_PATH,
