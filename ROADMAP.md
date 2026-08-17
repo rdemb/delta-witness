@@ -64,9 +64,15 @@ Implemented mechanism, design, and owned-synthetic result controls:
 - [x] Complete Coverage.py `expected`, `unexpected`, and `indeterminate` result semantics with measured-empty separation
 - [x] Frozen Coverage.py semantic and complete-report digests with adversarial reconstruction tests
 - [x] Editable, installed-wheel, clean offline research-extra, and dependency-removal reproduction on Python 3.11–3.14
+- [x] Pre-execution selector-context interaction-lattice source, test, truth-table, profile, path-shape, operator, and mutant identities frozen before result execution
+- [x] Exact interaction-lattice statement/arc aggregate hypotheses, anonymous path-multiset contract, condition-independence controls, and mutant-incidence table preregistered
+- [x] Reproducible interaction-lattice prior-art boundary with scientific novelty, award-level significance, method superiority, score, threshold, blocker, holdout, and execution claims disabled
 
 Unresolved analysis layers:
 
+- [ ] Execute the selector-context interaction-lattice result only from a merged preregistration commit
+- [ ] Test whether exact anonymous path multisets retain interaction evidence lost by aggregate statement and arc union/intersection
+- [ ] Test the preregistered agreement between truth-table condition-independence witnesses and dropped-conjunct mutant incidence
 - [ ] Expand calibration beyond one fixed source and three generic operators
 - [ ] Calibrate mutation evidence against a broader set of valid, weak, ambiguous, invalid, and equivalent-review controls
 - [ ] Expand claim-boundary coverage beyond one fixed owned-synthetic target
