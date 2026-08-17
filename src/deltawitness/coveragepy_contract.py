@@ -43,6 +43,14 @@ class CoveragePyContractError(DeltaWitnessError):
     """Raised when the exact optional dependency contract is violated."""
 
 
+class CoveragePyArtifactAccessError(CoveragePyContractError):
+    """Raised when the artifact cannot be inspected or read at all.
+
+    This is a harness or local-configuration failure, distinct from a readable
+    artifact whose filename, shape, or digest is unsupported.
+    """
+
+
 def _strict_equal(expected: object, actual: object) -> bool:
     if type(expected) is not type(actual):
         return False
@@ -219,7 +227,7 @@ def verify_coveragepy_artifact(path: Path) -> str:
     try:
         metadata = path.lstat()
     except OSError as exc:
-        raise CoveragePyContractError(
+        raise CoveragePyArtifactAccessError(
             "Coverage.py artifact cannot be inspected"
         ) from exc
     if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
@@ -244,7 +252,7 @@ def verify_coveragepy_artifact(path: Path) -> str:
                     break
                 digest.update(chunk)
     except OSError as exc:
-        raise CoveragePyContractError(
+        raise CoveragePyArtifactAccessError(
             "Coverage.py artifact cannot be read"
         ) from exc
     observed = digest.hexdigest()
@@ -266,6 +274,7 @@ __all__ = [
     "COVERAGEPY_VERSION",
     "COVERAGEPY_WHEEL_FILENAME",
     "COVERAGEPY_WHEEL_SHA256",
+    "CoveragePyArtifactAccessError",
     "CoveragePyContractError",
     "build_coveragepy_distribution_manifest",
     "compute_coveragepy_manifest_sha256",
