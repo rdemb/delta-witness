@@ -11,6 +11,7 @@ import unittest
 from deltawitness.coveragepy_contract import (
     COVERAGEPY_MANIFEST_SHA256,
     COVERAGEPY_WHEEL_FILENAME,
+    CoveragePyArtifactAccessError,
     CoveragePyContractError,
     build_coveragepy_distribution_manifest,
     compute_coveragepy_manifest_sha256,
@@ -140,6 +141,15 @@ class CoveragePyContractTests(unittest.TestCase):
             0,
             completed.stderr.decode("utf-8", errors="replace"),
         )
+
+    def test_missing_artifact_uses_the_typed_access_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            missing = Path(directory) / COVERAGEPY_WHEEL_FILENAME
+            with self.assertRaisesRegex(
+                CoveragePyArtifactAccessError,
+                "cannot be inspected",
+            ):
+                verify_coveragepy_artifact(missing)
 
     def test_artifact_verifier_rejects_wrong_name_digest_and_symbolic_link(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
