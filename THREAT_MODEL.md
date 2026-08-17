@@ -2,7 +2,7 @@
 
 ## Protected claims
 
-DeltaWitness currently supports fourteen narrow statement classes.
+DeltaWitness currently supports fifteen narrow statement classes.
 
 ### Canonical change witness
 
@@ -62,9 +62,13 @@ A typed observer further bounds that statement by a cooperating adapter's semant
 
 > Given the exact verified mutation plan and catalog, the fixed development runner executes only the candidate, three generic generated mutants, one separately labeled historical control, two selector profiles, and reference checks; retains every typed expected or unexpected observation; derives profile, reference, record, summary, analysis, and cost semantics; and refuses scores, thresholds, merge blockers, holdout status, ecological inference, and primary-denominator eligibility.
 
-The import, unrelated-assertion, and weak-proxy statements are controlled negative or contrast evidence. The development pilot establishes pipeline behavior for its sealed five-family synthetic population. The ecological source universe and claim-scoped mutation plan/catalog are design and generation metadata. The claim-scoped mutation result is one bounded owned-synthetic execution over those exact inputs. None is a prevalence, accuracy, oracle-adequacy, mutation-adequacy, ecological-effectiveness, or general-superiority claim.
+### DW-001 claim-scoped statement-coverage result
 
-None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, oracle relevance or strength, representative mutant outcomes, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy, execute an external repository, block a merge, or inspect a holdout.
+> Given the exact verified mutation plan, catalog, frozen mutation-result semantic identity, candidate source, target symbol, target-line set, and selector profiles, the fixed development baseline records invocation-bound typed selector outcomes and current-thread Python statement traces, derives exact profile line-set signatures, and compares them with the frozen mutation evidence while preserving expected, unexpected, and indeterminate evidence separately.
+
+The import, unrelated-assertion, and weak-proxy statements are controlled negative or contrast evidence. The development pilot establishes pipeline behavior for its sealed five-family synthetic population. The ecological source universe and claim-scoped mutation plan/catalog are design and generation metadata. The claim-scoped mutation result and claim-scoped statement-coverage result are bounded owned-synthetic executions over their exact fixed inputs. None is a prevalence, accuracy, oracle-adequacy, coverage-adequacy, mutation-adequacy, ecological-effectiveness, or general-superiority claim.
+
+None of these statements establishes full program correctness, universal causality, vulnerability removal, production safety, taxonomy completeness, oracle relevance or strength, representative coverage or mutant outcomes, empirical superiority, scientific novelty, legal admissibility, or authorization to deploy, execute an external repository, block a merge, or inspect a holdout.
 
 ## Assets
 
@@ -86,9 +90,12 @@ The design aims to protect:
 - complete retention of generated, duplicate, invalid, and not-applicable mutation records;
 - non-execution of duplicate, invalid, and not-applicable catalog records;
 - exact per-selector command, source/test digest, invocation binding, receipt, and observed outcome relations;
+- exact statement-trace target path, symbol, target-line, code-object, function-call, covered-line, and hit-count relations;
+- separation of a measured empty statement set from unavailable or indeterminate tracing;
+- exact profile statement unions and intersections, with set comparison separated from diagnostic hit magnitude;
 - recomputation of profile, reference, record, summary, analysis, cost, and policy semantics;
 - refusal to convert error or timeout into killed evidence;
-- refusal to infer mutation adequacy, generalization, or policy authorization from one result table;
+- refusal to infer coverage or mutation adequacy, generalization, or policy authorization from one result table;
 - separation of unsupported evidence from incomplete execution;
 - endpoint consistency and completeness of exact influence tables;
 - exact arithmetic and semantic integrity of released metrics;
@@ -106,10 +113,10 @@ The design aims to protect:
 - exact development-pilot plan order, case IDs, expected decisions, selectors, and analysis contract;
 - refusal to publish a partial pilot bundle or aggregate an invalid case;
 - complete archive path set, embedded-document digests, semantic index digest, and reconstructed bundle relations;
-- permanent development-only and denominator-ineligible status for mechanism-pilot, weak-oracle, mutation-plan, and mutation-result cases;
+- permanent development-only and denominator-ineligible status for mechanism-pilot, weak-oracle, mutation-plan, mutation-result, and statement-coverage cases;
 - design-only ecological source metadata from accidental execution authorization or holdout selection;
 - public artifacts from accidental disclosure of source bodies, mutant bodies, test bodies, absolute paths, environment values, credentials, private output, or unauthorized material;
-- separation between consecutive claims, coalitions, selectors, mutation controls, scenarios, pilot cases, and study artifacts.
+- separation between consecutive claims, coalitions, selectors, mutation controls, statement traces, scenarios, pilot cases, and study artifacts.
 
 ## Adversaries and failure sources
 
@@ -122,8 +129,11 @@ The model includes:
 - an incorrect implementation that preserves the proxy property and survives the declared selector;
 - a hidden claim check selected or rewritten after observing mutant survival;
 - a mutation operator, mutant set, threshold, score, profile, reference check, or exclusion selected after results are visible;
-- a complete unexpected mutation observation suppressed as a harness error because it contradicts the preregistration;
+- a complete unexpected mutation or statement-coverage observation suppressed as a harness error because it contradicts the preregistration;
 - malformed or receipt-contradictory evidence accepted as a legitimate negative result;
+- a valid typed receipt retained beside a contradictory observed outcome, return code, timeout flag, or observation error after result digests are recomputed;
+- a complete statement trace that retains positive line evidence with zero matching target-function calls;
+- a pre-existing, replaced, disabled, thread-local, or otherwise interfered-with trace function interpreted as complete evidence;
 - stored `expected`, `observed`, `outcome`, or `concordant` fields modified independently;
 - summary or analysis counters changed without changing the complete table;
 - an error or timeout counted as killed;
@@ -134,7 +144,7 @@ The model includes:
 - mutation target cardinality, symbol, source, or operator order drifting across runs;
 - interpreter AST-field drift changing identities without a declared compatibility rule;
 - source formatting or `ast.unparse` behavior mistaken for semantic mutation evidence;
-- a catalog, successful compile, or one complete result table presented as mutation adequacy;
+- a catalog, successful compile, one statement signature, or one complete result table presented as coverage or mutation adequacy;
 - a patch author that groups paths to manipulate attribution;
 - stale, unrelated, incorrectly selected, or substituted Git refs;
 - hostile Git overrides, replacement objects, hooks, filters, configuration, or binaries;
@@ -152,13 +162,13 @@ The model includes:
 - selector renaming, non-discovery, duplication, dynamic suite generation, or adapter drift;
 - invalid partial patches, nondeterminism, or environment drift;
 - background processes or external effects that survive repository resets;
-- one claim, selector, coalition, or mutation control contaminating later execution;
+- one claim, coalition, selector, mutation control, or trace contaminating later execution;
 - raw output containing credentials or private data;
-- tampered reports, projections, declarations, localizations, challenges, mutation plans, mutant catalogs, mutation results, manifests, results, fixture identities, bindings, or direct-control records;
+- tampered reports, projections, declarations, localizations, challenges, mutation plans, mutant catalogs, mutation results, statement-coverage results, manifests, results, fixture identities, bindings, or direct-control records;
 - recomputation of unkeyed digests after semantic modification;
 - hidden-state leakage or mixed observer arms;
 - false ownership, license, authorization, reviewer, or independence declarations;
-- a valid artifact paired with the wrong report, manifest, projection, declaration, localization, fixture, descriptor, mutation plan, catalog, or expected digest;
+- a valid artifact paired with the wrong report, manifest, projection, declaration, localization, fixture, descriptor, mutation plan, catalog, mutation result, statement-coverage result, or expected digest;
 - a descriptor relabeled to another family after outcomes are known;
 - a scenario pair that changes source/test bytes or scenario identity while claiming an observer-only contrast;
 - a negative control whose collateral assertion is not actually the sole discrimination source;
@@ -172,7 +182,7 @@ The model includes:
 - a pilot index whose stored labels or contrasts are trusted instead of recomputed;
 - an archive with duplicate, missing, unsafe, reordered, substituted, or unexpected embedded paths;
 - coordinated replacement of embedded documents followed by recomputed file and archive digests;
-- a fixed synthetic mechanism, weak-oracle challenge, or mutation result presented as an ecological effectiveness result;
+- a fixed synthetic mechanism, weak-oracle challenge, mutation result, or statement-coverage result presented as an ecological effectiveness result;
 - temporary archive transport or branch-write capability accidentally retained as a permanent permission;
 - a public benchmark label or repository-level license silently treated as instance execution authorization;
 - a moving benchmark repository silently treated as an immutable dataset release;
@@ -181,7 +191,7 @@ The model includes:
 - a non-empty or symbolic-link destination redirecting or overwriting fixture or pilot output;
 - malicious Python, Git, filesystem, dependency, kernel, or container behavior;
 - coordinated replacement of a complete artifact chain and all expected digests;
-- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, discriminating selector, valid fixture/binding, verified pilot, source-universe record, mutation catalog, mutation result, or one controlled mutant as proof of correctness, oracle adequacy, effectiveness, or safety;
+- misuse of a green matrix, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, discriminating selector, valid fixture/binding, verified pilot, source-universe record, mutation catalog, mutation result, statement-coverage result, or one controlled mutant as proof of correctness, oracle adequacy, effectiveness, or safety;
 - malicious repository content executed with operator privileges.
 
 ## Security and integrity invariants
@@ -370,10 +380,10 @@ The model includes:
 144. Absolute repository and specification paths are excluded from public artifacts.
 145. Default reports live in private Git metadata.
 146. Ambiguous configuration and harness errors stop analysis.
-147. Editable-install and installed-wheel smoke execute complete fixture, localization, challenge, mutation-plan, mutation-result, and pilot paths for supported development probes.
+147. Editable-install and installed-wheel smoke execute complete fixture, localization, challenge, mutation-plan, mutation-result, statement-coverage, and pilot paths for supported development probes.
 148. Packaged smoke is not independent reproduction.
-149. Every exported fixture, binding, report, projection, declaration, localization, challenge, mutation plan, mutant catalog, mutation result, manifest, result, pilot index, archive, or source-universe artifact requires privacy and boundary review.
-150. No current development challenge, mutation plan, or mutation result authorizes execution of external or untrusted repositories.
+149. Every exported fixture, binding, report, projection, declaration, localization, challenge, mutation plan, mutant catalog, mutation result, statement-coverage result, manifest, result, pilot index, archive, or source-universe artifact requires privacy and boundary review.
+150. No current development challenge, mutation plan, mutation result, or statement-coverage result authorizes execution of external or untrusted repositories.
 
 ### Development mechanism pilot plan and runner
 
@@ -477,13 +487,50 @@ The model includes:
 236. A valid result does not establish mutation adequacy, complete oracle strength, representative operator quality, ecological effectiveness, or merge-policy validity.
 237. Any later broader calibration or policy layer requires a separate frozen contract and cannot rewrite unexpected observations from this result.
 
+### Claim-scoped statement-coverage result
+
+238. Statement-coverage execution starts only after independent semantic verification of the exact frozen mutation plan, catalog, and mutation result, including the frozen mutation semantic digest.
+239. The runner accepts no caller-provided source, test, target, selector, expectation, comparison, score, threshold, or policy decision.
+240. Only the fixed project-owned candidate source and the exact two strong and one weak selectors execute in disposable temporary directories.
+241. Each selector command is shell-free and runs under the existing reduced process environment.
+242. Source path, source digest, target ID, target symbol, target line, profile identity, selector identity, test digest, command, observer identity, and producer identities are exact reconstructed relations.
+243. Each child receives one deterministic invocation binding shared by its typed outcome receipt and statement-trace receipt.
+244. Every retained typed receipt is independently reconstructed and must agree with the exact fixed producer, observed classification, return code, timeout flag, and observation error.
+245. A retained normal pass/fail receipt additionally represents exactly one logical selector test with the exact expected counts.
+246. A retained non-pass/fail typed receipt is error evidence and cannot be relabeled as pass or fail after digest recomputation.
+247. A timeout retains no completed receipt and cannot be relabeled as error, pass, or fail.
+248. The trace receipt is a bounded regular non-link strict UTF-8 JSON document with exact fields, duplicate-key rejection, and binding equality.
+249. The target path is normalized, relative, contained under the disposable root, regular, non-link, and source-digest matched before tracing.
+250. A target call counts only when the resolved code filename and code-object name match the exact target; a line event counts only when it belongs to the exact target-line set.
+251. A complete trace requires a nonnegative function-call count, null trace error, and exact internal agreement among covered lines and positive line-hit records.
+252. Positive complete line evidence requires at least one matching target-function call; zero calls with empty line evidence remains a valid measured empty set.
+253. An indeterminate trace requires a null call count, empty line evidence, and one stable non-empty trace error.
+254. A pre-existing trace function, producer failure, missing receipt, malformed receipt, or unavailable trace becomes indeterminate and never becomes complete empty coverage.
+255. Selector failure, error, or timeout cannot become ordinary complete selector coverage.
+256. Frozen expected selector outcomes and line sets remain separate from observed process and trace evidence.
+257. A complete internally consistent statement signature that disagrees with preregistration remains a valid `unexpected` result rather than a harness error.
+258. Profile statement unions, intersections, total hit counts, pass status, coverage status, concordance, and costs are derived from the complete ordered selector table.
+259. Statement discrimination is derived from complete union/intersection set relations, not hit-count magnitude.
+260. Mutation discrimination is derived only from the independently verified generic-mutant table; the candidate, historical control, and generation-only records remain excluded.
+261. Coverage-dependent comparison relations are null whenever either profile is incomplete.
+262. Analysis status is derived as `expected`, `unexpected`, or `indeterminate` without rewriting observations.
+263. Score, threshold, merge-blocker authorization, ecological inference, holdout selection, primary-denominator eligibility, and generalization remain null or false.
+264. Every command count, selector count, wall-clock time, and CPU time is finite and nonnegative.
+265. The semantic digest binds stable source, selector, receipt, trace, profile, comparison, analysis, and policy relations; the complete report digest additionally binds runtime and cost diagnostics.
+266. Recomputed digests cannot hide source, target, selector, command, context, receipt, trace, aggregate, comparison, cost, or policy drift because the verifier reconstructs those relations.
+267. Public artifacts contain no source or test bodies, raw output, tracebacks, absolute paths, credentials, or environment values.
+268. Repeated clean execution on supported Python 3.11–3.14 must preserve the exact statement-coverage semantic digest and profile signatures.
+269. Editable and installed-wheel smoke exercise the complete fixed statement-coverage path.
+270. The result remains development-only, primary-denominator ineligible, and unauthorized for external repository execution.
+271. A valid result does not establish complete coverage, branch coverage, coverage adequacy, oracle strength, mutation adequacy, method superiority, ecological effectiveness, or merge-policy validity.
+
 ## Residual risks
 
 ### No operating-system sandbox
 
 DeltaWitness and its generators are not containment systems. Executed code can read or modify accessible files, use the network, start processes, exhaust resources, affect external systems, exploit local dependencies, or forge a visible receipt binding.
 
-Use a separately secured disposable environment without credentials for untrusted code. Current owned-synthetic challenges and mutation results do not make external execution safe.
+Use a separately secured disposable environment without credentials for untrusted code. Current owned-synthetic challenges, mutation results, and statement-coverage results do not make external execution safe.
 
 ### Git state is not a complete environment model
 
@@ -527,15 +574,23 @@ It does not estimate false-warning or missed-warning rates over a population, so
 
 Unexpected complete observations are retained, but operator, selector, reference-check, or expected-outcome errors fixed before execution may still make the design uninformative. Internal consistency is not ground-truth validity.
 
+### One statement-trace result is not coverage adequacy
+
+The current statement-coverage result executes three fixed selectors against one fixed owned-synthetic candidate and records only current-thread Python line events for one declared function and target line. Matching line sets do not imply matching branches, conditions, data flow, assertions, side effects, or semantic behavior.
+
+`sys.settrace` is an observation mechanism, not containment. Its event semantics, line tables, frames, filenames, code-object names, and thread scope are trusted runtime behavior. Tested code can inspect, replace, disable, or evade tracing, and behavior in other threads, processes, native extensions, generated code, wrappers, or alternate import paths can be absent.
+
+The result therefore does not establish complete executable-statement coverage, branch coverage, condition coverage, coverage adequacy, oracle strength, or general agreement with mature coverage tooling. Its comparison with one frozen mutation table cannot establish mutation superiority or incremental value beyond this exact case.
+
 ### Ground-truth subtype and intent risk
 
-Fixed synthetic mechanism labels are auditable from owned bytes and direct controls. Real-corpus failure subtypes, claim relevance, intended behavior, mutation validity, and equivalent-mutant status may be ambiguous and susceptible to post-result relabeling.
+Fixed synthetic mechanism labels are auditable from owned bytes and direct controls. Real-corpus failure subtypes, claim relevance, intended behavior, coverage scope, mutation validity, and equivalent-mutant status may be ambiguous and susceptible to post-result relabeling.
 
 A frozen ecological protocol needs independent pre-execution review, disagreement handling, and unknown labels where evidence is insufficient.
 
 ### Fixed synthetic pilot and challenges are not ecological evidence
 
-The pilot arms, weak-proxy task, and mutation result are designed mechanism probes, not independent or representative samples. Successful execution establishes pipeline behavior and specific counterexamples only.
+The pilot arms, weak-proxy task, mutation result, and statement-coverage result are designed mechanism probes, not independent or representative samples. Successful execution establishes pipeline behavior and specific counterexamples only.
 
 They cannot support prevalence, accuracy, precision, recall, superiority, model-quality, or production-utility claims and cannot later become a holdout.
 
@@ -545,7 +600,7 @@ The plan pins protocol and evidence-producing implementation commits. Later arch
 
 ### Costs are diagnostics, not native-method or population estimates
 
-Per-case timings and byte counts are environment-sensitive. Full-matrix projection does not measure native `M0`, `M1`, or `M2` runtime. Mutation-result timing measures only this fixed synthetic workload. Human review time and equivalent-mutant adjudication are unmeasured.
+Per-case timings and byte counts are environment-sensitive. Full-matrix projection does not measure native `M0`, `M1`, or `M2` runtime. Mutation-result and statement-coverage timing measure only their fixed synthetic workloads. Human review time and equivalent-mutant adjudication are unmeasured.
 
 ### Historical transport capability
 
@@ -559,7 +614,7 @@ One path may contain multiple changes and one change may span paths. Rename or g
 
 Partial states may be impossible or unrepresentative. DeltaWitness withholds metrics when execution is indeterminate, which may reduce applicability.
 
-Each matrix, coalition, selector, and mutation-result state currently executes once. Exact means complete enumeration of declared states or records, not certainty about stochastic behavior.
+Each matrix, coalition, localization selector, mutation-result selector, and statement-coverage selector state currently executes once. Exact means complete enumeration of declared states or records, not certainty about stochastic behavior.
 
 ### Projections and contracts are not source attestations
 
@@ -581,42 +636,46 @@ Signing, DSSE, in-toto, Sigstore, SCITT, immutable timestamping, delegation iden
 
 At eight paths and one claim, influence can execute 512 coalition commands plus the canonical matrix. Per-command timeouts do not bound total CPU, memory, storage, process count, or network use.
 
-The development pilot executes 40 matrix states and 12 selector states. The weak-proxy challenge adds five fixed typed controls. The claim-scoped mutation result adds 25 fixed typed selector commands. These counts do not establish a safe resource bound for ecological repositories or broader mutation campaigns.
+The development pilot executes 40 matrix states and 12 selector states. The weak-proxy challenge adds five fixed typed controls. The claim-scoped mutation result adds 25 fixed typed selector commands. The statement-coverage result adds three fixed typed-and-traced selector commands. These counts do not establish a safe resource bound for ecological repositories, broader mutation campaigns, or broader tracing.
 
 ### Publication metadata can remain sensitive
 
-Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, prompts, test selectors, mutant identifiers, AST and source digests, invocation bindings, receipt metadata, reviewer records, authorization references, exclusions, deviations, counts, timings, and costs. Low-entropy digests can reveal equality or permit guessing.
+Artifacts may expose commands, relative paths, Git IDs, scenario/family labels, prompts, test selectors, mutant identifiers, target symbols and lines, AST and source digests, invocation bindings, receipt metadata, trace call and hit counts, reviewer records, authorization references, exclusions, deviations, timings, and costs. Low-entropy digests can reveal equality or permit guessing.
 
 ## Safe operation
 
 - Run only trusted repositories and commands, or use a separately secured disposable environment.
 - Verify exact refs, cleanliness, specification, and path classification before execution.
 - Prefer typed observers when a trusted adapter exists, but never treat receipts as attestations.
+- For statement tracing, independently verify both the typed outcome receipt and trace receipt, their shared invocation binding, and the exact receipt/process relation.
+- Reject complete positive line evidence unless at least one matching target-function call is retained.
+- Preserve the distinction between a measured empty statement set and unavailable or indeterminate tracing.
+- Do not infer branch behavior, oracle strength, coverage adequacy, or mutation superiority from statement sets or hit counts.
 - Do not infer a precise error subtype from generic `test_error` without independently fixed evidence.
 - Do not infer claim relevance from suite `test_failure`, failure counts, or a canonical matrix.
 - Do not infer oracle strength from one discriminating selector or one surviving/killed mutant.
 - Require selector declarations before execution and preserve every per-selector outcome.
 - Freeze mutation operators, scope, source, target, profiles, reference checks, mutant identities, outcome taxonomy, thresholds, and exclusions before outcome inspection.
-- Verify the exact committed mutation plan and catalog before mutation-result execution.
+- Verify the exact committed mutation plan and catalog before mutation-result or statement-coverage execution.
 - Preserve expected and observed outcomes separately and retain complete preregistration-divergent results.
-- Reject malformed, contradictory, source-substituted, command-substituted, binding-substituted, or aggregate-inconsistent evidence even when presented as unexpected.
+- Reject malformed, contradictory, source-substituted, command-substituted, binding-substituted, trace-substituted, or aggregate-inconsistent evidence even when presented as unexpected.
 - Preserve duplicate, invalid, not-applicable, equivalent-review, and indeterminate mutant records; never count or delete them silently.
-- Never treat a compiled mutant catalog or one synthetic result table as mutation adequacy.
-- Never count error or timeout as killed.
+- Never treat a compiled mutant catalog, one synthetic mutation table, or one statement-coverage result as adequacy evidence.
+- Never count error or timeout as killed or complete statement coverage.
 - Keep the known PR #34 challenge mutant separate from generic operator evidence.
 - Treat execution-sensitive configuration and generated inputs as code.
-- Review every incomplete state, invalid hybrid, endpoint anchor, selector, coalition, and mutation control before interpretation.
+- Review every incomplete state, invalid hybrid, endpoint anchor, selector, coalition, mutation control, and statement trace before interpretation.
 - Treat exact influence as enumeration over declared units, not complete causality.
-- Strict-decode and verify every report, projection, descriptor, identity, binding, declaration, localization, challenge, mutation plan, mutant catalog, mutation result, manifest, result, pilot plan, pilot index, pilot archive, and source-universe artifact separately.
+- Strict-decode and verify every report, projection, descriptor, identity, binding, declaration, localization, challenge, mutation plan, mutant catalog, mutation result, statement-coverage result, manifest, result, pilot plan, pilot index, pilot archive, and source-universe artifact separately.
 - Verify generated identity against its repository before using its commits.
 - Require paired observer probes to hold mechanism and scenario identity constant.
 - Require oracle-relevance controls to prove directly which assertion is the sole suite-level failure source.
 - Require weak-oracle controls to prove both mutant survival under the declared selector and claim violation under a separately fixed development check.
 - Run only an exact sealed pilot plan and reject runtime free-form cases or expectations.
 - Require complete staged-bundle and reconstructed-archive verification before interpreting a pilot result.
-- Keep every mechanism-pilot, weak-oracle, mutation-plan, and mutation-result case development-only and outside the primary denominator.
+- Keep every mechanism-pilot, weak-oracle, mutation-plan, mutation-result, and statement-coverage case development-only and outside the primary denominator.
 - Keep ecological execution unauthorized until instance licensing, sampling, review, environment, and containment contracts are accepted.
 - Preserve exclusions, disputes, negative results, surviving mutants, missing costs, and deviations rather than deleting or imputing them.
 - Do not interpret fixed synthetic evidence as ecological effectiveness or holdout evidence.
 - Do not run a DW-001 holdout while protocol and authorization gates are incomplete.
-- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, discriminating selector, valid fixture/binding, verified synthetic pilot, source-universe record, compiled mutant catalog, typed mutation result, or one fixed mutation challenge as full correctness, oracle adequacy, general effectiveness, production readiness, or deployment authorization.
+- Never interpret a green final state, `SUPPORTED_IN_SCOPE`, `ATTRIBUTION_AVAILABLE`, projected `accept`, typed assertion failure, discriminating selector, valid fixture/binding, verified synthetic pilot, source-universe record, compiled mutant catalog, typed mutation result, statement-coverage result, or one fixed mutation challenge as full correctness, oracle adequacy, coverage adequacy, general effectiveness, production readiness, or deployment authorization.

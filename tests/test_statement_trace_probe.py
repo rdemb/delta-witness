@@ -53,6 +53,19 @@ class StatementTraceProbeTests(unittest.TestCase):
         self.assertEqual(complete["schema_version"], TRACE_SCHEMA_VERSION)
         self.assertEqual(_validate(complete), complete)
 
+        measured_empty = build_trace_document(
+            binding=_BINDING,
+            target_path=_TARGET_PATH,
+            target_symbol=_TARGET_SYMBOL,
+            source_sha256=_SOURCE_SHA256,
+            target_lines=_TARGET_LINES,
+            trace_status="complete",
+            function_calls=0,
+            line_hits={},
+            trace_error=None,
+        )
+        self.assertEqual(_validate(measured_empty), measured_empty)
+
         indeterminate = build_trace_document(
             binding=_BINDING,
             target_path=_TARGET_PATH,
@@ -84,6 +97,22 @@ class StatementTraceProbeTests(unittest.TestCase):
 
         with self.assertRaisesRegex(StatementTraceError, "covered_lines"):
             _validate(tampered)
+
+    def test_complete_trace_cannot_report_line_hits_without_target_call(self) -> None:
+        document = build_trace_document(
+            binding=_BINDING,
+            target_path=_TARGET_PATH,
+            target_symbol=_TARGET_SYMBOL,
+            source_sha256=_SOURCE_SHA256,
+            target_lines=_TARGET_LINES,
+            trace_status="complete",
+            function_calls=0,
+            line_hits={2: 1},
+            trace_error=None,
+        )
+
+        with self.assertRaisesRegex(StatementTraceError, "function_calls"):
+            _validate(document)
 
     def test_indeterminate_receipt_cannot_carry_complete_trace_evidence(self) -> None:
         document = build_trace_document(

@@ -265,6 +265,11 @@ def validate_trace_document(
                 "statement trace receipt.function_calls",
                 "must be a nonnegative integer for complete traces",
             )
+        if calls == 0 and (covered_lines or line_hits):
+            raise _error(
+                "statement trace receipt.function_calls",
+                "must be positive when complete line evidence is present",
+            )
         if trace["trace_error"] is not None:
             raise _error(
                 "statement trace receipt.trace_error",

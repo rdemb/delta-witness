@@ -3,7 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
+from deltawitness import __version__
+import deltawitness.dw001_statement_coverage as statement_coverage
 from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result
 from deltawitness.dw001_statement_coverage import (
     compute_statement_coverage_report_sha256,
@@ -11,6 +14,7 @@ from deltawitness.dw001_statement_coverage import (
     run_claim_scoped_statement_coverage,
     verify_claim_scoped_statement_coverage_document,
 )
+from deltawitness.receipt import build_receipt_document, validate_receipt_document
 from deltawitness.reporting import load_report
 
 
@@ -49,6 +53,106 @@ class DW001StatementCoverageReceiptIntegrityTests(unittest.TestCase):
             self.catalog,
             self.mutation_result,
         )
+
+    def test_error_observation_cannot_retain_a_resealed_passed_receipt(self) -> None:
+        original = statement_coverage._execute_selector
+        injected = False
+
+        def contradictory_selector(**kwargs):
+            nonlocal injected
+            observation = original(**kwargs)
+            if not injected:
+                injected = True
+                observation = deepcopy(observation)
+                observation["observed"] = "error"
+                observation["return_code"] = 2
+                observation["timed_out"] = False
+                observation["observation_error"] = "receipt_exit_mismatch"
+                # Retain the valid, invocation-bound `passed` receipt and its
+                # one-passing-test counts. Current main incorrectly accepts
+                # this process/receipt contradiction after result resealing.
+            return observation
+
+        with patch.object(
+            statement_coverage,
+            "_execute_selector",
+            side_effect=contradictory_selector,
+            create=True,
+        ):
+            with self.assertRaisesRegex(
+                statement_coverage.DW001StatementCoverageError,
+                "receipt",
+            ):
+                run_claim_scoped_statement_coverage(
+                    self.plan,
+                    self.catalog,
+                    self.mutation_result,
+                )
+
+        self.assertTrue(injected)
+
+    def test_error_observation_rejects_process_inconsistent_typed_error_receipt(
+        self,
+    ) -> None:
+        original = statement_coverage._execute_selector
+        injected = False
+
+        def contradictory_selector(**kwargs):
+            nonlocal injected
+            observation = original(**kwargs)
+            if not injected:
+                injected = True
+                observation = deepcopy(observation)
+                counts = {
+                    "tests_run": 1,
+                    "passed": 0,
+                    "failures": 0,
+                    "errors": 1,
+                    "skipped": 0,
+                    "expected_failures": 0,
+                    "unexpected_successes": 0,
+                }
+                receipt = build_receipt_document(
+                    binding=observation["invocation_binding"],
+                    producer_name="deltawitness-unittest",
+                    producer_version=__version__,
+                    outcome="test_error",
+                    counts=counts,
+                )
+                canonical = validate_receipt_document(
+                    receipt,
+                    expected_binding=observation["invocation_binding"],
+                )
+                observation["observed"] = "error"
+                observation["return_code"] = 0
+                observation["timed_out"] = False
+                observation["receipt_sha256"] = canonical.sha256
+                observation["receipt_outcome"] = canonical.outcome
+                observation["receipt_producer"] = {
+                    "name": canonical.producer_name,
+                    "version": canonical.producer_version,
+                }
+                observation["receipt_counts"] = canonical.counts
+                observation["observation_error"] = "receipt_exit_mismatch"
+            return observation
+
+        with patch.object(
+            statement_coverage,
+            "_execute_selector",
+            side_effect=contradictory_selector,
+            create=True,
+        ):
+            with self.assertRaisesRegex(
+                statement_coverage.DW001StatementCoverageError,
+                "return_code",
+            ):
+                run_claim_scoped_statement_coverage(
+                    self.plan,
+                    self.catalog,
+                    self.mutation_result,
+                )
+
+        self.assertTrue(injected)
 
     def test_recomputed_result_digests_cannot_hide_receipt_producer_substitution(self) -> None:
         tampered = deepcopy(self.result)
