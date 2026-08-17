@@ -9,6 +9,7 @@ import sys
 
 from deltawitness.coveragepy_contract import (
     COVERAGEPY_WHEEL_FILENAME,
+    CoveragePyArtifactAccessError,
     CoveragePyContractError,
     verify_coveragepy_artifact,
 )
@@ -29,6 +30,9 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         digest = verify_coveragepy_artifact(args.artifact)
+    except CoveragePyArtifactAccessError as exc:
+        print(f"Coverage.py artifact verification failed: {exc}", file=sys.stderr)
+        return 2
     except CoveragePyContractError as exc:
         print(f"Coverage.py artifact verification failed: {exc}", file=sys.stderr)
         return 1
