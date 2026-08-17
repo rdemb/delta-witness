@@ -47,18 +47,25 @@ Implemented mechanism, design, and owned-synthetic result controls:
 - [x] Exact frozen catalog executed under both frozen selector profiles
 - [x] Complete typed per-selector, per-profile, reference, and per-mutant result table
 - [x] Generation-only duplicate, invalid, and not-applicable records retained without execution
-- [x] Complete preregistration-divergent observations retained as negative results rather than harness errors
-- [x] Stable semantic result digest separated from complete runtime and cost digest
-- [x] Editable and installed-wheel mutation-result smoke on Python 3.11–3.14
+- [x] Complete preregistration-divergent mutation observations retained as negative results rather than harness errors
+- [x] Stable mutation-result semantic digest separated from complete runtime and cost digest
+- [x] Invocation-bound statement-trace receipt for one exact source, symbol, and target-line set
+- [x] Exact statement-line union/intersection comparison for the frozen strong and weak selector profiles
+- [x] Direct comparison of statement coverage with the frozen mutation-result table
+- [x] Complete preregistration-divergent coverage signatures retained as negative results
+- [x] Missing, malformed, or unavailable trace evidence retained as indeterminate rather than empty coverage
+- [x] Hit-count magnitude kept diagnostic and excluded from the primary profile comparison
+- [x] Editable and installed-wheel mutation-result and statement-coverage smokes on Python 3.11–3.14
 
 Unresolved analysis layers:
 
 - [ ] Expand calibration beyond one fixed source and three generic operators
 - [ ] Calibrate mutation evidence against a broader set of valid, weak, ambiguous, invalid, and equivalent-review controls
+- [ ] Expand claim-boundary coverage beyond one fixed owned-synthetic target
+- [ ] Compare the stdlib statement baseline with pinned Coverage.py statement and branch coverage
 - [ ] Detect empty and assertion-free test deltas
 - [ ] Detect skipped, disabled, and weakened assertions
-- [ ] Measure patch coverage around the claimed behavior
-- [ ] Compare fixed-mutant evidence with coverage-only and changed-symbol mutation sets on the same frozen controls
+- [ ] Compare one fixed mutant, the three-mutant catalog, coverage-only, and changed-symbol mutation sets on a larger frozen control population
 - [ ] Compare against pinned mutmut and Cosmic Ray configurations where semantics are directly comparable
 - [ ] Define an independent equivalent-mutant review procedure
 - [ ] Identify excessive mocking around the claimed boundary
@@ -66,7 +73,7 @@ Unresolved analysis layers:
 - [ ] Support framework-specific selector and result adapters beyond stdlib unittest
 - [ ] Quantify false positives, false negatives, applicability, and cost before any blocker or score
 
-A checked negative control, pre-execution plan, or owned-synthetic result documents one limitation or validates one bounded evidence path. It does not complete Gate 1, validate oracle adequacy, establish mutation adequacy, or authorize a merge policy.
+A checked negative control, pre-execution plan, or owned-synthetic result documents one limitation or validates one bounded evidence path. It does not complete Gate 1, validate oracle adequacy, establish mutation or coverage adequacy, prove method superiority, or authorize a merge policy.
 
 ## Gate 2: Bounded intervention analysis
 
@@ -130,7 +137,7 @@ A checked negative control, pre-execution plan, or owned-synthetic result docume
 - [ ] Development corpus of authorized synthetic and curated public patches
 - [ ] Agent-authored patch sampling protocol
 - [ ] Frozen protocol and held-out evaluation set
-- [ ] Baselines against final-state CI, two-state fail-to-pass, raw exit codes, leave-one-out, delta debugging, mutation testing, and independent semantic verification
+- [ ] Baselines against final-state CI, two-state fail-to-pass, raw exit codes, leave-one-out, delta debugging, mutation testing, coverage, and independent semantic verification
 - [ ] Applicability and invalid-intervention analysis
 - [ ] Confidence intervals and hierarchical analysis where appropriate
 - [ ] Independent reproduction and external technical review
