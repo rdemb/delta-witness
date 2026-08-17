@@ -27,6 +27,9 @@ _COVERAGEPY_MANIFEST_PATH = (
     _DW001 / "coveragepy-7.15.2-artifact.v1.json"
 )
 _PR46_RESULT_PATH = _DW001 / "coveragepy-baseline-result.v1.json"
+_FROZEN_SEMANTIC_SHA256 = (
+    "bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77"
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -77,6 +80,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     if not valid:
         raise AssertionError(errors)
+    if result["semantic_sha256"] != _FROZEN_SEMANTIC_SHA256:
+        raise AssertionError(
+            "interaction-lattice semantic result changed: "
+            f"expected {_FROZEN_SEMANTIC_SHA256}, "
+            f"observed {result['semantic_sha256']}"
+        )
     if result["analysis"]["status"] != "expected":
         raise AssertionError(
             "interaction-lattice result is complete but preregistration-"
