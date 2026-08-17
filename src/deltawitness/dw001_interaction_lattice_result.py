@@ -1,135 +1,42 @@
-"""Public scaffold for the frozen DW-001 interaction-lattice result.
+"""Public facade for the frozen DW-001 interaction-lattice result.
 
-The separately authorized execution protocol exists and is verifiable. The
-result runner and verifier remain deliberately unavailable until the normative
-red-first contract has been retained in CI.
+The normative implementation lives in the private sibling module. This facade
+preserves controlled executor seams used by the retained red-first negative
+result tests without allowing product callers to provide an executor.
 """
 
 from __future__ import annotations
 
-from collections import Counter
-from copy import deepcopy
 from pathlib import Path
-import stat
+from threading import RLock
 from typing import Any, Mapping, Sequence
 
-from .errors import DeltaWitnessError
-from .reporting import load_report, sha256_document
+from . import _dw001_interaction_lattice_result as _implementation
 
 
-RESULT_SCHEMA_VERSION = (
-    "deltawitness.dw001-interaction-witness-lattice-result.v1"
+RESULT_SCHEMA_VERSION = _implementation.RESULT_SCHEMA_VERSION
+RESULT_ID = _implementation.RESULT_ID
+EXECUTION_PROTOCOL_SHA256 = _implementation.EXECUTION_PROTOCOL_SHA256
+PLAN_SHA256 = _implementation.PLAN_SHA256
+CATALOG_SHA256 = _implementation.CATALOG_SHA256
+PRIOR_ART_LOG_SHA256 = _implementation.PRIOR_ART_LOG_SHA256
+DW001InteractionLatticeResultError = (
+    _implementation.DW001InteractionLatticeResultError
 )
-RESULT_ID = "DW-001-INTERACTION-WITNESS-LATTICE-RESULT-V1"
-EXECUTION_PROTOCOL_SHA256 = (
-    "e10a9e287555ee8a1b8c0a9b7768d2f949c04a70081a778d51fefb78c1276912"
+
+compute_interaction_lattice_result_semantic_sha256 = (
+    _implementation.compute_interaction_lattice_result_semantic_sha256
 )
-PLAN_SHA256 = (
-    "a79a500feb94c8ad78fe4633f9ca176465113de6297db2d07b2d005f5318e1f1"
+compute_interaction_lattice_result_report_sha256 = (
+    _implementation.compute_interaction_lattice_result_report_sha256
 )
-CATALOG_SHA256 = (
-    "2b06a86180a45fcd495c0bcf39365dde0cb590507e9a3528714f9ef58526308e"
+build_anonymous_result_path_multiset = (
+    _implementation.build_anonymous_result_path_multiset
 )
-PRIOR_ART_LOG_SHA256 = (
-    "af6cb9782ea01a0e58baed8cfc1a4895dc1a53ed934498b307c6b05e8634c44f"
-)
-_PATH_MULTISET_SCHEMA_VERSION = (
-    "deltawitness.dw001-interaction-result-path-multiset.v1"
-)
-_MAX_RESULT_BYTES = 4_000_000
 
-
-class DW001InteractionLatticeResultError(DeltaWitnessError):
-    """Raised when the frozen interaction-lattice result cannot be produced."""
-
-
-def _semantic_view(document: dict[str, Any]) -> dict[str, Any]:
-    normalized = deepcopy(document)
-    normalized["created_at"] = None
-    normalized["runtime"] = None
-    normalized["semantic_sha256"] = None
-    normalized["report_sha256"] = None
-    return normalized
-
-
-def compute_interaction_lattice_result_semantic_sha256(
-    document: dict[str, Any],
-) -> str:
-    """Hash stable result semantics once the runner is implemented."""
-
-    if not isinstance(document, dict):
-        raise DW001InteractionLatticeResultError(
-            "interaction-lattice result must be an object"
-        )
-    return sha256_document(_semantic_view(document))
-
-
-def compute_interaction_lattice_result_report_sha256(
-    document: dict[str, Any],
-) -> str:
-    """Hash the complete result with only its report digest normalized."""
-
-    if not isinstance(document, dict):
-        raise DW001InteractionLatticeResultError(
-            "interaction-lattice result must be an object"
-        )
-    normalized = deepcopy(document)
-    normalized["report_sha256"] = None
-    return sha256_document(normalized)
-
-
-def build_anonymous_result_path_multiset(
-    path_records: Sequence[Mapping[str, object]],
-) -> dict[str, object]:
-    """Build an order-independent path multiset with explicit multiplicity."""
-
-    digests: list[str] = []
-    for index, record in enumerate(path_records):
-        if not isinstance(record, Mapping):
-            raise DW001InteractionLatticeResultError(
-                f"path record {index} must be an object"
-            )
-        digest = record.get("path_shape_sha256")
-        if (
-            not isinstance(digest, str)
-            or len(digest) != 64
-            or any(character not in "0123456789abcdef" for character in digest)
-        ):
-            raise DW001InteractionLatticeResultError(
-                f"path record {index}.path_shape_sha256 is invalid"
-            )
-        digests.append(digest)
-    counts = Counter(digests)
-    records = [
-        {"path_shape_sha256": digest, "count": counts[digest]}
-        for digest in sorted(counts)
-    ]
-    return {
-        "multiplicity_semantics": "multiset",
-        "records": records,
-        "anonymous_path_multiset_sha256": sha256_document(
-            {
-                "schema_version": _PATH_MULTISET_SCHEMA_VERSION,
-                "records": records,
-            }
-        ),
-    }
-
-
-def _execute_candidate_selector(**kwargs: object) -> dict[str, Any]:
-    """Stable executor seam for the retained red-first negative tests."""
-
-    raise DW001InteractionLatticeResultError(
-        "candidate selector execution is intentionally not implemented"
-    )
-
-
-def _execute_mutant_selector(**kwargs: object) -> dict[str, Any]:
-    """Stable mutant executor seam for the retained red-first negative tests."""
-
-    raise DW001InteractionLatticeResultError(
-        "mutant selector execution is intentionally not implemented"
-    )
+_execute_candidate_selector = _implementation._execute_candidate_selector
+_execute_mutant_selector = _implementation._execute_mutant_selector
+_EXECUTOR_LOCK = RLock()
 
 
 def run_interaction_witness_lattice_result(
@@ -140,11 +47,25 @@ def run_interaction_witness_lattice_result(
     coveragepy_manifest: object,
     pr46_result: object,
 ) -> dict[str, Any]:
-    """Execute the exact fixed experiment after red evidence is retained."""
+    """Execute the fixed result with the controlled public test seams."""
 
-    raise DW001InteractionLatticeResultError(
-        "interaction-witness lattice result is intentionally not implemented"
-    )
+    with _EXECUTOR_LOCK:
+        original_candidate = _implementation._execute_candidate_selector
+        original_mutant = _implementation._execute_mutant_selector
+        _implementation._execute_candidate_selector = _execute_candidate_selector
+        _implementation._execute_mutant_selector = _execute_mutant_selector
+        try:
+            return _implementation.run_interaction_witness_lattice_result(
+                execution_protocol,
+                plan,
+                catalog,
+                prior_art,
+                coveragepy_manifest,
+                pr46_result,
+            )
+        finally:
+            _implementation._execute_candidate_selector = original_candidate
+            _implementation._execute_mutant_selector = original_mutant
 
 
 def verify_interaction_witness_lattice_result_document(
@@ -156,10 +77,16 @@ def verify_interaction_witness_lattice_result_document(
     coveragepy_manifest: object,
     pr46_result: object,
 ) -> tuple[bool, tuple[str, ...]]:
-    """Verify one result after the red-first contract is retained."""
+    """Independently reconstruct and verify one result document."""
 
-    return False, (
-        "interaction-witness lattice result is intentionally not implemented",
+    return _implementation.verify_interaction_witness_lattice_result_document(
+        document,
+        execution_protocol,
+        plan,
+        catalog,
+        prior_art,
+        coveragepy_manifest,
+        pr46_result,
     )
 
 
@@ -172,25 +99,10 @@ def load_interaction_witness_lattice_result(
     coveragepy_manifest: object,
     pr46_result: object,
 ) -> dict[str, Any]:
-    """Strict-load one bounded regular non-link result and verify it."""
+    """Strict-load and verify one bounded regular non-link result."""
 
-    try:
-        metadata = path.lstat()
-    except OSError as exc:
-        raise DW001InteractionLatticeResultError(
-            "interaction-lattice result path cannot be inspected"
-        ) from exc
-    if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
-        raise DW001InteractionLatticeResultError(
-            "interaction-lattice result path must be a regular non-link file"
-        )
-    if metadata.st_size <= 0 or metadata.st_size > _MAX_RESULT_BYTES:
-        raise DW001InteractionLatticeResultError(
-            "interaction-lattice result path is outside the size limit"
-        )
-    document = load_report(path)
-    valid, errors = verify_interaction_witness_lattice_result_document(
-        document,
+    return _implementation.load_interaction_witness_lattice_result(
+        path,
         execution_protocol,
         plan,
         catalog,
@@ -198,9 +110,6 @@ def load_interaction_witness_lattice_result(
         coveragepy_manifest,
         pr46_result,
     )
-    if not valid:
-        raise DW001InteractionLatticeResultError("; ".join(errors))
-    return document
 
 
 __all__ = [
