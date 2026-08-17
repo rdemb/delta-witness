@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import coverage
 
@@ -86,20 +87,6 @@ class CoveragePyAmbientStateTests(unittest.TestCase):
             sys.path[:] = previous_sys_path
             os.chdir(previous)
 
-    @staticmethod
-    def _coverage_environment() -> dict[str, str]:
-        return {
-            key: value
-            for key, value in os.environ.items()
-            if key.startswith("COVERAGE_")
-        }
-
-    @staticmethod
-    def _clear_coverage_environment() -> None:
-        for key in tuple(os.environ):
-            if key.startswith("COVERAGE_"):
-                os.environ.pop(key, None)
-
     def test_coverage_environment_variable_forces_indeterminate_measurement(self) -> None:
         previous = os.environ.get("COVERAGE_RCFILE")
         os.environ["COVERAGE_RCFILE"] = "/tmp/ambient-coveragerc"
@@ -124,21 +111,16 @@ class CoveragePyAmbientStateTests(unittest.TestCase):
         self.assertIsNone(receipt["context_evidence"])
 
     def test_preexisting_active_collector_forces_indeterminate_measurement(self) -> None:
-        # Starting Coverage.py may itself create implementation-selection
-        # COVERAGE_* variables. This test isolates only the active-collector
-        # boundary so the ambient-environment boundary remains a separate test.
-        previous_environment = self._coverage_environment()
-        self._clear_coverage_environment()
-        ambient = coverage.Coverage(data_file=None, config_file=False)
-        ambient.start()
-        self._clear_coverage_environment()
-        try:
+        # Test the public active-collector signal without installing an actual
+        # process-global trace function that could contaminate later research
+        # tests. The production code still calls Coverage.current() directly.
+        with patch.object(
+            coverage.Coverage,
+            "current",
+            return_value=object(),
+        ):
             with tempfile.TemporaryDirectory() as directory:
                 result, receipt = self._measure(Path(directory))
-        finally:
-            ambient.stop()
-            self._clear_coverage_environment()
-            os.environ.update(previous_environment)
 
         self.assertTrue(result.wasSuccessful())
         self.assertEqual(receipt["measurement_status"], "indeterminate")
