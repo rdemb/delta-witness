@@ -53,6 +53,7 @@ jobs:
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
           python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
           python -c "import sys; from deltawitness.coveragepy_contract import build_coveragepy_distribution_manifest; from deltawitness.dw001_coveragepy_baseline import verify_claim_scoped_coveragepy_baseline_document; assert 'coverage' not in sys.modules"
+          python -c "import sys; from deltawitness.dw001_interaction_lattice_plan import build_interaction_witness_lattice_mutant_catalog, build_interaction_witness_lattice_plan, verify_interaction_witness_lattice_mutant_catalog_document, verify_interaction_witness_lattice_plan_document; from deltawitness.dw001_interaction_lattice_prior_art import build_interaction_witness_prior_art_log, verify_interaction_witness_prior_art_log_document; assert 'coverage' not in sys.modules"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -62,6 +63,7 @@ jobs:
           python scripts/smoke_dw001_mutation_plan.py
           python scripts/smoke_dw001_mutation_results.py
           python scripts/smoke_dw001_statement_coverage.py
+          python scripts/smoke_dw001_interaction_lattice_plan.py
           python scripts/smoke_dw001_development_pilot_plan.py
           python scripts/smoke_dw001_development_pilot.py
 
@@ -111,6 +113,7 @@ jobs:
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
           python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
           python -c "import sys; from deltawitness.coveragepy_contract import build_coveragepy_distribution_manifest; from deltawitness.dw001_coveragepy_baseline import verify_claim_scoped_coveragepy_baseline_document; assert 'coverage' not in sys.modules"
+          python -c "import sys; from deltawitness.dw001_interaction_lattice_plan import build_interaction_witness_lattice_mutant_catalog, build_interaction_witness_lattice_plan, verify_interaction_witness_lattice_mutant_catalog_document, verify_interaction_witness_lattice_plan_document; from deltawitness.dw001_interaction_lattice_prior_art import build_interaction_witness_prior_art_log, verify_interaction_witness_prior_art_log_document; assert 'coverage' not in sys.modules"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -120,6 +123,7 @@ jobs:
           python scripts/smoke_dw001_mutation_plan.py
           python scripts/smoke_dw001_mutation_results.py
           python scripts/smoke_dw001_statement_coverage.py
+          python scripts/smoke_dw001_interaction_lattice_plan.py
           python scripts/smoke_dw001_development_pilot_plan.py
           python scripts/smoke_dw001_development_pilot.py
 
@@ -237,7 +241,16 @@ jobs:
           from deltawitness.dw001_statement_coverage import (
               verify_claim_scoped_statement_coverage_document,
           )
+          from deltawitness.dw001_interaction_lattice_plan import (
+              build_interaction_witness_lattice_plan,
+          )
+          from deltawitness.dw001_interaction_lattice_prior_art import (
+              build_interaction_witness_prior_art_log,
+          )
           assert "coverage" not in sys.modules
           assert build_coveragepy_distribution_manifest()["version"] == "7.15.2"
+          assert build_interaction_witness_lattice_plan()["future_execution_contract"]["execution_status"] == "not_implemented"
+          assert build_interaction_witness_prior_art_log()["novelty_boundary"]["novelty_status"] == "not_established"
           PY
           python scripts/smoke_dw001_statement_coverage.py
+          python scripts/smoke_dw001_interaction_lattice_plan.py
