@@ -52,6 +52,7 @@ jobs:
           python -c "from deltawitness.dw001_mutation_plan import build_claim_scoped_mutant_catalog, build_claim_scoped_mutation_plan, verify_claim_scoped_mutant_catalog_document, verify_claim_scoped_mutation_plan_document"
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
           python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
+          python -c "import sys; from deltawitness.coveragepy_contract import build_coveragepy_distribution_manifest; from deltawitness.dw001_coveragepy_baseline import verify_claim_scoped_coveragepy_baseline_document; assert 'coverage' not in sys.modules"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -109,6 +110,7 @@ jobs:
           python -c "from deltawitness.dw001_mutation_plan import build_claim_scoped_mutant_catalog, build_claim_scoped_mutation_plan, verify_claim_scoped_mutant_catalog_document, verify_claim_scoped_mutation_plan_document"
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
           python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
+          python -c "import sys; from deltawitness.coveragepy_contract import build_coveragepy_distribution_manifest; from deltawitness.dw001_coveragepy_baseline import verify_claim_scoped_coveragepy_baseline_document; assert 'coverage' not in sys.modules"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -120,3 +122,63 @@ jobs:
           python scripts/smoke_dw001_statement_coverage.py
           python scripts/smoke_dw001_development_pilot_plan.py
           python scripts/smoke_dw001_development_pilot.py
+
+  coveragepy-research:
+    name: Coverage.py research / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependency-free DeltaWitness base
+        run: python -m pip install --no-deps -e .
+
+      - name: Download the exact reviewed universal wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheelhouse="${RUNNER_TEMP}/coveragepy-wheelhouse"
+          mkdir -p "$wheelhouse"
+          python -m pip download \
+            --dest "$wheelhouse" \
+            --require-hashes \
+            --no-deps \
+            --only-binary=:all: \
+            --platform any \
+            --implementation py \
+            --abi none \
+            --python-version "${{ matrix.python-version }}" \
+            -r research/requirements-coveragepy-v1.txt
+          test "$(find "$wheelhouse" -maxdepth 1 -type f | wc -l)" -eq 1
+
+      - name: Verify and install the artifact offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheel="${RUNNER_TEMP}/coveragepy-wheelhouse/coverage-7.15.2-py3-none-any.whl"
+          python scripts/verify_coveragepy_artifact.py "$wheel"
+          python -m pip install --no-index --no-deps "$wheel"
+
+      - name: Verify exact runtime identity and inactive auto-start
+        run: |
+          python - <<'PY'
+          import importlib.metadata
+          import coverage
+
+          assert importlib.metadata.version("coverage") == "7.15.2"
+          assert coverage.__version__ == "7.15.2"
+          assert coverage.Coverage.current() is None
+          PY
+
+      - name: Run red-first research contract
+        run: python -m unittest discover -s tests/research -v
