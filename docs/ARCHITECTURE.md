@@ -625,3 +625,145 @@ DeltaWitness intentionally refuses substitution among evidence layers:
 - controlled synthetic cases do not establish general observer or method superiority.
 
 Future work may compare the fixed mutation warning with claim-boundary coverage, a broader changed-symbol mutation set, mutmut, Cosmic Ray, and simpler fixed-mutant baselines; add assertion-delta and over-mocking controls; repeat stochastic execution; introduce reproducible containment and signed provenance; execute authorized ecological baselines; and obtain independent reproduction. Each layer must retain its own claim boundary and explicit positive and negative controls.
+
+## Coverage.py direct-baseline architecture
+
+This section supersedes only the earlier phrase `broader calibration and direct baselines (not implemented)` for one exact direct baseline. Broader calibration, broader coverage controls, external repositories, and ecological evaluation remain unimplemented and unauthorized.
+
+The fixed path is:
+
+```text
+verified mutation plan and catalog
+    + frozen mutation-result semantic identity
+    + frozen stdlib statement-result semantic identity
+    + reviewed Coverage.py distribution manifest
+    -> exact owned-synthetic selector child
+    -> typed unittest outcome receipt
+    -> Coverage.py statement/arc/context receipt
+    -> selector evidence reconstruction
+    -> profile statement and arc set aggregation
+    -> stdlib / Coverage.py / mutation comparison
+    -> expected | unexpected | indeterminate analysis
+    -> semantic digest + complete report digest
+```
+
+### Dependency and acquisition boundary
+
+Coverage.py is not a base runtime dependency. The base project keeps `dependencies = []`; `coverage==7.15.2` exists only in the optional `research` extra.
+
+The exact selected artifact is the universal pure-Python wheel:
+
+```text
+coverage-7.15.2-py3-none-any.whl
+eb6bcae8d1a9d305351ecb108232441d11c5cfe9de840a04388ba5d2db8d735c
+```
+
+The preparation stage downloads one hash-locked wheel, verifies its exact filename and SHA-256, and installs it offline with `--no-index --no-deps`. Package acquisition is separate from measurement. The measurement path contains no package-manager, download, upload, telemetry, or remote-service operation.
+
+The issue-nominated source distribution remains recorded provenance evidence but is not selected for execution. Selecting one universal wheel avoids unnecessary build-toolchain and native/platform artifact variance across Python 3.11–3.14. The baseline additionally fixes `timid=True` so the selected tracer is the documented Python trace function.
+
+### Measurement child
+
+Each of the three exact selectors runs in a separate child and disposable directory containing only fixed project-owned source and test bytes.
+
+The child constructs Coverage.py only through documented public APIs with:
+
+```text
+data_file=None
+auto_data=False
+timid=True
+branch=True
+config_file=False
+source_dirs=[explicit disposable source directory]
+concurrency=None
+check_preimported=False
+context=<exact static selector context>
+messages=False
+plugins=()
+```
+
+The child rejects Coverage-prefixed ambient environment state and an already active Coverage.py collector. It authorizes no configuration discovery, plug-in, auto-start, concurrency adapter, subprocess coverage, persistent `.coverage` file, or measurement-time network.
+
+The runner remains an observation mechanism, not a sandbox.
+
+### Dual receipt boundary
+
+Every selector has one deterministic binding over the frozen plan, catalog, mutation and stdlib result identities, source, target, test, selector, command, context, observer, and producer identities.
+
+The child emits:
+
+```text
+outcome-receipt-v1
+coveragepy-measurement-receipt.v1
+```
+
+The typed receipt retains exact unittest outcome/process semantics. The Coverage.py receipt retains:
+
+- exact distribution and configuration identity;
+- exact target and measured-file identity;
+- executable, executed, missing, measured, and target statement sets;
+- all, context, and target arc sets;
+- branch statistics and missing-branch counts;
+- explicit unavailability of exact missing-branch arc identities at the selected public-API boundary;
+- measured contexts, context-to-line relations, query-context lines and arcs, and partition validity;
+- finite nonnegative wall-clock and CPU diagnostics;
+- a complete receipt digest.
+
+Missing, malformed, substituted, ambiguous, or unavailable measurement is never converted to empty coverage. Complete empty evidence and unavailable evidence are separate states.
+
+### Result and verifier boundary
+
+The result stores the complete ordered selector records before profile aggregates. A profile aggregate exists only when every selector record is complete. Statement and arc discrimination compare exact union/intersection sets, not hit counts or magnitude.
+
+The verifier independently reconstructs:
+
+- package and artifact provenance;
+- plan, catalog, mutation-result, and stdlib-result relations;
+- source, target, selector, test, command, context, and binding identities;
+- typed receipt/process agreement;
+- Coverage.py receipt structure, relations, and digest;
+- profile statement and arc unions/intersections;
+- stdlib statement, Coverage.py statement, Coverage.py branch, and mutation discrimination;
+- cross-method agreement and incremental-signal relations;
+- expected/observed concordance, analysis, policy, and costs;
+- semantic and complete-report digests.
+
+A complete preregistration-divergent result remains `unexpected`. Tool error, timeout, missing dependency or data, or context ambiguity remains `indeterminate`. Malformed or contradictory evidence fails closed and cannot be rescued by an `unexpected` label.
+
+The frozen result is:
+
+```text
+research/DW-001/coveragepy-baseline-result.v1.json
+semantic_sha256 = ec0c2fdd5ac24ba53eb895d9014aab623d2631125b8512ba0e0cbf5105f21ee8
+report_sha256   = 8b248757374ebff4195bad181ad02bc5b0bfc61fa2e21ebf45549686c33d2c41
+```
+
+### Reproduction and package-mode boundary
+
+The research CI matrix runs Python 3.11–3.14 and verifies:
+
+- exact wheel filename and digest before offline installation;
+- exact runtime package and module version with inactive auto-start;
+- receipt, result, schema, negative, and adversarial contracts;
+- result generation and independent verification;
+- editable and force-reinstalled base-wheel semantic digest equality;
+- clean offline installation of `deltawitness[research]`;
+- removal of Coverage.py followed by existing base and stdlib-baseline smokes.
+
+The repeated semantic digest excludes timestamps, runtime identity, output digests, and measured timing values. The complete report digest retains those diagnostics.
+
+### Architectural claim boundary
+
+```text
+same target statement and arc sets in one fixed case
+    != equal test semantics
+    != coverage adequacy
+    != oracle strength
+
+incremental mutation signal in one fixed case
+    != mutation adequacy
+    != mutation superiority
+    != merge policy
+```
+
+The baseline adds one mature direct comparison to the development evidence path. It does not complete Gate 0 or Gate 1, authorize external execution or a holdout, establish an ecological result, or create a score, threshold, blocker, production capability, signed attestation, or novelty claim.
