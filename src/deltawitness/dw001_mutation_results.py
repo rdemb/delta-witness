@@ -18,6 +18,12 @@ RESULT_SCHEMA_VERSION = _implementation.RESULT_SCHEMA_VERSION
 RESULT_ID = _implementation.RESULT_ID
 DW001MutationResultError = _implementation.DW001MutationResultError
 
+# Private sibling-fixture alias. Statement-coverage baselines must exercise the
+# byte-identical candidate tests already frozen by the mutation-result contract
+# rather than maintaining a second copy. It is intentionally omitted from
+# __all__ and is not a caller-supplied execution surface.
+_CALIBRATION_TESTS = _implementation._CALIBRATION_TESTS
+
 # Deliberately module-scoped for one red-first regression that injects an
 # internally consistent but preregistration-divergent observation. Product
 # callers cannot supply an executor. The lock prevents cross-call contamination.

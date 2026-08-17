@@ -1,0 +1,868 @@
+{
+  "$id": "https://github.com/rdemb/delta-witness/research/DW-001/schema/statement-coverage-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeltaWitness DW-001 Statement-Coverage Result v1",
+  "description": "Development-only typed statement-coverage evidence for the exact frozen candidate source and selector profiles, with an explicit comparison to the frozen claim-scoped mutation result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "result_id",
+    "partition",
+    "plan_sha256",
+    "catalog_sha256",
+    "mutation_result_semantic_sha256",
+    "created_at",
+    "runtime",
+    "adapter",
+    "source",
+    "profiles",
+    "comparison",
+    "analysis",
+    "policy",
+    "cost",
+    "semantic_sha256",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "deltawitness.dw001-statement-coverage-result.v1"
+    },
+    "study_id": {
+      "const": "DW-001"
+    },
+    "result_id": {
+      "const": "DW-001-STATEMENT-COVERAGE-RESULT-V1"
+    },
+    "partition": {
+      "const": "development"
+    },
+    "plan_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "catalog_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "mutation_result_semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "adapter": {
+      "$ref": "#/$defs/adapter"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "comparison": {
+      "$ref": "#/$defs/comparison"
+    },
+    "analysis": {
+      "$ref": "#/$defs/analysis"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "cost": {
+      "$ref": "#/$defs/rootCost"
+    },
+    "semantic_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "report_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableSha256": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableInteger": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableBoolean": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "positiveLineArray": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "nullableLineArray": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/positiveLineArray"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_version",
+        "python_implementation",
+        "python_version",
+        "platform_system",
+        "trace_api",
+        "trace_thread_scope"
+      ],
+      "properties": {
+        "tool_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_implementation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform_system": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_api": {
+          "const": "sys.settrace"
+        },
+        "trace_thread_scope": {
+          "const": "current-thread"
+        }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "trace_schema_version",
+        "trace_producer"
+      ],
+      "properties": {
+        "id": {
+          "const": "stdlib-statement-trace-v1"
+        },
+        "version": {
+          "const": "1"
+        },
+        "trace_schema_version": {
+          "const": "deltawitness.statement-trace-receipt.v1"
+        },
+        "trace_producer": {
+          "const": "deltawitness-statement-trace"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_sha256",
+        "source_ast_sha256",
+        "target_id",
+        "path",
+        "symbol",
+        "target_lines",
+        "source_body_published"
+      ],
+      "properties": {
+        "source_id": {
+          "const": "authorization-predicate-candidate-v1"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_ast_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "path": {
+          "const": "src/access.py"
+        },
+        "symbol": {
+          "const": "is_admin"
+        },
+        "target_lines": {
+          "const": [
+            2
+          ]
+        },
+        "source_body_published": {
+          "const": false
+        }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests_run",
+        "passed",
+        "failures",
+        "errors",
+        "skipped",
+        "expected_failures",
+        "unexpected_successes"
+      ],
+      "properties": {
+        "tests_run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_successes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "lineHit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "hits"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "nullableLineHits": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lineHit"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "traceTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "symbol",
+        "source_sha256",
+        "target_lines"
+      ],
+      "properties": {
+        "path": {
+          "const": "src/access.py"
+        },
+        "symbol": {
+          "const": "is_admin"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_lines": {
+          "const": [
+            2
+          ]
+        }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "binding",
+        "producer",
+        "target",
+        "trace_status",
+        "function_calls",
+        "covered_lines",
+        "line_hits",
+        "trace_error",
+        "trace_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "deltawitness.statement-trace-receipt.v1"
+        },
+        "binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "producer": {
+          "$ref": "#/$defs/producer"
+        },
+        "target": {
+          "$ref": "#/$defs/traceTarget"
+        },
+        "trace_status": {
+          "enum": [
+            "complete",
+            "indeterminate"
+          ]
+        },
+        "function_calls": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "covered_lines": {
+          "$ref": "#/$defs/positiveLineArray"
+        },
+        "line_hits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lineHit"
+          }
+        },
+        "trace_error": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "trace_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selector",
+        "source_sha256",
+        "test_sha256",
+        "command",
+        "expected_observed",
+        "observed",
+        "outcome_concordant",
+        "return_code",
+        "timed_out",
+        "duration_seconds",
+        "stdout_sha256",
+        "stderr_sha256",
+        "invocation_binding",
+        "receipt_sha256",
+        "receipt_outcome",
+        "receipt_producer",
+        "receipt_counts",
+        "observation_error",
+        "expected_covered_lines",
+        "coverage_status",
+        "coverage_concordant",
+        "trace",
+        "concordant"
+      ],
+      "properties": {
+        "selector": {
+          "enum": [
+            "test_access.AccessTests.test_admin_is_allowed",
+            "test_access.AccessTests.test_viewer_is_denied",
+            "test_access.AccessTests.test_viewer_result_is_boolean"
+          ]
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "test_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "expected_observed": {
+          "const": "pass"
+        },
+        "observed": {
+          "enum": [
+            "pass",
+            "fail",
+            "error",
+            "timeout"
+          ]
+        },
+        "outcome_concordant": {
+          "type": "boolean"
+        },
+        "return_code": {
+          "$ref": "#/$defs/nullableInteger"
+        },
+        "timed_out": {
+          "type": "boolean"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stdout_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stderr_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "invocation_binding": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/nullableSha256"
+        },
+        "receipt_outcome": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "receipt_producer": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/producer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receipt_counts": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/counts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation_error": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "expected_covered_lines": {
+          "const": [
+            2
+          ]
+        },
+        "coverage_status": {
+          "enum": [
+            "complete",
+            "candidate_invalid",
+            "indeterminate"
+          ]
+        },
+        "coverage_concordant": {
+          "type": "boolean"
+        },
+        "trace": {
+          "$ref": "#/$defs/trace"
+        },
+        "concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "profileCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command_count",
+        "selector_count",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "measured"
+        },
+        "command_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "selector_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "wall_clock_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "missing_reason": {
+          "type": "null"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order",
+        "profile_id",
+        "profile_role",
+        "selectors",
+        "expected_union_lines",
+        "union_lines",
+        "expected_intersection_lines",
+        "intersection_lines",
+        "line_hits",
+        "expected_all_selectors_passed",
+        "all_selectors_passed",
+        "coverage_status",
+        "concordant",
+        "cost"
+      ],
+      "properties": {
+        "order": {
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "profile_id": {
+          "enum": [
+            "strong-authorization-oracle-v1",
+            "weak-boolean-proxy-v1"
+          ]
+        },
+        "profile_role": {
+          "enum": [
+            "positive_control",
+            "negative_control"
+          ]
+        },
+        "selectors": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/selector"
+          }
+        },
+        "expected_union_lines": {
+          "const": [
+            2
+          ]
+        },
+        "union_lines": {
+          "$ref": "#/$defs/nullableLineArray"
+        },
+        "expected_intersection_lines": {
+          "const": [
+            2
+          ]
+        },
+        "intersection_lines": {
+          "$ref": "#/$defs/nullableLineArray"
+        },
+        "line_hits": {
+          "$ref": "#/$defs/nullableLineHits"
+        },
+        "expected_all_selectors_passed": {
+          "const": true
+        },
+        "all_selectors_passed": {
+          "type": "boolean"
+        },
+        "coverage_status": {
+          "enum": [
+            "complete",
+            "candidate_invalid",
+            "indeterminate"
+          ]
+        },
+        "concordant": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/profileCost"
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_statement_coverage_discriminates_profiles",
+        "expected_mutation_discriminates_profiles",
+        "expected_coverage_and_mutation_agree",
+        "expected_incremental_mutation_signal_observed",
+        "statement_coverage_discriminates_profiles",
+        "mutation_discriminates_profiles",
+        "coverage_and_mutation_agree",
+        "incremental_mutation_signal_observed",
+        "concordant"
+      ],
+      "properties": {
+        "expected_statement_coverage_discriminates_profiles": {
+          "const": false
+        },
+        "expected_mutation_discriminates_profiles": {
+          "const": true
+        },
+        "expected_coverage_and_mutation_agree": {
+          "const": false
+        },
+        "expected_incremental_mutation_signal_observed": {
+          "const": true
+        },
+        "statement_coverage_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "mutation_discriminates_profiles": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "coverage_and_mutation_agree": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "incremental_mutation_signal_observed": {
+          "$ref": "#/$defs/nullableBoolean"
+        },
+        "concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "unexpected_selector_count",
+        "unexpected_profile_count",
+        "indeterminate_selector_count",
+        "unexpected_profile_ids",
+        "comparison_concordant"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "expected",
+            "unexpected",
+            "indeterminate"
+          ]
+        },
+        "unexpected_selector_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_profile_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "indeterminate_selector_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unexpected_profile_ids": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "strong-authorization-oracle-v1",
+              "weak-boolean-proxy-v1"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "comparison_concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality_score",
+        "headline_score",
+        "universal_threshold",
+        "merge_blocker_authorized",
+        "ecological_inference_allowed",
+        "holdout_selected",
+        "primary_denominator_eligible",
+        "coverage_superiority_claim_allowed",
+        "mutation_superiority_claim_allowed"
+      ],
+      "properties": {
+        "quality_score": {
+          "type": "null"
+        },
+        "headline_score": {
+          "type": "null"
+        },
+        "universal_threshold": {
+          "type": "null"
+        },
+        "merge_blocker_authorized": {
+          "const": false
+        },
+        "ecological_inference_allowed": {
+          "const": false
+        },
+        "holdout_selected": {
+          "const": false
+        },
+        "primary_denominator_eligible": {
+          "const": false
+        },
+        "coverage_superiority_claim_allowed": {
+          "const": false
+        },
+        "mutation_superiority_claim_allowed": {
+          "const": false
+        }
+      }
+    },
+    "rootCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "profile_count",
+        "command_count",
+        "selector_count",
+        "wall_clock_seconds",
+        "cpu_seconds",
+        "missing_reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "measured"
+        },
+        "profile_count": {
+          "const": 2
+        },
+        "command_count": {
+          "const": 3
+        },
+        "selector_count": {
+          "const": 3
+        },
+        "wall_clock_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "missing_reason": {
+          "type": "null"
+        }
+      }
+    }
+  }
+}
