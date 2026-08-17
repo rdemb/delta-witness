@@ -634,23 +634,64 @@
       }
     },
     "rootCost": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/aggregateCost"
-        },
-        {
-          "type": "object",
-          "required": [
-            "profile_count"
-          ],
-          "properties": {
-            "profile_count": {
-              "$ref": "#/$defs/nonnegativeInteger"
-            }
-          }
-        }
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "profile_count",
+        "command_count",
+        "selector_count",
+        "process_wall_seconds",
+        "coverage_wall_seconds",
+        "coverage_cpu_seconds",
+        "missing_reason"
       ],
-      "unevaluatedProperties": false
+      "properties": {
+        "status": {
+          "enum": [
+            "measured",
+            "partial"
+          ]
+        },
+        "profile_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "command_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "selector_count": {
+          "$ref": "#/$defs/nonnegativeInteger"
+        },
+        "process_wall_seconds": {
+          "$ref": "#/$defs/nonnegativeNumber"
+        },
+        "coverage_wall_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_cpu_seconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonnegativeNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
     },
     "typedCounts": {
       "type": "object",
