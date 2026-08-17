@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
@@ -32,9 +33,15 @@ _CONTEXT_ID = (
     f"{_SELECTOR}"
 )
 _BINDING = "a" * 64
+_SYNTHETIC_MODULES = ("access", "test_access", "tests.test_access")
 
 
 class CoveragePyAmbientStateTests(unittest.TestCase):
+    @staticmethod
+    def _clear_synthetic_modules() -> None:
+        for name in _SYNTHETIC_MODULES:
+            sys.modules.pop(name, None)
+
     def _measure(self, root: Path):
         (root / "src").mkdir()
         (root / "tests").mkdir()
@@ -53,6 +60,8 @@ class CoveragePyAmbientStateTests(unittest.TestCase):
             verbosity=0,
         )
         previous = Path.cwd()
+        previous_sys_path = list(sys.path)
+        self._clear_synthetic_modules()
         try:
             os.chdir(root)
             suite = coveragepy_probe._load_suite(args)
@@ -73,6 +82,8 @@ class CoveragePyAmbientStateTests(unittest.TestCase):
                 binding=_BINDING,
             )
         finally:
+            self._clear_synthetic_modules()
+            sys.path[:] = previous_sys_path
             os.chdir(previous)
 
     @staticmethod
