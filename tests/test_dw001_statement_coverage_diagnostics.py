@@ -27,9 +27,28 @@ class DW001StatementCoverageDiagnosticTests(unittest.TestCase):
         for profile in result["profiles"]:
             for selector in profile["selectors"]:
                 self.assertEqual(
+                    selector["observed"],
+                    "pass",
+                    selector,
+                )
+                self.assertEqual(
+                    selector["return_code"],
+                    0,
+                    selector,
+                )
+                self.assertIsNone(
+                    selector["observation_error"],
+                    selector,
+                )
+                self.assertEqual(
+                    selector["receipt_outcome"],
+                    "passed",
+                    selector,
+                )
+                self.assertEqual(
                     selector["trace"]["trace_status"],
                     "complete",
-                    selector["trace"],
+                    selector,
                 )
 
 
