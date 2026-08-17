@@ -160,7 +160,10 @@ def _strict_equal(expected: object, observed: object) -> bool:
         return False
     if isinstance(expected, dict):
         assert isinstance(observed, dict)
-        return list(expected) == list(observed) and all(
+        # JSON object member order is non-semantic. Canonical serialization
+        # sorts keys, so round-tripped receipts must be compared by exact key
+        # membership and values rather than insertion order.
+        return set(expected) == set(observed) and all(
             _strict_equal(expected[key], observed[key]) for key in expected
         )
     if isinstance(expected, list):
