@@ -51,6 +51,7 @@ jobs:
           python -c "from deltawitness.dw001_oracle_challenge import run_weak_proxy_oracle_challenge, verify_weak_oracle_challenge_document"
           python -c "from deltawitness.dw001_mutation_plan import build_claim_scoped_mutant_catalog, build_claim_scoped_mutation_plan, verify_claim_scoped_mutant_catalog_document, verify_claim_scoped_mutation_plan_document"
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
+          python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -59,6 +60,7 @@ jobs:
           python scripts/smoke_dw001_weak_proxy_oracle.py
           python scripts/smoke_dw001_mutation_plan.py
           python scripts/smoke_dw001_mutation_results.py
+          python scripts/smoke_dw001_statement_coverage.py
           python scripts/smoke_dw001_development_pilot_plan.py
           python scripts/smoke_dw001_development_pilot.py
 
@@ -106,6 +108,7 @@ jobs:
           python -c "from deltawitness.dw001_oracle_challenge import run_weak_proxy_oracle_challenge, verify_weak_oracle_challenge_document"
           python -c "from deltawitness.dw001_mutation_plan import build_claim_scoped_mutant_catalog, build_claim_scoped_mutation_plan, verify_claim_scoped_mutant_catalog_document, verify_claim_scoped_mutation_plan_document"
           python -c "from deltawitness.dw001_mutation_results import run_claim_scoped_mutation_result, verify_claim_scoped_mutation_result_document"
+          python -c "from deltawitness.dw001_statement_coverage import run_claim_scoped_statement_coverage, verify_claim_scoped_statement_coverage_document"
           python -c "from deltawitness.dw001_pilot import build_development_pilot_archive, build_development_pilot_plan, run_development_pilot, verify_development_pilot_archive_document, verify_development_pilot_bundle"
           python scripts/smoke_dw001_fixture_binding.py
           python scripts/smoke_dw001_wrong_reason.py
@@ -114,5 +117,6 @@ jobs:
           python scripts/smoke_dw001_weak_proxy_oracle.py
           python scripts/smoke_dw001_mutation_plan.py
           python scripts/smoke_dw001_mutation_results.py
+          python scripts/smoke_dw001_statement_coverage.py
           python scripts/smoke_dw001_development_pilot_plan.py
           python scripts/smoke_dw001_development_pilot.py
