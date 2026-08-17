@@ -43,6 +43,25 @@ class CoveragePyContractTests(unittest.TestCase):
         )
         self.assertTrue(valid, errors)
 
+    def test_json_object_member_order_is_non_semantic(self) -> None:
+        expected = build_coveragepy_distribution_manifest()
+        reordered = {
+            key: deepcopy(expected[key]) for key in reversed(list(expected))
+        }
+        selected = reordered["selected_artifact"]
+        reordered["selected_artifact"] = {
+            key: selected[key] for key in reversed(list(selected))
+        }
+
+        valid, errors = verify_coveragepy_distribution_manifest_document(
+            reordered
+        )
+        self.assertTrue(valid, errors)
+        self.assertEqual(
+            compute_coveragepy_manifest_sha256(reordered),
+            COVERAGEPY_MANIFEST_SHA256,
+        )
+
     def test_manifest_rejects_package_version_artifact_and_provenance_changes(self) -> None:
         changes = (
             ("version", "7.15.1"),
