@@ -7,9 +7,11 @@ red-first contract has been retained in CI.
 
 from __future__ import annotations
 
+from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any
+import stat
+from typing import Any, Mapping, Sequence
 
 from .errors import DeltaWitnessError
 from .reporting import load_report, sha256_document
@@ -31,6 +33,10 @@ CATALOG_SHA256 = (
 PRIOR_ART_LOG_SHA256 = (
     "af6cb9782ea01a0e58baed8cfc1a4895dc1a53ed934498b307c6b05e8634c44f"
 )
+_PATH_MULTISET_SCHEMA_VERSION = (
+    "deltawitness.dw001-interaction-result-path-multiset.v1"
+)
+_MAX_RESULT_BYTES = 4_000_000
 
 
 class DW001InteractionLatticeResultError(DeltaWitnessError):
@@ -70,6 +76,60 @@ def compute_interaction_lattice_result_report_sha256(
     normalized = deepcopy(document)
     normalized["report_sha256"] = None
     return sha256_document(normalized)
+
+
+def build_anonymous_result_path_multiset(
+    path_records: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    """Build an order-independent path multiset with explicit multiplicity."""
+
+    digests: list[str] = []
+    for index, record in enumerate(path_records):
+        if not isinstance(record, Mapping):
+            raise DW001InteractionLatticeResultError(
+                f"path record {index} must be an object"
+            )
+        digest = record.get("path_shape_sha256")
+        if (
+            not isinstance(digest, str)
+            or len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)
+        ):
+            raise DW001InteractionLatticeResultError(
+                f"path record {index}.path_shape_sha256 is invalid"
+            )
+        digests.append(digest)
+    counts = Counter(digests)
+    records = [
+        {"path_shape_sha256": digest, "count": counts[digest]}
+        for digest in sorted(counts)
+    ]
+    return {
+        "multiplicity_semantics": "multiset",
+        "records": records,
+        "anonymous_path_multiset_sha256": sha256_document(
+            {
+                "schema_version": _PATH_MULTISET_SCHEMA_VERSION,
+                "records": records,
+            }
+        ),
+    }
+
+
+def _execute_candidate_selector(**kwargs: object) -> dict[str, Any]:
+    """Stable executor seam for the retained red-first negative tests."""
+
+    raise DW001InteractionLatticeResultError(
+        "candidate selector execution is intentionally not implemented"
+    )
+
+
+def _execute_mutant_selector(**kwargs: object) -> dict[str, Any]:
+    """Stable mutant executor seam for the retained red-first negative tests."""
+
+    raise DW001InteractionLatticeResultError(
+        "mutant selector execution is intentionally not implemented"
+    )
 
 
 def run_interaction_witness_lattice_result(
@@ -112,8 +172,22 @@ def load_interaction_witness_lattice_result(
     coveragepy_manifest: object,
     pr46_result: object,
 ) -> dict[str, Any]:
-    """Strict-load and verify one result document."""
+    """Strict-load one bounded regular non-link result and verify it."""
 
+    try:
+        metadata = path.lstat()
+    except OSError as exc:
+        raise DW001InteractionLatticeResultError(
+            "interaction-lattice result path cannot be inspected"
+        ) from exc
+    if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
+        raise DW001InteractionLatticeResultError(
+            "interaction-lattice result path must be a regular non-link file"
+        )
+    if metadata.st_size <= 0 or metadata.st_size > _MAX_RESULT_BYTES:
+        raise DW001InteractionLatticeResultError(
+            "interaction-lattice result path is outside the size limit"
+        )
     document = load_report(path)
     valid, errors = verify_interaction_witness_lattice_result_document(
         document,
@@ -137,6 +211,7 @@ __all__ = [
     "PRIOR_ART_LOG_SHA256",
     "RESULT_ID",
     "RESULT_SCHEMA_VERSION",
+    "build_anonymous_result_path_multiset",
     "compute_interaction_lattice_result_report_sha256",
     "compute_interaction_lattice_result_semantic_sha256",
     "load_interaction_witness_lattice_result",
