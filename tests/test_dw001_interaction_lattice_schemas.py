@@ -19,6 +19,12 @@ _CATALOG_PATH = (
     / "DW-001"
     / "interaction-witness-lattice-mutant-catalog.v1.json"
 )
+_PRIOR_ART_PATH = (
+    _ROOT
+    / "research"
+    / "DW-001"
+    / "interaction-witness-prior-art-log.v1.json"
+)
 _PLAN_SCHEMA_PATH = (
     _ROOT
     / "research"
@@ -33,6 +39,13 @@ _CATALOG_SCHEMA_PATH = (
     / "schema"
     / "interaction-witness-lattice-mutant-catalog.schema.json"
 )
+_PRIOR_ART_SCHEMA_PATH = (
+    _ROOT
+    / "research"
+    / "DW-001"
+    / "schema"
+    / "interaction-witness-prior-art-log.schema.json"
+)
 
 
 class DW001InteractionLatticeSchemaTests(unittest.TestCase):
@@ -40,13 +53,16 @@ class DW001InteractionLatticeSchemaTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.plan = load_report(_PLAN_PATH)
         cls.catalog = load_report(_CATALOG_PATH)
+        cls.prior_art = load_report(_PRIOR_ART_PATH)
         cls.plan_schema = load_report(_PLAN_SCHEMA_PATH)
         cls.catalog_schema = load_report(_CATALOG_SCHEMA_PATH)
+        cls.prior_art_schema = load_report(_PRIOR_ART_SCHEMA_PATH)
 
     def test_schema_roots_are_closed_and_cover_every_artifact_field(self) -> None:
         for artifact, schema in (
             (self.plan, self.plan_schema),
             (self.catalog, self.catalog_schema),
+            (self.prior_art, self.prior_art_schema),
         ):
             with self.subTest(schema=schema["$id"]):
                 self.assertEqual(
@@ -89,6 +105,17 @@ class DW001InteractionLatticeSchemaTests(unittest.TestCase):
                 self.catalog_schema,
                 ("source", "test", "target", "mutant", "summary"),
             ),
+            (
+                self.prior_art_schema,
+                (
+                    "searchProtocol",
+                    "source",
+                    "baseline",
+                    "plannedDifference",
+                    "noveltyBoundary",
+                    "policy",
+                ),
+            ),
         ):
             for name in names:
                 with self.subTest(schema=schema["$id"], definition=name):
@@ -123,6 +150,44 @@ class DW001InteractionLatticeSchemaTests(unittest.TestCase):
         self.assertEqual(
             policy["scientific_novelty_claim_allowed"],
             {"const": False},
+        )
+
+    def test_prior_art_schema_freezes_novelty_and_execution_boundaries(self) -> None:
+        novelty = self.prior_art_schema["$defs"]["noveltyBoundary"][
+            "properties"
+        ]
+        self.assertEqual(
+            novelty["novelty_status"],
+            {"const": "not_established"},
+        )
+        self.assertEqual(
+            novelty["scientific_novelty_claim_allowed"],
+            {"const": False},
+        )
+        self.assertEqual(
+            novelty["award_level_significance_claim_allowed"],
+            {"const": False},
+        )
+        policy = self.prior_art_schema["$defs"]["policy"]["properties"]
+        self.assertEqual(policy["execution_authorized"], {"const": False})
+        self.assertEqual(
+            policy["external_repository_execution_authorized"],
+            {"const": False},
+        )
+        self.assertEqual(policy["holdout_selected"], {"const": False})
+        self.assertEqual(
+            policy["merge_blocker_authorized"],
+            {"const": False},
+        )
+        self.assertEqual(
+            self.prior_art_schema["properties"]["sources"]["minItems"],
+            9,
+        )
+        self.assertEqual(
+            self.prior_art_schema["properties"]["closest_baselines"][
+                "minItems"
+            ],
+            5,
         )
 
     def test_schema_cardinalities_match_the_preregistration(self) -> None:
