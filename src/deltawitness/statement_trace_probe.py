@@ -402,7 +402,7 @@ def _target_source(
 
 
 def _write_trace(destination: Path, document: dict[str, Any]) -> None:
-    data = (canonical_json(document) + "\n").encode("utf-8")
+    data = canonical_json(document) + b"\n"
     if len(data) > _MAX_TRACE_BYTES:
         raise _error("statement trace receipt", "exceeds the size limit")
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
