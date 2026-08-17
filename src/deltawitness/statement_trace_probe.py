@@ -14,7 +14,6 @@ from pathlib import Path
 import stat
 import sys
 from threading import RLock
-from typing import Any
 
 from . import _statement_trace_probe as _implementation
 from .errors import ReceiptError
@@ -27,6 +26,8 @@ TRACE_SCHEMA_VERSION = _implementation.TRACE_SCHEMA_VERSION
 
 build_trace_document = _implementation.build_trace_document
 compute_trace_sha256 = _implementation.compute_trace_sha256
+load_trace_document = _implementation.load_trace_document
+validate_trace_document = _implementation.validate_trace_document
 _parser = _implementation._parser
 
 # Private regression seam. Product callers do not provide a suite loader; the
@@ -39,66 +40,6 @@ _TARGET_LOCK = RLock()
 
 def _error(context: str, message: str) -> StatementTraceError:
     return StatementTraceError(f"{context}: {message}")
-
-
-def validate_trace_document(
-    document: object,
-    *,
-    expected_binding: str,
-    expected_target_path: str,
-    expected_target_symbol: str,
-    expected_source_sha256: str,
-    expected_target_lines: list[int],
-) -> dict[str, Any]:
-    """Validate one trace and enforce producer-implied call/line relations."""
-
-    validated = _implementation.validate_trace_document(
-        document,
-        expected_binding=expected_binding,
-        expected_target_path=expected_target_path,
-        expected_target_symbol=expected_target_symbol,
-        expected_source_sha256=expected_source_sha256,
-        expected_target_lines=expected_target_lines,
-    )
-    if (
-        validated["trace_status"] == "complete"
-        and validated["function_calls"] == 0
-        and (validated["covered_lines"] or validated["line_hits"])
-    ):
-        raise _error(
-            "statement trace function_calls",
-            "must be positive when complete line evidence is present",
-        )
-    return validated
-
-
-def load_trace_document(
-    path: Path,
-    *,
-    expected_binding: str,
-    expected_target_path: str,
-    expected_target_symbol: str,
-    expected_source_sha256: str,
-    expected_target_lines: list[int],
-) -> dict[str, Any]:
-    """Load a bounded trace file and apply the public relational validator."""
-
-    document = _implementation.load_trace_document(
-        path,
-        expected_binding=expected_binding,
-        expected_target_path=expected_target_path,
-        expected_target_symbol=expected_target_symbol,
-        expected_source_sha256=expected_source_sha256,
-        expected_target_lines=expected_target_lines,
-    )
-    return validate_trace_document(
-        document,
-        expected_binding=expected_binding,
-        expected_target_path=expected_target_path,
-        expected_target_symbol=expected_target_symbol,
-        expected_source_sha256=expected_source_sha256,
-        expected_target_lines=expected_target_lines,
-    )
 
 
 def _safe_relative_path(raw: str, *, context: str) -> Path:
