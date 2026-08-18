@@ -767,3 +767,86 @@ incremental mutation signal in one fixed case
 ```
 
 The baseline adds one mature direct comparison to the development evidence path. It does not complete Gate 0 or Gate 1, authorize external execution or a holdout, establish an ecological result, or create a score, threshold, blocker, production capability, signed attestation, or novelty claim.
+
+## Selector-context interaction-lattice result architecture
+
+The interaction-lattice result extends only the fixed owned-synthetic DW-001 development path. It starts from the exact merged preregistration commit and a separate execution protocol; it does not rewrite the preregistration's design-only authorization fields.
+
+```text
+merged preregistration
+    + execution protocol
+    + exact plan, catalog, and prior-art identities
+    + reviewed Coverage.py distribution manifest
+    + frozen Coverage.py baseline result
+    -> 4 exact candidate selector children
+    -> 20 exact mutant selector children
+    -> complete candidate and mutant selector tables
+    -> per-selector statement, arc, context, and path-shape evidence
+    -> profile statement/arc unions and intersections
+    -> anonymous profile path multisets with multiplicity
+    -> truth-table condition-independence relations
+    -> frozen mutant-incidence comparison
+    -> expected | unexpected | indeterminate analysis
+    -> semantic result digest
+    -> dependency-free public checkpoint
+```
+
+The bounded workload contains **24 exact selector commands**: four candidate selectors each emitting typed unittest and Coverage.py receipts, plus five generated mutants executed under the same four selectors with typed unittest receipts. Profile results are derived from these unique observations rather than re-executing selectors once per overlapping profile.
+
+### Candidate evidence path
+
+Each candidate selector executes in a separate disposable nonsensitive directory. The command is shell-free and receives a reduced environment. One invocation binding covers the merged preregistration, protocol, source, target, selector, test, command, context, observer, and producer identities.
+
+Each child emits:
+
+```text
+outcome-receipt-v1
+coveragepy-measurement-receipt.v1
+```
+
+The result retains exact executable, executed, missing, target, and measured statement sets; all, context, and target arcs; branch statistics; one unique static context; context-to-line and context-to-arc evidence; process and measurement diagnostics; and one exact statement-and-arc path shape.
+
+### Mutant evidence path
+
+The five generated mutants are reconstructed from the frozen catalog. Each mutant is executed exactly once under each of the four frozen selectors. Every observation requires typed receipt/process agreement and remains bound to exact mutant, operator, source, selector, test, command, and invocation identities.
+
+Errors, timeouts, missing receipts, or contradictions remain indeterminate and never count as killed. Duplicate, invalid, and not-applicable generation controls remain visible but unexecuted.
+
+### Profile and comparison path
+
+Profiles reference subsets of the four candidate selector records. The runner derives complete statement and arc union/intersection sets only when every referenced selector is complete. It separately builds an order-independent anonymous path multiset that excludes selector names, quadrant labels, contexts, bindings, and hit magnitude while preserving path-shape multiplicity.
+
+Truth-table membership derives the MFA and role condition-independence witnesses. The generic mutant table independently derives dropped-conjunct and connector incidence. Stored comparison fields are accepted only when these relations can be reconstructed from the complete underlying tables.
+
+A complete result that disagrees with preregistration is retained as `unexpected`. Missing optional dependency, tool failure, timeout, unavailable evidence, or context ambiguity is `indeterminate`. Malformed, substituted, contradictory, or relationally impossible evidence fails closed.
+
+### Stable and diagnostic representations
+
+The stable result identity is:
+
+```text
+semantic_sha256 = bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77
+```
+
+The semantic digest excludes timestamps, runtime identity, output digests, command durations, and measured costs while retaining frozen inputs, stable selector/path semantics, mutant incidence, comparisons, analysis, and policy.
+
+The full result is diagnostic-only. It retains exact commands, contexts, bindings, receipts, runtime identity, output digests, and costs and therefore requires explicit privacy and publication review.
+
+The dependency-free public checkpoint is independently reconstructed from the frozen semantic result and excludes volatile or disclosure-sensitive execution diagnostics. Its verifier imports no Coverage.py dependency and rechecks the stable result, profile, comparison, analysis, and policy relations.
+
+### Architectural claim boundary
+
+```text
+profile aggregates equal while selector-path multisets differ
+    != general path-coverage adequacy
+    != complete condition or MC/DC evidence
+    != oracle strength
+
+truth-table independence agrees with five frozen mutants
+    != mutation adequacy
+    != operator representativeness
+    != method superiority
+    != merge policy
+```
+
+The result validates one exact project-owned synthetic experiment and its integrity path. It does not authorize external repository execution, a benchmark, holdout, release, deployment, score, threshold, blocker, containment claim, authentication claim, Gate completion, production-readiness claim, scientific-novelty claim, or award-level-significance claim.
