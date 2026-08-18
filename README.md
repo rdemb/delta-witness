@@ -658,3 +658,47 @@ See:
 - [Coverage.py threat boundary](research/DW-001/COVERAGEPY_THREAT_BOUNDARY_V1.md)
 - [Coverage.py direct-baseline architecture](docs/ARCHITECTURE.md#coveragepy-direct-baseline-architecture)
 - [Frozen public-safe result](research/DW-001/coveragepy-baseline-result.v1.json)
+
+## DW-001 selector-context interaction-lattice result
+
+Issue #47 executes one exact preregistered, project-owned two-condition authorization control only after the design artifacts were merged. A separate execution protocol leaves the merged preregistration's `execution_authorized = false` and `execution_status = not_implemented` fields unchanged while authorizing exactly:
+
+```text
+4 candidate selectors with typed and Coverage.py evidence
+5 generated mutants × 4 typed selectors
+24 exact selector commands total
+```
+
+The complete result matched the frozen hypotheses:
+
+```text
+statement_aggregate_discriminates_profiles     = false
+arc_aggregate_discriminates_profiles           = false
+anonymous_path_multiset_discriminates_profiles = true
+
+equal_cardinality_path_multisets_distinct     = true
+mfa_independence_agrees_with_drop_mfa          = true
+role_independence_agrees_with_drop_role        = true
+any_independence_agrees_with_or_gates          = true
+analysis.status                                = expected
+```
+
+Every candidate selector passed with one unique static context and complete typed and Coverage.py evidence. The five profiles had identical statement and arc union/intersection signatures, while their order-independent multisets of exact per-selector statement-and-arc path shapes were distinct. The fixed truth-table condition-independence relations agreed with the separately frozen five-mutant incidence table.
+
+Stable result identity:
+
+```text
+semantic_sha256 = bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77
+checkpoint_sha256 = 40cf297679c83809368e53f35796d817761c25746302530f29fa4dda603277fc
+```
+
+The dependency-free public checkpoint is the default publication artifact. The full result retains exact commands, contexts, bindings, receipts, runtime identity, output digests, and costs only as reviewed diagnostic evidence.
+
+This result is one bounded owned-synthetic observation. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; a score, threshold, or merge blocker; containment or authentication; Gate completion; production readiness; scientific novelty; or award-level significance. The authorization boundary is explicit: external repository execution remains unauthorized.
+
+See:
+
+- [Interaction-lattice preregistration result note](research/DW-001/INTERACTION_WITNESS_LATTICE_RESULT_V1.md)
+- [Interaction-lattice execution threat boundary](research/DW-001/INTERACTION_WITNESS_LATTICE_RESULT_THREAT_BOUNDARY_V1.md)
+- [Dependency-free public checkpoint](research/DW-001/interaction-witness-lattice-result-checkpoint.v1.json)
+- [Result architecture](docs/ARCHITECTURE.md#selector-context-interaction-lattice-result-architecture)
