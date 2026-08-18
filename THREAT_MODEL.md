@@ -774,3 +774,93 @@ The selected public API contract retains exact executed arcs and branch statisti
 - Never infer oracle strength, coverage adequacy, mutation adequacy, or method superiority from one statement/arc/mutation comparison.
 - Never publish raw `.coverage` data.
 - Keep scores, thresholds, blockers, holdout, ecological inference, external execution, release, deployment, and superiority claims disabled.
+
+## Selector-context interaction-lattice result extension
+
+This addendum is normative only for the fixed development-only DW-001 selector-context interaction-lattice result. It does not add a generally supported product statement class and therefore does not change the count above. The complete execution-specific boundary is recorded in `research/DW-001/INTERACTION_WITNESS_LATTICE_RESULT_THREAT_BOUNDARY_V1.md`.
+
+### Protected statement
+
+> Given the exact merged preregistration, separately verified execution protocol, frozen plan, catalog, prior-art log, Coverage.py distribution manifest, and PR #46 baseline result, the interaction-lattice runner executes four exact candidate selectors and five exact generated mutants under those selectors; retains complete invocation-bound typed and Coverage.py evidence; derives exact selector path shapes, profile aggregates, anonymous path multisets, truth-table condition-independence relations, and frozen mutant incidence; and preserves expected, unexpected, and indeterminate outcomes separately.
+
+This statement is restricted to fixed project-owned synthetic bytes. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; containment; authentication; a score, threshold, blocker, release, deployment, production-readiness, scientific-novelty, or award-level-significance claim. External repository execution remains unauthorized.
+
+### Additional assets and adversaries
+
+The extension additionally protects:
+
+- exact identity of the PR #48 merge, execution protocol, plan, catalog, prior-art log, Coverage.py manifest, and PR #46 baseline result;
+- the immutable design-only authorization fields in the merged preregistration;
+- the exact four candidate selectors, five generated mutants, four truth-table quadrants, five selector profiles, and 24 shell-free selector commands;
+- complete candidate and mutant selector tables before every aggregate, comparison, or analysis field;
+- one unique static Coverage.py context per candidate selector and exact shared bindings across typed and Coverage.py receipts;
+- exact executable, executed, missing, target, arc, branch-statistic, context, and statement-and-arc path-shape relations;
+- order-independent anonymous path multisets that exclude selector, quadrant, context, binding, and hit-magnitude identities while preserving multiplicity;
+- independently derived truth-table condition-independence relations and frozen mutant incidence;
+- separation among complete expected, complete unexpected, indeterminate, malformed, contradictory, and unavailable evidence;
+- separation of a measured empty result from unavailable or indeterminate measurement;
+- stable result semantics identified by `bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77`;
+- the dependency-free public checkpoint identified by `40cf297679c83809368e53f35796d817761c25746302530f29fa4dda603277fc`;
+- separation between the default public checkpoint and the diagnostic-only full result;
+- continued refusal of scores, thresholds, merge blockers, holdout status, ecological inference, external execution, release, deployment, production-readiness, scientific-novelty, and award-level-significance claims.
+
+The extension includes threats from changing preregistered source, test, selector, profile, path, operator, mutant, expected-incidence, or policy inputs after outcomes are visible; substituting the execution protocol or merged preregistration; re-executing overlapping profiles and counting duplicate observations; omitting selector or mutant rows before summary; swapping selector, context, quadrant, path-shape, source, test, mutant, command, binding, or producer identities; accepting cross-contaminated contexts; changing only derived aggregates while leaving producer evidence untouched; counting error or timeout as killed; converting unavailable evidence to empty evidence; publishing diagnostic-only fields as the default artifact; and overstating one deterministic owned-synthetic result.
+
+### Interaction-lattice result invariants
+
+318. The exact PR #48 merge, execution protocol, plan, catalog, prior-art log, Coverage.py manifest, and PR #46 result pass their authoritative verifiers before execution.
+319. The merged preregistration remains immutable and retains `execution_authorized = false` and `execution_status = not_implemented`; later execution authority exists only in the separately verified protocol.
+320. The execution scope is exactly four candidate selectors and five generated mutants under four selectors, for 24 selector commands total.
+321. Every selector command is shell-free, runs under a reduced environment in a disposable nonsensitive directory, and executes only fixed project-owned synthetic bytes.
+322. The runner accepts no caller-provided source, test, selector, profile, mutant, command, context, expected outcome, comparison, score, threshold, or policy decision.
+323. Each candidate selector emits one typed unittest receipt and one Coverage.py receipt under the same deterministic invocation binding.
+324. Each candidate selector uses one unique deterministic static Coverage.py context; context duplication or cross-contamination prevents complete evidence.
+325. Each mutant selector emits typed receipt/process evidence bound to exact protocol, plan, catalog, mutant, operator, source, selector, test, and command identities.
+326. Candidate and mutant selector tables are complete and ordered before any profile, mutant, summary, comparison, analysis, policy, or checkpoint field is derived.
+327. Overlapping profiles reuse the same four unique candidate-selector observations and never create repeated executions or duplicated evidence counts.
+328. Every complete candidate selector retains exact executable, executed, missing, target, measured, all-arc, context-arc, target-arc, branch-statistic, and context-partition evidence.
+329. A path shape is reconstructed only from the exact retained selector statement and arc evidence.
+330. An anonymous profile path multiset excludes selector names, quadrant labels, contexts, bindings, and hit magnitude while preserving exact path-shape multiplicity.
+331. Profile statement and arc unions/intersections are derived only from complete referenced selectors; incomplete profiles expose no ordinary aggregate evidence.
+332. Truth-table condition-independence relations are derived from exact frozen quadrant membership rather than stored labels.
+333. Mutant incidence is derived only from the complete five-mutant selector table; duplicate, invalid, and not-applicable generation controls remain unexecuted and excluded.
+334. Error, timeout, receipt failure, dependency failure, unavailable measurement, or context ambiguity never becomes killed, survived, ordinary coverage, or complete path evidence.
+335. A complete internally consistent observation that disagrees with preregistration remains `unexpected` and is not suppressed as a harness error.
+336. Malformed, substituted, contradictory, or relationally impossible evidence fails closed and cannot be rescued by an `unexpected` label.
+337. A complete measured empty statement, arc, or path relation remains distinct from unavailable or indeterminate evidence.
+338. Expected and observed selector, path, profile, mutant, comparison, and analysis values remain separate and concordance is recomputed.
+339. The verifier independently reconstructs commands, contexts, bindings, receipts, path shapes, profile aggregates, anonymous path multisets, condition-independence relations, mutant incidence, comparisons, analysis, policy, costs, and digests.
+340. The stable result semantic digest is exactly `bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77` for the frozen result.
+341. The semantic digest excludes timestamps, runtime identity, output digests, command durations, and measured costs while retaining stable frozen inputs, selector/path semantics, mutant incidence, comparison, analysis, and policy.
+342. The full result remains diagnostic-only because it retains exact commands, contexts, bindings, receipts, runtime identity, output digests, and measured costs.
+343. The dependency-free public checkpoint is the default publication artifact and has exact digest `40cf297679c83809368e53f35796d817761c25746302530f29fa4dda603277fc`.
+344. The checkpoint imports no Coverage.py dependency and independently verifies its exact result, profile, comparison, analysis, and policy relations.
+345. The checkpoint excludes volatile commands, contexts, bindings, receipts, raw output, runtime identity, output digests, and costs.
+346. Quality score, headline score, universal threshold, mutation score, merge-blocker authorization, holdout selection, primary-denominator eligibility, ecological inference, external execution, release, deployment, and superiority claims remain null or false.
+347. Editable and force-reinstalled wheel executions on Python 3.11–3.14 preserve the frozen semantic digest; dependency-free checkpoint verification remains green after Coverage.py removal.
+348. Public artifacts exclude raw `.coverage` data, raw stdout/stderr, tracebacks, absolute paths, credentials, environment values, and source, test, or mutant bodies excluded by contract.
+349. A valid result or checkpoint does not complete Gate 0 or Gate 1 and does not authorize a benchmark, holdout, external repository, release, deployment, or ruleset.
+350. External repository execution remains unauthorized.
+
+### Additional residual risks
+
+The anonymous runtime path multiset may be equivalent to explicit truth-table membership in this exact deterministic two-condition control. Distinguishing profile identities here does not establish incremental information over a simpler frozen input-membership baseline, path adequacy, or oracle strength.
+
+Static contexts and invocation bindings are visible identifiers rather than authentication. Unkeyed result and checkpoint digests detect modification only against a separately trusted identity and do not establish producer provenance or creation time.
+
+Hosted CI timings are diagnostic and environment-sensitive. The fixed command count does not establish safe CPU, memory, storage, process, or total-time bounds for broader experiments.
+
+The result runner and Coverage.py are observation mechanisms, not a sandbox. Disposable directories and a reduced environment do not contain malicious Python, dependencies, operating-system behavior, filesystem effects, network effects, background processes, or resource exhaustion.
+
+### Additional safe operation
+
+- Execute only the exact verified protocol over the frozen owned-synthetic source, tests, selectors, profiles, and generated mutants in a disposable nonsensitive environment without credentials.
+- Verify the merged preregistration and every exact bound input before execution; never rewrite the design-only preregistration to authorize the result.
+- Preserve complete unique selector and mutant tables before every aggregate or comparison.
+- Reject selector, context, quadrant, path-shape, mutant, source, test, command, binding, receipt, aggregate, or digest substitution.
+- Preserve expected, unexpected, indeterminate, measured-empty, and unavailable evidence as distinct states.
+- Never count error, timeout, missing dependency, missing receipt, or context ambiguity as killed or complete evidence.
+- Use the dependency-free public checkpoint as the default publication artifact; retain the full result only as reviewed diagnostic evidence.
+- Never infer general coverage, path, condition, MC/DC, mutation, or oracle adequacy, method superiority, ecological effectiveness, production readiness, scientific novelty, or merge-policy validity from this result.
+- Keep scores, thresholds, blockers, holdout, ecological inference, external execution, release, deployment, production-readiness, scientific-novelty, and award-level-significance claims disabled.
+- External repository execution remains unauthorized.
