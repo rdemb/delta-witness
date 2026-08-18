@@ -83,7 +83,7 @@ Read the complete protocol and its non-claims in [Outcome Receipt Protocol v1](d
 
 ## Layer 3: declared witness-test provenance
 
-DW-001 research infrastructure can bind one claim to exact predeclared standard-library unittest selectors and replay those selectors under the exact `base_candidate` and `candidate_candidate` states reconstructed from a verified matrix report.
+DW-001 research infrastructure can bind one claim to exact predeclared standard-library unittest selector identities and replay those selectors under the exact `base_candidate` and `candidate_candidate` states reconstructed from a verified matrix report.
 
 A selector is classified as:
 
@@ -694,7 +694,7 @@ checkpoint_sha256 = 40cf297679c83809368e53f35796d817761c25746302530f29fa4dda6032
 
 The dependency-free public checkpoint is the default publication artifact. The full result retains exact commands, contexts, bindings, receipts, runtime identity, output digests, and costs only as reviewed diagnostic evidence.
 
-This result is one bounded owned-synthetic observation. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; a score, threshold, or merge blocker; containment or authentication; Gate completion; production readiness; scientific novelty; or award-level significance. External repository execution remains unauthorized.
+This result is one bounded owned-synthetic observation. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; a score, threshold, or merge blocker; containment or authentication; Gate completion; production readiness; scientific novelty; or award-level significance. The authorization boundary is explicit: external repository execution remains unauthorized.
 
 See:
 
