@@ -67,12 +67,15 @@ Implemented mechanism, design, and owned-synthetic result controls:
 - [x] Pre-execution selector-context interaction-lattice source, test, truth-table, profile, path-shape, operator, and mutant identities frozen before result execution
 - [x] Exact interaction-lattice statement/arc aggregate hypotheses, anonymous path-multiset contract, condition-independence controls, and mutant-incidence table preregistered
 - [x] Reproducible interaction-lattice prior-art boundary with scientific novelty, award-level significance, method superiority, score, threshold, blocker, holdout, and execution claims disabled
+- [x] Exact frozen selector-context interaction-lattice result executed from the merged preregistration
+- [x] Exact anonymous path multisets tested against aggregate statement and arc union/intersection in the frozen control
+- [x] Preregistered agreement tested between truth-table condition-independence witnesses and dropped-conjunct mutant incidence
+- [x] Stable dependency-free interaction-result checkpoint with a strict schema and verifier
+- [x] Editable, installed-wheel, offline Coverage.py, dependency-removal, and checkpoint reproduction on Python 3.11–3.14
 
 Unresolved analysis layers:
 
-- [ ] Execute the selector-context interaction-lattice result only from a merged preregistration commit
-- [ ] Test whether exact anonymous path multisets retain interaction evidence lost by aggregate statement and arc union/intersection
-- [ ] Test the preregistered agreement between truth-table condition-independence witnesses and dropped-conjunct mutant incidence
+- [ ] Separate explicit input labels from actual runtime path evidence in a frozen owned-synthetic control population
 - [ ] Expand calibration beyond one fixed source and three generic operators
 - [ ] Calibrate mutation evidence against a broader set of valid, weak, ambiguous, invalid, and equivalent-review controls
 - [ ] Expand claim-boundary coverage beyond one fixed owned-synthetic target
