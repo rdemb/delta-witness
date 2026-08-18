@@ -783,7 +783,7 @@ This addendum is normative only for the fixed development-only DW-001 selector-c
 
 > Given the exact merged preregistration, separately verified execution protocol, frozen plan, catalog, prior-art log, Coverage.py distribution manifest, and PR #46 baseline result, the interaction-lattice runner executes four exact candidate selectors and five exact generated mutants under those selectors; retains complete invocation-bound typed and Coverage.py evidence; derives exact selector path shapes, profile aggregates, anonymous path multisets, truth-table condition-independence relations, and frozen mutant incidence; and preserves expected, unexpected, and indeterminate outcomes separately.
 
-This statement is restricted to fixed project-owned synthetic bytes. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; containment; authentication; a score, threshold, blocker, release, deployment, production-readiness, scientific-novelty, or award-level-significance claim. External repository execution remains unauthorized.
+This statement is restricted to fixed project-owned synthetic bytes. It does not establish general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; containment; authentication; a score, threshold, blocker, release, deployment, production-readiness, scientific-novelty, or award-level-significance claim. The authorization boundary is explicit: external repository execution remains unauthorized.
 
 ### Additional assets and adversaries
 
