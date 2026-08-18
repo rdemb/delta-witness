@@ -83,7 +83,7 @@ Read the complete protocol and its non-claims in [Outcome Receipt Protocol v1](d
 
 ## Layer 3: declared witness-test provenance
 
-DW-001 research infrastructure can bind one claim to exact predeclared standard-library unittest selector identities and replay those selectors under the exact `base_candidate` and `candidate_candidate` states reconstructed from a verified matrix report.
+DW-001 research infrastructure can bind one claim to exact predeclared standard-library unittest selectors and replay those selectors under the exact `base_candidate` and `candidate_candidate` states reconstructed from a verified matrix report.
 
 A selector is classified as:
 
