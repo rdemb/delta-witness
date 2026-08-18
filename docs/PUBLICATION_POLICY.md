@@ -84,3 +84,22 @@ Before a public release:
 9. obtain a second review for security-sensitive material when practical.
 
 If uncertainty remains, do not publish the material until the boundary is resolved.
+
+## Selector-context interaction-lattice result boundary
+
+The fixed DW-001 selector-context interaction-lattice execution is restricted to the exact project-owned synthetic source, tests, selectors, profiles, generated mutants, Coverage.py distribution, merged preregistration, and separately authorized execution protocol recorded by the result contract.
+
+The default release artifact is the dependency-free **public checkpoint**. It may retain only reviewed stable relations needed to reproduce the bounded interpretation, including:
+
+- preregistration, protocol, catalog, prior-art, baseline-result, result-semantic, and checkpoint digests;
+- exact profile identities and truth-table membership;
+- reviewed statement and arc aggregate relations;
+- anonymous path-multiset identities with multiplicity semantics;
+- complete mutant-incidence outcomes and stable expected/unexpected/indeterminate analysis;
+- explicit null score and threshold fields and false blocker, holdout, ecological, external-execution, release, and deployment authorizations.
+
+The **diagnostic-only full result** is not the default public artifact. Retaining or publishing it requires a separate privacy and boundary review because it contains exact selector commands, static contexts, invocation bindings, typed and Coverage.py receipt metadata, path shapes, runtime identity, output digests, and measured costs. Raw `.coverage` data, raw stdout or stderr, tracebacks, absolute paths, environment values, credentials, source or test bodies excluded by the contract, and unreviewed low-entropy fingerprints remain prohibited.
+
+A publication-safe shape for this owned-synthetic fixture is not automatically safe for an external, private, employer, customer, or third-party repository. Reuse requires a new authorization, privacy, license, containment, and boundary review. External repository execution remains unauthorized.
+
+Do not present this result or checkpoint as evidence of general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; a score, threshold, or merge blocker; containment or authentication; Gate completion; production readiness; scientific novelty; or award-level significance.
