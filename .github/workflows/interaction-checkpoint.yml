@@ -1,4 +1,4 @@
-name: Preserve claim-relevant path transport recovery evidence
+name: Export claim-relevant path recovery bytes
 
 on:
   pull_request:
@@ -12,18 +12,16 @@ env:
   PYTHONUTF8: "1"
 
 concurrency:
-  group: recover-claim-relevant-path-${{ github.ref }}
+  group: export-claim-relevant-path-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  preserve-recovery-evidence:
-    name: Preserve exact truncated-member evidence
+  export-recovery-bytes:
+    name: Export exact recovery bytes
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.head_ref == 'research/claim-relevant-path-divergence-v1'
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -33,155 +31,41 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Recover exact available bytes from the first effective member
+      - name: Verify exact recovery identities
         shell: bash
         env:
           EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
-          git merge-base --is-ancestor \
-            d16101cba0ea074c1750b8d4336409a9ff15dabc \
-            HEAD
           python - <<'PY'
-          from __future__ import annotations
-
-          import hashlib
-          import io
-          import json
           from pathlib import Path
-          import tarfile
-          import zlib
+          import hashlib
+          import json
 
-          archive = Path(
-              "research/DW-001/"
-              ".claim-relevant-path-preregistration.bundle.tar.gz"
-          )
-          raw = archive.read_bytes()
-          expected_raw_sha256 = (
-              "8aee966cbbe5b2cff5b792923e0c3831"
-              "ddf44abd0cb7827da3dcf48d2e4f7d54"
-          )
-          observed_raw_sha256 = hashlib.sha256(raw).hexdigest()
-          if observed_raw_sha256 != expected_raw_sha256:
-              raise SystemExit("transport identity mismatch")
-
-          inflater = zlib.decompressobj(16 + zlib.MAX_WBITS)
-          decompressed = bytearray()
-          zlib_error: str | None = None
-          for offset in range(0, len(raw), 32):
-              try:
-                  decompressed.extend(
-                      inflater.decompress(raw[offset : offset + 32])
-                  )
-              except zlib.error as exc:
-                  zlib_error = f"offset={offset}: {exc}"
-                  break
-          if zlib_error is None:
-              try:
-                  decompressed.extend(inflater.flush())
-              except zlib.error as exc:
-                  zlib_error = f"flush: {exc}"
-
-          expected_member = (
-              "src/deltawitness/dw001_claim_relevant_path_plan.py"
-          )
-          content = bytearray()
-          stream_error: str | None = None
-          with tarfile.open(
-              fileobj=io.BytesIO(bytes(decompressed)), mode="r|"
-          ) as handle:
-              member = handle.next()
-              if member is None:
-                  raise SystemExit("transport has no effective member")
-              if member.name != expected_member or not member.isfile():
-                  raise SystemExit(
-                      "unexpected first effective member: "
-                      f"{member.name!r}, type={member.type!r}"
-                  )
-              source = handle.extractfile(member)
-              if source is None:
-                  raise SystemExit("first effective member is unreadable")
-              while True:
-                  try:
-                      chunk = source.read(1024)
-                  except (tarfile.ReadError, EOFError) as exc:
-                      stream_error = str(exc)
-                      break
-                  if not chunk:
-                      break
-                  content.extend(chunk)
-
-          if len(content) >= member.size:
-              raise SystemExit(
-                  "recovery unexpectedly contains the complete first member"
-              )
-          recovery_root = Path(
+          root = Path(
               "research/DW-001/.claim-relevant-path-transport-recovery"
           )
-          recovery_root.mkdir(parents=True, exist_ok=True)
-          partial_path = recovery_root / (
-              "dw001_claim_relevant_path_plan.py.partial"
+          partial = root / "dw001_claim_relevant_path_plan.py.partial"
+          metadata_path = root / "recovery-metadata.v1.json"
+          metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+          raw = partial.read_bytes()
+          assert len(raw) == 32768
+          assert hashlib.sha256(raw).hexdigest() == (
+              "ff4da3962fda78d5cc390632388c5256"
+              "87ae48e694fa215099a0c3c115d03c22"
           )
-          metadata_path = recovery_root / "recovery-metadata.v1.json"
-          partial_path.write_bytes(bytes(content))
-          metadata = {
-              "schema_version": (
-                  "deltawitness.dw001-claim-relevant-path-"
-                  "transport-recovery.v1"
-              ),
-              "diagnostic_only": True,
-              "transport_path": str(archive),
-              "transport_blob_sha": (
-                  "f65b6ec9f341d834643cba6f8994acbd82f759f9"
-              ),
-              "transport_sha256": observed_raw_sha256,
-              "transport_bytes": len(raw),
-              "decompressed_bytes": len(decompressed),
-              "gzip_eof": inflater.eof,
-              "zlib_error": zlib_error,
-              "member_path": member.name,
-              "member_expected_bytes": member.size,
-              "member_available_bytes": len(content),
-              "member_partial_sha256": hashlib.sha256(content).hexdigest(),
-              "member_complete": False,
-              "stream_error": stream_error,
-              "execution_authorized": False,
-              "publication_default": "remove_before_merge",
-          }
-          metadata_path.write_text(
-              json.dumps(
-                  metadata,
-                  sort_keys=True,
-                  indent=2,
-                  ensure_ascii=True,
-              )
-              + "\n",
-              encoding="utf-8",
-          )
-          print(json.dumps(metadata, sort_keys=True))
+          assert metadata["member_available_bytes"] == len(raw)
+          assert metadata["member_partial_sha256"] == hashlib.sha256(raw).hexdigest()
+          assert metadata["member_complete"] is False
+          assert metadata["execution_authorized"] is False
           PY
 
-      - name: Commit diagnostic-only recovery evidence
-        shell: bash
-        env:
-          HEAD_BRANCH: ${{ github.head_ref }}
-          EXPECTED_REMOTE_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin \
-            "${HEAD_BRANCH}:refs/remotes/origin/${HEAD_BRANCH}"
-          test "$(git rev-parse "refs/remotes/origin/${HEAD_BRANCH}")" = \
-            "$EXPECTED_REMOTE_SHA"
-          git add -- \
-            research/DW-001/.claim-relevant-path-transport-recovery/
-          if git diff --cached --quiet; then
-            echo "Recovery evidence already matches exact transport bytes."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email \
-            "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m \
-            "research: preserve truncated transport recovery evidence"
-          git push origin "HEAD:${HEAD_BRANCH}"
+      - name: Upload exact recovery evidence
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: claim-relevant-path-recovery-${{ github.event.pull_request.head.sha }}
+          path: research/DW-001/.claim-relevant-path-transport-recovery/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
