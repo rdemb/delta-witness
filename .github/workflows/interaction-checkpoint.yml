@@ -1,95 +1,29 @@
-name: Interaction checkpoint
+name: Recover claim-relevant path preregistration transport
 
 on:
   pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PYTHONDONTWRITEBYTECODE: "1"
   PYTHONUTF8: "1"
 
 concurrency:
-  group: interaction-checkpoint-${{ github.ref }}
+  group: recover-claim-relevant-path-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  reproduce:
-    name: Interaction checkpoint / Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
-    steps:
-      - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Remove ambient Coverage.py and install dependency-free editable package
-        run: |
-          python -m pip uninstall --yes coverage || true
-          python -m pip install --no-deps -e .
-
-      - name: Verify dependency-free checkpoint and public imports
-        run: |
-          python - <<'PY'
-          import importlib.util
-          import sys
-
-          assert importlib.util.find_spec("coverage") is None
-          from deltawitness.dw001_interaction_lattice_checkpoint import (
-              build_interaction_lattice_result_checkpoint,
-              verify_interaction_lattice_result_checkpoint_document,
-          )
-          from deltawitness.dw001_interaction_lattice_result import (
-              verify_interaction_witness_lattice_result_document,
-          )
-          assert callable(build_interaction_lattice_result_checkpoint)
-          assert callable(verify_interaction_lattice_result_checkpoint_document)
-          assert callable(verify_interaction_witness_lattice_result_document)
-          assert "coverage" not in sys.modules
-          PY
-          python scripts/smoke_dw001_interaction_lattice_plan.py
-          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
-
-      - name: Build and force-reinstall dependency-free wheel
-        run: |
-          python -m pip wheel --no-deps . --wheel-dir dist
-          python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
-
-      - name: Reproduce checkpoint from installed wheel
-        run: |
-          python - <<'PY'
-          import importlib.util
-          import sys
-
-          assert importlib.util.find_spec("coverage") is None
-          assert "coverage" not in sys.modules
-          PY
-          python scripts/smoke_dw001_interaction_lattice_plan.py
-          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
-
-  apply-claim-relevant-path-preregistration:
-    name: Apply exact claim-relevant path preregistration bundle
+  inspect-truncated-transport:
+    name: Inspect truncated preregistration transport
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.head_ref == 'research/claim-relevant-path-divergence-v1'
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Check out exact PR branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -97,7 +31,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Verify branch identity and exact transport
+      - name: Recover and attest complete tar members without extraction
         shell: bash
         env:
           EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -108,213 +42,140 @@ jobs:
             d16101cba0ea074c1750b8d4336409a9ff15dabc \
             HEAD
           python - <<'PY'
-          from pathlib import Path, PurePosixPath
+          from __future__ import annotations
+
+          import base64
           import hashlib
-          import tarfile
+          from pathlib import Path, PurePosixPath
+          import zlib
 
           archive = Path(
               "research/DW-001/"
               ".claim-relevant-path-preregistration.bundle.tar.gz"
           )
-          expected_sha256 = (
+          raw = archive.read_bytes()
+          expected_raw_sha256 = (
               "8aee966cbbe5b2cff5b792923e0c3831"
               "ddf44abd0cb7827da3dcf48d2e4f7d54"
           )
-          expected = {
-              ".github/workflows/claim-relevant-path-preregistration.yml",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md",
-              "research/DW-001/claim-relevant-path-divergence-catalog.v1.json",
-              "research/DW-001/claim-relevant-path-divergence-plan.v1.json",
-              "research/DW-001/claim-relevant-path-prior-art-log.v1.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json",
-              "research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json",
-              "scripts/smoke_dw001_claim_relevant_path_plan.py",
-              "src/deltawitness/dw001_claim_relevant_path_plan.py",
-              "tests/test_dw001_claim_relevant_path_adversarial.py",
-              "tests/test_dw001_claim_relevant_path_preregistration.py",
-              "tests/test_dw001_claim_relevant_path_schemas.py",
-          }
-
-          observed_sha256 = hashlib.sha256(archive.read_bytes()).hexdigest()
-          if observed_sha256 != expected_sha256:
+          observed_raw_sha256 = hashlib.sha256(raw).hexdigest()
+          if observed_raw_sha256 != expected_raw_sha256:
               raise SystemExit(
-                  "bundle digest mismatch: "
-                  f"{observed_sha256} != {expected_sha256}"
+                  "transport identity mismatch: "
+                  f"{observed_raw_sha256} != {expected_raw_sha256}"
               )
 
-          with tarfile.open(archive, "r:gz") as handle:
-              members = handle.getmembers()
-              names = [member.name for member in members]
-              if len(names) != len(set(names)):
-                  raise SystemExit("bundle contains duplicate member names")
-              if set(names) != expected:
-                  raise SystemExit(
-                      "bundle member mismatch: "
-                      f"missing={sorted(expected - set(names))!r} "
-                      f"extra={sorted(set(names) - expected)!r}"
-                  )
-              for member in members:
-                  path = PurePosixPath(member.name)
-                  if path.is_absolute() or ".." in path.parts:
-                      raise SystemExit(
-                          f"unsafe bundle member path: {member.name!r}"
-                      )
-                  if not member.isfile():
-                      raise SystemExit(
-                          "non-regular bundle member rejected: "
-                          f"{member.name!r}"
-                      )
-          PY
+          inflater = zlib.decompressobj(16 + zlib.MAX_WBITS)
+          decompressed = bytearray()
+          error: str | None = None
+          for offset in range(0, len(raw), 32):
+              chunk = raw[offset : offset + 32]
+              try:
+                  decompressed.extend(inflater.decompress(chunk))
+              except zlib.error as exc:
+                  error = f"offset={offset}: {exc}"
+                  break
+          if error is None:
+              try:
+                  decompressed.extend(inflater.flush())
+              except zlib.error as exc:
+                  error = f"flush: {exc}"
 
-      - name: Extract exact regular files and remove transport
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import shutil
-          import tarfile
-
-          archive = Path(
-              "research/DW-001/"
-              ".claim-relevant-path-preregistration.bundle.tar.gz"
+          print(
+              "TRANSPORT\t"
+              f"raw_bytes={len(raw)}\t"
+              f"raw_sha256={observed_raw_sha256}\t"
+              f"decompressed_bytes={len(decompressed)}\t"
+              f"gzip_eof={inflater.eof}\t"
+              f"zlib_error={error!r}"
           )
-          stage = Path(".claim-relevant-path-bundle-stage")
-          if stage.exists():
-              raise SystemExit("staging path already exists")
-          stage.mkdir()
 
-          with tarfile.open(archive, "r:gz") as handle:
-              for member in handle.getmembers():
-                  source = handle.extractfile(member)
-                  if source is None:
-                      raise SystemExit(
-                          f"unreadable bundle member: {member.name!r}"
-                      )
-                  destination = stage / member.name
-                  destination.parent.mkdir(parents=True, exist_ok=True)
-                  destination.write_bytes(source.read())
-
-          for source in sorted(path for path in stage.rglob("*") if path.is_file()):
-              relative = source.relative_to(stage)
-              destination = Path(relative)
-              for parent in destination.parents:
-                  if parent == Path("."):
-                      break
-                  if parent.is_symlink():
-                      raise SystemExit(
-                          f"linked destination ancestor rejected: {parent}"
-                      )
-              if destination.is_symlink():
+          def parse_octal(raw_value: bytes, *, field: str, name: str) -> int:
+              value = raw_value.rstrip(b"\0 ").lstrip(b" ")
+              if not value:
+                  return 0
+              try:
+                  return int(value, 8)
+              except ValueError as exc:
                   raise SystemExit(
-                      f"linked destination rejected: {destination}"
-                  )
-              destination.parent.mkdir(parents=True, exist_ok=True)
-              shutil.copyfile(source, destination)
+                      f"invalid tar {field} for {name!r}: {raw_value!r}"
+                  ) from exc
 
-          shutil.rmtree(stage)
-          archive.unlink()
-          Path(
-              ".github/workflows/"
-              "unpack-claim-relevant-path-bundle.yml"
-          ).unlink()
-          PY
-          git fetch --no-tags origin \
-            main:refs/remotes/origin/main
-          git show \
-            origin/main:.github/workflows/interaction-checkpoint.yml \
-            > .github/workflows/interaction-checkpoint.yml
+          offset = 0
+          complete: list[tuple[str, bytes]] = []
+          partial: tuple[str, int, int] | None = None
+          while offset + 512 <= len(decompressed):
+              header = bytes(decompressed[offset : offset + 512])
+              if header == b"\0" * 512:
+                  break
 
-      - name: Install dependency-free editable package
-        run: python -m pip install --no-deps -e .
-
-      - name: Validate preregistration and unchanged product path
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/validate_public_tree.py
-          python -m compileall -q src tests scripts
-          python -m unittest -v \
-            tests.test_dw001_claim_relevant_path_preregistration \
-            tests.test_dw001_claim_relevant_path_adversarial \
-            tests.test_dw001_claim_relevant_path_schemas
-          python scripts/smoke_dw001_claim_relevant_path_plan.py
-          python -m unittest discover -s tests -v
-          ./scripts/demo.sh
-
-      - name: Verify exact staged file set
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-
-          expected = {
-              ".github/workflows/claim-relevant-path-preregistration.yml",
-              ".github/workflows/interaction-checkpoint.yml",
-              ".github/workflows/unpack-claim-relevant-path-bundle.yml",
-              "research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md",
-              "research/DW-001/claim-relevant-path-divergence-catalog.v1.json",
-              "research/DW-001/claim-relevant-path-divergence-plan.v1.json",
-              "research/DW-001/claim-relevant-path-prior-art-log.v1.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json",
-              "research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json",
-              "scripts/smoke_dw001_claim_relevant_path_plan.py",
-              "src/deltawitness/dw001_claim_relevant_path_plan.py",
-              "tests/test_dw001_claim_relevant_path_adversarial.py",
-              "tests/test_dw001_claim_relevant_path_preregistration.py",
-              "tests/test_dw001_claim_relevant_path_schemas.py",
-          }
-          output = subprocess.run(
-              ["git", "status", "--short"],
-              check=True,
-              capture_output=True,
-              text=True,
-          ).stdout
-          observed = {
-              line[3:]
-              for line in output.splitlines()
-              if len(line) >= 4
-          }
-          if observed != expected:
-              raise SystemExit(
-                  "unexpected staged worktree set: "
-                  f"missing={sorted(expected - observed)!r} "
-                  f"extra={sorted(observed - expected)!r}"
+              stored_checksum = parse_octal(
+                  header[148:156], field="checksum", name="<pending>"
               )
-          for path in expected:
-              value = Path(path)
-              if value.exists() and value.is_symlink():
-                  raise SystemExit(f"symbolic link rejected: {path}")
-          PY
+              computed_checksum = sum(header[:148]) + (32 * 8) + sum(header[156:])
+              if stored_checksum != computed_checksum:
+                  raise SystemExit(
+                      "tar checksum mismatch at block "
+                      f"{offset // 512}: {stored_checksum} != {computed_checksum}"
+                  )
 
-      - name: Commit exact preregistration implementation
-        shell: bash
-        env:
-          HEAD_BRANCH: ${{ github.head_ref }}
-          EXPECTED_REMOTE_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin \
-            "${HEAD_BRANCH}:refs/remotes/origin/${HEAD_BRANCH}"
-          test "$(git rev-parse "refs/remotes/origin/${HEAD_BRANCH}")" = \
-            "$EXPECTED_REMOTE_SHA"
-          git config user.name "github-actions[bot]"
-          git config user.email \
-            "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m \
-            "research: implement claim-relevant path preregistration"
-          git push origin "HEAD:${HEAD_BRANCH}"
+              name_bytes = header[:100].split(b"\0", 1)[0]
+              prefix_bytes = header[345:500].split(b"\0", 1)[0]
+              try:
+                  name = name_bytes.decode("utf-8")
+                  prefix = prefix_bytes.decode("utf-8")
+              except UnicodeDecodeError as exc:
+                  raise SystemExit("tar member name is not UTF-8") from exc
+              if prefix:
+                  name = f"{prefix}/{name}"
+              path = PurePosixPath(name)
+              if not name or path.is_absolute() or ".." in path.parts:
+                  raise SystemExit(f"unsafe tar member path: {name!r}")
+
+              typeflag = header[156:157]
+              if typeflag not in {b"\0", b"0"}:
+                  raise SystemExit(
+                      f"non-regular tar member rejected: {name!r}, "
+                      f"type={typeflag!r}"
+                  )
+              size = parse_octal(header[124:136], field="size", name=name)
+              content_start = offset + 512
+              content_end = content_start + size
+              padded_end = content_start + ((size + 511) // 512) * 512
+              available = max(0, len(decompressed) - content_start)
+              if padded_end > len(decompressed):
+                  partial = (name, size, min(size, available))
+                  break
+
+              content = bytes(decompressed[content_start:content_end])
+              complete.append((name, content))
+              offset = padded_end
+
+          names = [name for name, _ in complete]
+          if len(names) != len(set(names)):
+              raise SystemExit("duplicate complete tar member names")
+
+          print(f"COMPLETE_MEMBER_COUNT\t{len(complete)}")
+          for name, content in complete:
+              print(
+                  "COMPLETE_MEMBER\t"
+                  f"{name}\t{len(content)}\t"
+                  f"{hashlib.sha256(content).hexdigest()}\t"
+                  f"{base64.b64encode(content).decode('ascii')}"
+              )
+          if partial is None:
+              print("PARTIAL_MEMBER\tnone")
+          else:
+              print(
+                  "PARTIAL_MEMBER\t"
+                  f"{partial[0]}\texpected={partial[1]}\t"
+                  f"available={partial[2]}"
+              )
+
+          print(
+              "RECOVERY_SUMMARY\t"
+              f"complete={len(complete)}\t"
+              f"partial={partial[0] if partial else None!r}\t"
+              f"remaining_decompressed_bytes={len(decompressed) - offset}"
+          )
+          PY
