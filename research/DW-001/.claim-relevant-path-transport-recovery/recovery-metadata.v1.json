@@ -1,0 +1,19 @@
+{
+  "decompressed_bytes": 40668,
+  "diagnostic_only": true,
+  "execution_authorized": false,
+  "gzip_eof": false,
+  "member_available_bytes": 32768,
+  "member_complete": false,
+  "member_expected_bytes": 50029,
+  "member_partial_sha256": "ff4da3962fda78d5cc390632388c525687ae48e694fa215099a0c3c115d03c22",
+  "member_path": "src/deltawitness/dw001_claim_relevant_path_plan.py",
+  "publication_default": "remove_before_merge",
+  "schema_version": "deltawitness.dw001-claim-relevant-path-transport-recovery.v1",
+  "stream_error": "unexpected end of data",
+  "transport_blob_sha": "f65b6ec9f341d834643cba6f8994acbd82f759f9",
+  "transport_bytes": 9000,
+  "transport_path": "research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz",
+  "transport_sha256": "8aee966cbbe5b2cff5b792923e0c3831ddf44abd0cb7827da3dcf48d2e4f7d54",
+  "zlib_error": null
+}
