@@ -46,7 +46,9 @@ jobs:
 
           import base64
           import hashlib
+          import io
           from pathlib import Path, PurePosixPath
+          import tarfile
           import zlib
 
           archive = Path(
@@ -67,19 +69,20 @@ jobs:
 
           inflater = zlib.decompressobj(16 + zlib.MAX_WBITS)
           decompressed = bytearray()
-          error: str | None = None
+          zlib_error: str | None = None
           for offset in range(0, len(raw), 32):
-              chunk = raw[offset : offset + 32]
               try:
-                  decompressed.extend(inflater.decompress(chunk))
+                  decompressed.extend(
+                      inflater.decompress(raw[offset : offset + 32])
+                  )
               except zlib.error as exc:
-                  error = f"offset={offset}: {exc}"
+                  zlib_error = f"offset={offset}: {exc}"
                   break
-          if error is None:
+          if zlib_error is None:
               try:
                   decompressed.extend(inflater.flush())
               except zlib.error as exc:
-                  error = f"flush: {exc}"
+                  zlib_error = f"flush: {exc}"
 
           print(
               "TRANSPORT\t"
@@ -87,73 +90,80 @@ jobs:
               f"raw_sha256={observed_raw_sha256}\t"
               f"decompressed_bytes={len(decompressed)}\t"
               f"gzip_eof={inflater.eof}\t"
-              f"zlib_error={error!r}"
+              f"zlib_error={zlib_error!r}"
           )
 
-          def parse_octal(raw_value: bytes, *, field: str, name: str) -> int:
-              value = raw_value.rstrip(b"\0 ").lstrip(b" ")
-              if not value:
-                  return 0
-              try:
-                  return int(value, 8)
-              except ValueError as exc:
-                  raise SystemExit(
-                      f"invalid tar {field} for {name!r}: {raw_value!r}"
-                  ) from exc
-
-          offset = 0
+          expected = {
+              ".github/workflows/claim-relevant-path-preregistration.yml",
+              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md",
+              "research/DW-001/claim-relevant-path-divergence-catalog.v1.json",
+              "research/DW-001/claim-relevant-path-divergence-plan.v1.json",
+              "research/DW-001/claim-relevant-path-prior-art-log.v1.json",
+              "research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json",
+              "research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json",
+              "research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json",
+              "scripts/smoke_dw001_claim_relevant_path_plan.py",
+              "src/deltawitness/dw001_claim_relevant_path_plan.py",
+              "tests/test_dw001_claim_relevant_path_adversarial.py",
+              "tests/test_dw001_claim_relevant_path_preregistration.py",
+              "tests/test_dw001_claim_relevant_path_schemas.py",
+          }
           complete: list[tuple[str, bytes]] = []
-          partial: tuple[str, int, int] | None = None
-          while offset + 512 <= len(decompressed):
-              header = bytes(decompressed[offset : offset + 512])
-              if header == b"\0" * 512:
-                  break
+          partial_name: str | None = None
+          stream_error: str | None = None
 
-              stored_checksum = parse_octal(
-                  header[148:156], field="checksum", name="<pending>"
-              )
-              computed_checksum = sum(header[:148]) + (32 * 8) + sum(header[156:])
-              if stored_checksum != computed_checksum:
-                  raise SystemExit(
-                      "tar checksum mismatch at block "
-                      f"{offset // 512}: {stored_checksum} != {computed_checksum}"
-                  )
-
-              name_bytes = header[:100].split(b"\0", 1)[0]
-              prefix_bytes = header[345:500].split(b"\0", 1)[0]
-              try:
-                  name = name_bytes.decode("utf-8")
-                  prefix = prefix_bytes.decode("utf-8")
-              except UnicodeDecodeError as exc:
-                  raise SystemExit("tar member name is not UTF-8") from exc
-              if prefix:
-                  name = f"{prefix}/{name}"
-              path = PurePosixPath(name)
-              if not name or path.is_absolute() or ".." in path.parts:
-                  raise SystemExit(f"unsafe tar member path: {name!r}")
-
-              typeflag = header[156:157]
-              if typeflag not in {b"\0", b"0"}:
-                  raise SystemExit(
-                      f"non-regular tar member rejected: {name!r}, "
-                      f"type={typeflag!r}"
-                  )
-              size = parse_octal(header[124:136], field="size", name=name)
-              content_start = offset + 512
-              content_end = content_start + size
-              padded_end = content_start + ((size + 511) // 512) * 512
-              available = max(0, len(decompressed) - content_start)
-              if padded_end > len(decompressed):
-                  partial = (name, size, min(size, available))
-                  break
-
-              content = bytes(decompressed[content_start:content_end])
-              complete.append((name, content))
-              offset = padded_end
+          try:
+              with tarfile.open(
+                  fileobj=io.BytesIO(bytes(decompressed)), mode="r|"
+              ) as handle:
+                  while True:
+                      try:
+                          member = handle.next()
+                      except (tarfile.ReadError, EOFError) as exc:
+                          stream_error = f"member-header: {exc}"
+                          break
+                      if member is None:
+                          break
+                      name = member.name
+                      path = PurePosixPath(name)
+                      if not name or path.is_absolute() or ".." in path.parts:
+                          raise SystemExit(f"unsafe tar member path: {name!r}")
+                      if not member.isfile():
+                          raise SystemExit(
+                              "non-regular effective tar member rejected: "
+                              f"{name!r}, type={member.type!r}"
+                          )
+                      if name not in expected:
+                          raise SystemExit(
+                              f"unexpected effective tar member: {name!r}"
+                          )
+                      try:
+                          source = handle.extractfile(member)
+                          if source is None:
+                              raise tarfile.ReadError("member is unreadable")
+                          content = source.read()
+                      except (tarfile.ReadError, EOFError) as exc:
+                          partial_name = name
+                          stream_error = f"member-content: {exc}"
+                          break
+                      if len(content) != member.size:
+                          partial_name = name
+                          stream_error = (
+                              "member-content: short read "
+                              f"{len(content)} != {member.size}"
+                          )
+                          break
+                      complete.append((name, content))
+          except tarfile.ReadError as exc:
+              stream_error = f"archive-open: {exc}"
 
           names = [name for name, _ in complete]
           if len(names) != len(set(names)):
-              raise SystemExit("duplicate complete tar member names")
+              raise SystemExit("duplicate complete effective member names")
 
           print(f"COMPLETE_MEMBER_COUNT\t{len(complete)}")
           for name, content in complete:
@@ -163,19 +173,11 @@ jobs:
                   f"{hashlib.sha256(content).hexdigest()}\t"
                   f"{base64.b64encode(content).decode('ascii')}"
               )
-          if partial is None:
-              print("PARTIAL_MEMBER\tnone")
-          else:
-              print(
-                  "PARTIAL_MEMBER\t"
-                  f"{partial[0]}\texpected={partial[1]}\t"
-                  f"available={partial[2]}"
-              )
-
           print(
               "RECOVERY_SUMMARY\t"
               f"complete={len(complete)}\t"
-              f"partial={partial[0] if partial else None!r}\t"
-              f"remaining_decompressed_bytes={len(decompressed) - offset}"
+              f"partial={partial_name!r}\t"
+              f"missing={sorted(expected - set(names))!r}\t"
+              f"stream_error={stream_error!r}"
           )
           PY
