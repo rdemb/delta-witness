@@ -1,82 +1,81 @@
-name: Export claim-relevant path branch tree
+name: Interaction checkpoint
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PYTHONDONTWRITEBYTECODE: "1"
   PYTHONUTF8: "1"
 
 concurrency:
-  group: export-claim-relevant-path-${{ github.ref }}
+  group: interaction-checkpoint-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  export-branch-tree:
-    name: Export exact branch tree
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.head_ref == 'research/claim-relevant-path-divergence-v1'
+  reproduce:
+    name: Interaction checkpoint / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     steps:
-      - name: Check out exact PR branch
+      - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
 
-      - name: Verify exact head and create deterministic Git archive
-        shell: bash
-        env:
-          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Remove ambient Coverage.py and install dependency-free editable package
         run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
-          git diff --quiet
-          git diff --cached --quiet
-          git archive \
-            --format=tar \
-            --prefix=delta-witness/ \
-            --output=claim-relevant-path-branch.tar \
-            HEAD
-          sha256sum claim-relevant-path-branch.tar \
-            > claim-relevant-path-branch.tar.sha256
+          python -m pip uninstall --yes coverage || true
+          python -m pip install --no-deps -e .
+
+      - name: Verify dependency-free checkpoint and public imports
+        run: |
           python - <<'PY'
-          from pathlib import Path
-          import hashlib
-          import json
+          import importlib.util
+          import sys
 
-          partial = Path(
-              "research/DW-001/.claim-relevant-path-transport-recovery/"
-              "dw001_claim_relevant_path_plan.py.partial"
-          ).read_bytes()
-          metadata = json.loads(
-              Path(
-                  "research/DW-001/.claim-relevant-path-transport-recovery/"
-                  "recovery-metadata.v1.json"
-              ).read_text(encoding="utf-8")
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness.dw001_interaction_lattice_checkpoint import (
+              build_interaction_lattice_result_checkpoint,
+              verify_interaction_lattice_result_checkpoint_document,
           )
-          assert len(partial) == 32768
-          assert hashlib.sha256(partial).hexdigest() == (
-              "ff4da3962fda78d5cc390632388c5256"
-              "87ae48e694fa215099a0c3c115d03c22"
+          from deltawitness.dw001_interaction_lattice_result import (
+              verify_interaction_witness_lattice_result_document,
           )
-          assert metadata["member_partial_sha256"] == hashlib.sha256(partial).hexdigest()
-          assert metadata["execution_authorized"] is False
+          assert callable(build_interaction_lattice_result_checkpoint)
+          assert callable(verify_interaction_lattice_result_checkpoint_document)
+          assert callable(verify_interaction_witness_lattice_result_document)
+          assert "coverage" not in sys.modules
           PY
+          python scripts/smoke_dw001_interaction_lattice_plan.py
+          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
 
-      - name: Upload exact branch archive
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: claim-relevant-path-branch-${{ github.event.pull_request.head.sha }}
-          path: |
-            claim-relevant-path-branch.tar
-            claim-relevant-path-branch.tar.sha256
-          if-no-files-found: error
-          retention-days: 1
+      - name: Build and force-reinstall dependency-free wheel
+        run: |
+          python -m pip wheel --no-deps . --wheel-dir dist
+          python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
+
+      - name: Reproduce checkpoint from installed wheel
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          assert "coverage" not in sys.modules
+          PY
+          python scripts/smoke_dw001_interaction_lattice_plan.py
+          python scripts/smoke_dw001_interaction_lattice_checkpoint.py
