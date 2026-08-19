@@ -117,8 +117,8 @@ jobs:
               ".claim-relevant-path-preregistration.bundle.tar.gz"
           )
           expected_sha256 = (
-              "1b6e4b8bf2c85636be94832a8cb0b368"
-              "03d6cd75043adeb2a08255e529564c5f"
+              "8aee966cbbe5b2cff5b792923e0c3831"
+              "ddf44abd0cb7827da3dcf48d2e4f7d54"
           )
           expected = {
               ".github/workflows/claim-relevant-path-preregistration.yml",
