@@ -1,4 +1,4 @@
-name: Export claim-relevant path recovery bytes
+name: Export claim-relevant path branch tree
 
 on:
   pull_request:
@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  export-recovery-bytes:
-    name: Export exact recovery bytes
+  export-branch-tree:
+    name: Export exact branch tree
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
@@ -31,41 +31,52 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Verify exact recovery identities
+      - name: Verify exact head and create deterministic Git archive
         shell: bash
         env:
           EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
+          git diff --quiet
+          git diff --cached --quiet
+          git archive \
+            --format=tar \
+            --prefix=delta-witness/ \
+            --output=claim-relevant-path-branch.tar \
+            HEAD
+          sha256sum claim-relevant-path-branch.tar \
+            > claim-relevant-path-branch.tar.sha256
           python - <<'PY'
           from pathlib import Path
           import hashlib
           import json
 
-          root = Path(
-              "research/DW-001/.claim-relevant-path-transport-recovery"
+          partial = Path(
+              "research/DW-001/.claim-relevant-path-transport-recovery/"
+              "dw001_claim_relevant_path_plan.py.partial"
+          ).read_bytes()
+          metadata = json.loads(
+              Path(
+                  "research/DW-001/.claim-relevant-path-transport-recovery/"
+                  "recovery-metadata.v1.json"
+              ).read_text(encoding="utf-8")
           )
-          partial = root / "dw001_claim_relevant_path_plan.py.partial"
-          metadata_path = root / "recovery-metadata.v1.json"
-          metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-          raw = partial.read_bytes()
-          assert len(raw) == 32768
-          assert hashlib.sha256(raw).hexdigest() == (
+          assert len(partial) == 32768
+          assert hashlib.sha256(partial).hexdigest() == (
               "ff4da3962fda78d5cc390632388c5256"
               "87ae48e694fa215099a0c3c115d03c22"
           )
-          assert metadata["member_available_bytes"] == len(raw)
-          assert metadata["member_partial_sha256"] == hashlib.sha256(raw).hexdigest()
-          assert metadata["member_complete"] is False
+          assert metadata["member_partial_sha256"] == hashlib.sha256(partial).hexdigest()
           assert metadata["execution_authorized"] is False
           PY
 
-      - name: Upload exact recovery evidence
+      - name: Upload exact branch archive
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: claim-relevant-path-recovery-${{ github.event.pull_request.head.sha }}
-          path: research/DW-001/.claim-relevant-path-transport-recovery/
-          include-hidden-files: true
+          name: claim-relevant-path-branch-${{ github.event.pull_request.head.sha }}
+          path: |
+            claim-relevant-path-branch.tar
+            claim-relevant-path-branch.tar.sha256
           if-no-files-found: error
           retention-days: 1
