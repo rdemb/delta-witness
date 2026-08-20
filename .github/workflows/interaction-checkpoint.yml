@@ -112,6 +112,34 @@ jobs:
           test "$start_head" = "$EXPECTED_HEAD"
           git merge-base --is-ancestor 818fa19da69e50319325b2544832fd1b7833b0e9 HEAD
 
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path(".github/dw51-reconstruction/code.py")
+          source = path.read_text(encoding="utf-8")
+          old = '''partial = run("git", "show", f"{BASE_COMMIT}:{PARTIAL_PATH}")
+          lines = partial.splitlines(keepends=True)
+          if len(lines) != 909:
+              raise SystemExit(f"unexpected reviewed partial line count: {len(lines)}")
+          prefix = b"".join(lines[:810])
+          '''
+          new = '''partial = run("git", "show", f"{BASE_COMMIT}:{PARTIAL_PATH}")
+          if len(partial) != 32768:
+              raise SystemExit(f"unexpected reviewed partial byte count: {len(partial)}")
+          blob_header = b"blob " + str(len(partial)).encode("ascii") + b"\\0"
+          blob_sha = hashlib.sha1(blob_header + partial).hexdigest()
+          if blob_sha != "6fbf216799427fd6787499df1cc4f3e5a6c7d6ab":
+              raise SystemExit(f"unexpected reviewed partial blob identity: {blob_sha}")
+          lines = partial.splitlines(keepends=True)
+          if len(lines) < 810:
+              raise SystemExit(f"reviewed partial prefix incomplete: {len(lines)} lines")
+          prefix = b"".join(lines[:810])
+          '''
+          if source.count(old) != 1:
+              raise SystemExit("reconstruction line-count guard patch cardinality mismatch")
+          path.write_text(source.replace(old, new, 1), encoding="utf-8")
+          PY
+
           for script in \
             .github/dw51-reconstruction/code.py \
             .github/dw51-reconstruction/tests_v2.py \
