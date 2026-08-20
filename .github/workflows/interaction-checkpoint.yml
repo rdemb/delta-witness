@@ -79,3 +79,139 @@ jobs:
           PY
           python scripts/smoke_dw001_interaction_lattice_plan.py
           python scripts/smoke_dw001_interaction_lattice_checkpoint.py
+
+  reconstruct_claim_path_v1:
+    name: DW-001 claim-path exact reconstruction
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.ref == 'research/claim-relevant-path-divergence-v1' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out exact PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: research/claim-relevant-path-divergence-v1
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Reconstruct, verify, and publish exact design-only v1
+        shell: bash
+        run: |
+          set -euo pipefail
+          start_head="$(git rev-parse HEAD)"
+          test "$start_head" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 818fa19da69e50319325b2544832fd1b7833b0e9 HEAD
+
+          for script in \
+            .github/dw51-reconstruction/code.py \
+            .github/dw51-reconstruction/tests_v2.py \
+            .github/dw51-reconstruction/docs_v2.py \
+            .github/dw51-reconstruction/workflows_v2.py
+          do
+            test -f "$script"
+            test ! -L "$script"
+            python "$script"
+          done
+
+          rm -rf .github/dw51-reconstruction .github/dw51-text-transport
+          rm -rf research/DW-001/.claim-relevant-path-transport-recovery
+          rm -f .github/workflows/dw51-autonomous-apply.yml
+          rm -f .github/workflows/dw51-text-transport.yml
+          rm -f .github/workflows/unpack-claim-relevant-path-bundle.yml
+          rm -f research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz
+          rm -f research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_CI_TRIGGER_RECEIPT_V1.md
+          rm -f .connector-file-probe .dw-inline-tree-probe .dw51-tree-content-probe
+
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          git show origin/main:.github/workflows/interaction-checkpoint.yml > .github/workflows/interaction-checkpoint.yml
+
+          python -m pip uninstall --yes coverage || true
+          python -m pip install --no-deps -e .
+          python -m unittest -v \
+            tests.test_dw001_claim_relevant_path_preregistration \
+            tests.test_dw001_claim_relevant_path_adversarial \
+            tests.test_dw001_claim_relevant_path_schemas 2>&1 | tee /tmp/dw51-targeted.log
+          python scripts/smoke_dw001_claim_relevant_path_plan.py
+          python scripts/validate_public_tree.py
+          python -m compileall -q src tests scripts
+          python -m unittest discover -s tests -v 2>&1 | tee /tmp/dw51-full.log
+          ./scripts/demo.sh
+
+          python - <<'PY'
+          import importlib.util
+          import sys
+          from deltawitness.dw001_claim_relevant_path_plan import (
+              CATALOG_SHA256,
+              INFLUENCE_CONTROL_SHA256,
+              PLAN_SHA256,
+              PRIOR_ART_LOG_SHA256,
+              SOURCE_AST_SHA256,
+              SOURCE_SHA256,
+              TEST_SHA256,
+          )
+
+          assert SOURCE_SHA256 == "8c1bdd26c2e98cd209f210630bfe4d274a3dcd7bbd042db8b8586c7750814327"
+          assert SOURCE_AST_SHA256 == "dabb7011748968f8d43d590ff843a91697a3344a2400d7cabaf926b79ca88e2d"
+          assert TEST_SHA256 == "8a26d52fa7fbb4ab7fc6eab466d9051cd329b0da09a667b5e220fbbfd416d1e9"
+          assert INFLUENCE_CONTROL_SHA256 == "7b068d2f71003fade4eca77e1aa9cdb3a0f2f526f89dbd4828d4f17fbf2bd4f5"
+          assert PLAN_SHA256 == "ff0403132c3424fc7309a15a05794eed93ac9eb526de172e17326f8409ca0888"
+          assert CATALOG_SHA256 == "f36fbe58c00cfb8ed0fd994f3bb1dcdb45040774f7ae4663563b9f40ac15daa5"
+          assert PRIOR_ART_LOG_SHA256 == "5f697631a5ded7a413dd11f4da0606ee8809e2b0f5de257ecab53a7e2d7f790c"
+          assert importlib.util.find_spec("coverage") is None
+          assert "coverage" not in sys.modules
+          PY
+
+          rm -rf build dist
+          python -m pip wheel --no-deps . --wheel-dir dist
+          python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
+          python scripts/smoke_dw001_claim_relevant_path_plan.py
+          python - <<'PY'
+          import importlib.util
+          import sys
+          assert importlib.util.find_spec("coverage") is None
+          assert "coverage" not in sys.modules
+          PY
+
+          targeted="$(grep -Eo 'Ran [0-9]+ tests?' /tmp/dw51-targeted.log | tail -1 | awk '{print $2}')"
+          complete="$(grep -Eo 'Ran [0-9]+ tests?' /tmp/dw51-full.log | tail -1 | awk '{print $2}')"
+          test -n "$targeted"
+          test -n "$complete"
+
+          cat > research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md <<EOF
+          # DW-001 Claim-Relevant Path Divergence Local Gate Receipt v1
+
+          - Starting branch SHA: \`$start_head\`
+          - Targeted contract/adversarial/schema tests: \`$targeted\` passed
+          - Complete repository regression tests: \`$complete\` passed
+          - Public-tree validation: \`PASS\`
+          - Python compilation: \`PASS\`
+          - End-to-end demo: \`PASS\`
+          - Dependency-free editable install: \`PASS\`
+          - Wheel build, force reinstall, and installed smoke: \`PASS\`
+          - Frozen source/AST/test/influence/plan/catalog/prior-art identities: \`EXACT\`
+          - Coverage.py import during preregistration checks: \`ABSENT\`
+          - Candidate, selector, Coverage.py, fault, influence, and target execution: \`NOT AUTHORIZED\`
+
+          This receipt records local GitHub-hosted gates before publication of the ordinary implementation commit. It is not final-head CI evidence and does not expand the design-only claim boundary.
+          EOF
+          sed -i 's/^          //' research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md
+
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          rm -rf build dist
+          git add -A
+          test -n "$(git diff --cached --name-only)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "research: implement exact claim-path preregistration"
+
+          remote_head="$(git ls-remote origin refs/heads/research/claim-relevant-path-divergence-v1 | cut -f1)"
+          test "$remote_head" = "$GITHUB_SHA"
+          git push origin HEAD:refs/heads/research/claim-relevant-path-divergence-v1
