@@ -37,6 +37,40 @@ jobs:
           python -m pip uninstall --yes coverage || true
           python -m pip install --no-deps -e .
 
+      - name: Record exact editable identities and inactive Coverage.py
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness.dw001_claim_relevant_path_plan import (
+              CATALOG_SHA256,
+              INFLUENCE_CONTROL_SHA256,
+              PLAN_SHA256,
+              PRIOR_ART_LOG_SHA256,
+              SOURCE_AST_SHA256,
+              SOURCE_SHA256,
+              TEST_SHA256,
+          )
+          assert "coverage" not in sys.modules
+          identities = {
+              "source_sha256": SOURCE_SHA256,
+              "source_ast_sha256": SOURCE_AST_SHA256,
+              "test_sha256": TEST_SHA256,
+              "influence_control_sha256": INFLUENCE_CONTROL_SHA256,
+              "plan_sha256": PLAN_SHA256,
+              "catalog_sha256": CATALOG_SHA256,
+              "prior_art_log_sha256": PRIOR_ART_LOG_SHA256,
+          }
+          Path("/tmp/dw001-claim-path-editable-identities.json").write_text(
+              json.dumps(identities, sort_keys=True, separators=(",", ":")),
+              encoding="utf-8",
+          )
+          PY
+
       - name: Validate public tree and compile sources
         run: |
           python scripts/validate_public_tree.py
@@ -46,12 +80,7 @@ jobs:
         run: python -m unittest discover -s tests
 
       - name: Reproduce design-only claim-path smoke
-        run: |
-          python scripts/smoke_dw001_claim_relevant_path_plan.py
-          python - <<'PY'
-          import sys
-          assert "coverage" not in sys.modules
-          PY
+        run: python scripts/smoke_dw001_claim_relevant_path_plan.py
 
       - name: Build, force-reinstall, and reproduce wheel
         run: |
@@ -59,6 +88,42 @@ jobs:
           python -m pip wheel --no-deps . --wheel-dir dist
           python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
           python scripts/smoke_dw001_claim_relevant_path_plan.py
+
+      - name: Require exact editable and installed-wheel identity equality
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          import sys
+
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness.dw001_claim_relevant_path_plan import (
+              CATALOG_SHA256,
+              INFLUENCE_CONTROL_SHA256,
+              PLAN_SHA256,
+              PRIOR_ART_LOG_SHA256,
+              SOURCE_AST_SHA256,
+              SOURCE_SHA256,
+              TEST_SHA256,
+          )
+          assert "coverage" not in sys.modules
+          editable = json.loads(
+              Path("/tmp/dw001-claim-path-editable-identities.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          installed = {
+              "source_sha256": SOURCE_SHA256,
+              "source_ast_sha256": SOURCE_AST_SHA256,
+              "test_sha256": TEST_SHA256,
+              "influence_control_sha256": INFLUENCE_CONTROL_SHA256,
+              "plan_sha256": PLAN_SHA256,
+              "catalog_sha256": CATALOG_SHA256,
+              "prior_art_log_sha256": PRIOR_ART_LOG_SHA256,
+          }
+          assert installed == editable, (installed, editable)
+          PY
 
   compatibility:
     name: Compatibility / Python ${{ matrix.python-version }}
@@ -84,6 +149,14 @@ jobs:
 
       - name: Run claim-path contract, adversarial, and exact-schema tests
         run: |
+          python - <<'PY'
+          import importlib.util
+          import sys
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness import dw001_claim_relevant_path_plan as preregistration
+          assert preregistration.PLAN_SHA256
+          assert "coverage" not in sys.modules
+          PY
           python -m unittest -v \
             tests.test_dw001_claim_relevant_path_preregistration \
             tests.test_dw001_claim_relevant_path_adversarial \
@@ -98,3 +171,11 @@ jobs:
           python -m pip wheel --no-deps . --wheel-dir dist
           python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
           python scripts/smoke_dw001_claim_relevant_path_plan.py
+          python - <<'PY'
+          import importlib.util
+          import sys
+          assert importlib.util.find_spec("coverage") is None
+          from deltawitness import dw001_claim_relevant_path_plan as preregistration
+          assert preregistration.PLAN_SHA256
+          assert "coverage" not in sys.modules
+          PY
