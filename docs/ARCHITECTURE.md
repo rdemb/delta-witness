@@ -850,3 +850,8 @@ truth-table independence agrees with five frozen mutants
 ```
 
 The result validates one exact project-owned synthetic experiment and its integrity path. It does not authorize external repository execution, a benchmark, holdout, release, deployment, score, threshold, blocker, containment claim, authentication claim, Gate completion, production-readiness claim, scientific-novelty claim, or award-level-significance claim.
+
+<!-- DW001_CLAIM_RELEVANT_PATH_ARCH_V1 -->
+## Design-only claim-path layer
+
+The DW-001 claim-path layer is an integrity-bound preregistration component: owned fixture bytes → semantic identities → exact plan/catalog/prior-art documents → closed schemas → fail-closed loaders and verifiers. It deliberately stops before fixture execution, Coverage.py collection, candidate generation, selector invocation, fault observation, scoring, or merge gating.

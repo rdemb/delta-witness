@@ -702,3 +702,8 @@ See:
 - [Interaction-lattice execution threat boundary](research/DW-001/INTERACTION_WITNESS_LATTICE_RESULT_THREAT_BOUNDARY_V1.md)
 - [Dependency-free public checkpoint](research/DW-001/interaction-witness-lattice-result-checkpoint.v1.json)
 - [Result architecture](docs/ARCHITECTURE.md#selector-context-interaction-lattice-result-architecture)
+
+<!-- DW001_CLAIM_RELEVANT_PATH_V1 -->
+### DW-001 claim-relevant path divergence preregistration
+
+The repository includes a design-only synthetic preregistration that freezes claim-facing selectors, collateral-reference selectors, path-shape expectations, a fixed influence control, explicit fault/neutral controls, exact schemas, and a prior-art boundary. Execution remains `not_implemented`; no score, novelty, superiority, production, release, or deployment claim is authorized. See `research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md`.
