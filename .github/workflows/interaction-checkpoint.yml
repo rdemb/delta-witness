@@ -170,6 +170,7 @@ jobs:
 
           git fetch --no-tags origin main:refs/remotes/origin/main
           git show origin/main:.github/workflows/interaction-checkpoint.yml > .github/workflows/interaction-checkpoint.yml
+          git add -A
 
           python -m pip uninstall --yes coverage || true
           python -m pip install --no-deps -e .
