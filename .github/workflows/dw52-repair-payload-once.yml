@@ -1,0 +1,75 @@
+name: Repair DW-001 protocol payload once
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+env:
+  TARGET_BRANCH: research/claim-relevant-path-execution-v1
+  EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+
+concurrency:
+  group: dw52-payload-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    if: >-
+      github.event.pull_request.head.ref == 'research/claim-relevant-path-execution-v1' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: research/claim-relevant-path-execution-v1
+          fetch-depth: 0
+
+      - name: Reassemble and verify exact reviewed payload
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          python - <<'PY'
+          import base64
+          import hashlib
+          from pathlib import Path
+          import stat
+
+          root = Path('.github/dw52-freeze')
+          paths = [root / f'payload.v1.b64.segment-{index:02d}' for index in range(20)]
+          observed_names = sorted(path.name for path in root.glob('payload.v1.b64.segment-*'))
+          expected_names = [path.name for path in paths]
+          assert observed_names == expected_names, (observed_names, expected_names)
+          chunks: list[bytes] = []
+          for path in paths:
+              metadata = path.lstat()
+              assert stat.S_ISREG(metadata.st_mode) and not path.is_symlink(), path
+              chunks.append(b''.join(path.read_bytes().split()))
+          encoded = b''.join(chunks)
+          archive = base64.b64decode(encoded, validate=True)
+          digest = hashlib.sha256(archive).hexdigest()
+          expected = '996067e573c2fe4f4e3e35aaeb825ea79cfe775cf6d45e86b494f0c7615df631'
+          assert digest == expected, (digest, expected)
+          destination = root / 'payload.v1.b64'
+          destination.write_bytes(encoded + b'\n')
+          assert base64.b64decode(destination.read_bytes(), validate=False) == archive
+          print(f'payload repaired: archive_sha256={digest} encoded_bytes={len(encoded)}')
+          PY
+
+      - name: Publish ordinary repair commit and remove temporary transport
+        run: |
+          set -euo pipefail
+          rm -f .github/dw52-freeze/payload.v1.b64.segment-*
+          rm -f .github/workflows/dw52-repair-payload-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "ci: repair exact claim-path protocol payload"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          remote_head="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)"
+          test "$remote_head" = "$EXPECTED_HEAD"
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"

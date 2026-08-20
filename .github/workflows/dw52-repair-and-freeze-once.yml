@@ -1,0 +1,245 @@
+name: Repair and freeze DW-001 claim-path protocol once
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUTF8: "1"
+  TARGET_BRANCH: research/claim-relevant-path-execution-v1
+  EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+  RED_FIRST_HEAD: 553ed0289f498231574029623992bd41b69432e7
+  RED_FIRST_RUN_ID: "32268617021"
+  REVIEWED_ARCHIVE_SHA256: 996067e573c2fe4f4e3e35aaeb825ea79cfe775cf6d45e86b494f0c7615df631
+
+concurrency:
+  group: dw52-repair-and-freeze
+  cancel-in-progress: false
+
+jobs:
+  repair-and-freeze:
+    if: >-
+      github.event.pull_request.head.ref == 'research/claim-relevant-path-execution-v1' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: research/claim-relevant-path-execution-v1
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Verify retained red-first evidence and reconstruct reviewed archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          python - <<'PY'
+          import base64
+          import hashlib
+          import io
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import stat
+          import tarfile
+          import urllib.request
+          import zipfile
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          headers = {
+              "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+
+          def read_json(url: str) -> object:
+              request = urllib.request.Request(url, headers=headers)
+              return json.loads(urllib.request.urlopen(request, timeout=60).read())
+
+          run_id = os.environ["RED_FIRST_RUN_ID"]
+          metadata = read_json(
+              f"https://api.github.com/repos/{repository}/actions/runs/{run_id}"
+          )
+          assert isinstance(metadata, dict)
+          assert metadata["head_sha"] == os.environ["RED_FIRST_HEAD"]
+          assert metadata["name"] == "CI"
+          assert metadata["conclusion"] == "failure"
+          logs_request = urllib.request.Request(
+              f"https://api.github.com/repos/{repository}/actions/runs/{run_id}/logs",
+              headers=headers,
+          )
+          log_archive = urllib.request.urlopen(logs_request, timeout=60).read()
+          expected_error = (
+              b"claim-relevant path execution protocol is intentionally not implemented"
+          )
+          with zipfile.ZipFile(io.BytesIO(log_archive)) as archive:
+              joined = b"\n".join(
+                  archive.read(name) for name in archive.namelist()
+              )
+          assert expected_error in joined
+
+          blob_shas = [
+              "19626e4b0d43ae07efff2eba30b51ce5ce4aa434",
+              "35ab4175cb630f6ecaee12ec7add53f8682179f6",
+              "0c7e186674a58631fb177ac4e6a788cd158d1dc2",
+              "40a7119944d279a36a4efff6532c454a26cdb342",
+              "25f63d07379801545be60242d128fa7fdf73a615",
+              "43b83092ae538a49256e0536a0ee4326e25eb6d7",
+              "d5a1af48409dc75bbf9640ae95fe85edf7d77cf6",
+              "f249a4aceaf8ab0099a131faef3b2e328ca15b98",
+              "8ac617ed84837440ba1f4182f8d5b68e84870dd0",
+              "891dbc7cff9d58cf480cd8370bd1515229896c21",
+              "53e8e01718060bb4085ee022ed9dbed113073c3f",
+              "a034d1ff578feeddf62143fb5a9a435a3b035593",
+              "c9ea688472a58af2634853a6ba6c73536edaacf8",
+              "d8546f7de969a40b733fde0bf239e491c7de8216",
+              "30e54626c86b95c351dc985fac69900b7258ff68",
+              "630c61f565e37a916b8d93b9ca675f8f9a42b1ab",
+              "030281f953257f5d5b1c1df8bca242087f56dff1",
+              "7f42d34a8ebbdfb8388f6268107c1cce7b70438a",
+              "3f6c14e1c38e08b68ac993401aa527a72619db3f",
+              "dd790811016f0f669d8c033a3e0cc8f4283fb5ec",
+          ]
+          encoded_parts: list[bytes] = []
+          for blob_sha in blob_shas:
+              payload = read_json(
+                  f"https://api.github.com/repos/{repository}/git/blobs/{blob_sha}"
+              )
+              assert isinstance(payload, dict)
+              assert payload["sha"] == blob_sha
+              assert payload["encoding"] == "base64"
+              data = base64.b64decode(payload["content"], validate=False)
+              git_identity = hashlib.sha1(
+                  b"blob " + str(len(data)).encode("ascii") + b"\0" + data
+              ).hexdigest()
+              assert git_identity == blob_sha
+              encoded_parts.append(data)
+          encoded = b"".join(encoded_parts)
+          assert len(encoded) == 24441, len(encoded)
+          archive_bytes = base64.b64decode(b"".join(encoded.split()), validate=True)
+          digest = hashlib.sha256(archive_bytes).hexdigest()
+          assert digest == os.environ["REVIEWED_ARCHIVE_SHA256"], digest
+
+          expected_members = {
+              ".github/dw52-freeze/generate.py",
+              ".github/workflows/claim-relevant-path-execution-protocol.yml",
+              "research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_PROTOCOL_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_PUBLICATION_BOUNDARY_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_RED_FIRST_V1.md",
+              "research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_THREAT_BOUNDARY_V1.md",
+              "scripts/smoke_dw001_claim_relevant_path_execution_protocol.py",
+              "src/deltawitness/dw001_claim_relevant_path_execution.py",
+              "tests/test_dw001_claim_relevant_path_execution_protocol.py",
+              "tests/test_dw001_claim_relevant_path_execution_protocol_adversarial.py",
+              "tests/test_dw001_claim_relevant_path_execution_protocol_schema.py",
+              "tests/test_dw001_claim_relevant_path_execution_red_first.py",
+          }
+          with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:gz") as archive:
+              members = archive.getmembers()
+              names = [member.name for member in members]
+              assert len(names) == len(set(names)) == 12
+              assert set(names) == expected_members
+              for member in members:
+                  pure = PurePosixPath(member.name)
+                  assert not pure.is_absolute() and ".." not in pure.parts
+                  assert member.isfile() and not member.issym() and not member.islnk()
+                  source = archive.extractfile(member)
+                  assert source is not None
+                  data = source.read()
+                  assert len(data) == member.size
+                  destination = Path(*pure.parts)
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  destination.write_bytes(data)
+                  metadata = destination.lstat()
+                  assert stat.S_ISREG(metadata.st_mode) and not destination.is_symlink()
+          print(
+              "reviewed payload reconstructed: "
+              f"archive_sha256={digest} blobs={len(blob_shas)} files=12"
+          )
+          PY
+
+      - name: Reuse reviewed freeze blocks and execute design-only gates
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import textwrap
+
+          workflow = Path(".github/workflows/dw52-freeze-once.yml")
+          source = workflow.read_text(encoding="utf-8")
+
+          def block(step_name: str) -> str:
+              marker = f"      - name: {step_name}\n"
+              if source.count(marker) != 1:
+                  raise SystemExit(f"step marker cardinality mismatch: {step_name}")
+              tail = source.split(marker, 1)[1]
+              section = tail.split("\n      - name: ", 1)[0]
+              match = re.search(r"\n        run: \|\n(?P<body>(?:          .*\n?)*)", "\n" + section)
+              if match is None:
+                  raise SystemExit(f"run block missing: {step_name}")
+              return textwrap.dedent(match.group("body"))
+
+          mapping = {
+              "/tmp/dw52-generate.sh": "Generate exact design-only protocol artifacts",
+              "/tmp/dw52-gates.sh": "Run design-only protocol gates",
+              "/tmp/dw52-commit.sh": "Commit and fast-forward the exact protocol tree",
+          }
+          for destination, step_name in mapping.items():
+              path = Path(destination)
+              path.write_text(block(step_name), encoding="utf-8")
+              path.chmod(0o700)
+          PY
+
+          rm -f .github/workflows/dw52-repair-and-freeze-once.yml
+          rm -f .github/workflows/dw52-repair-payload-once.yml
+          rm -f .github/workflows/dw52-repair-payload-api-once.yml
+          export GITHUB_REF_NAME="$TARGET_BRANCH"
+          bash /tmp/dw52-generate.sh
+
+          trigger="research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_EXACT_HEAD_TRIGGER_V1.md"
+          : > "$trigger"
+          git add -A
+          cat > /tmp/dw52-final-allowlist <<'EOF'
+          .github/workflows/claim-relevant-path-execution-protocol.yml
+          README.md
+          ROADMAP.md
+          THREAT_MODEL.md
+          docs/ARCHITECTURE.md
+          docs/PUBLICATION_POLICY.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_EXACT_HEAD_TRIGGER_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_PROTOCOL_FREEZE_RECEIPT_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_PROTOCOL_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_PUBLICATION_BOUNDARY_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_RED_FIRST_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_EXECUTION_THREAT_BOUNDARY_V1.md
+          research/DW-001/claim-relevant-path-execution-manifest.v1.json
+          research/DW-001/schema/claim-relevant-path-execution-manifest.schema.json
+          scripts/smoke_dw001_claim_relevant_path_execution_protocol.py
+          src/deltawitness/dw001_claim_relevant_path_execution.py
+          tests/test_dw001_claim_relevant_path_execution_protocol.py
+          tests/test_dw001_claim_relevant_path_execution_protocol_adversarial.py
+          tests/test_dw001_claim_relevant_path_execution_protocol_schema.py
+          tests/test_dw001_claim_relevant_path_execution_red_first.py
+          EOF
+          sed -i 's/^          //' /tmp/dw52-final-allowlist
+          sort -o /tmp/dw52-final-allowlist /tmp/dw52-final-allowlist
+          git diff --cached --name-only origin/main | sort > /tmp/dw52-final-observed
+          diff -u /tmp/dw52-final-allowlist /tmp/dw52-final-observed
+
+          bash /tmp/dw52-gates.sh
+          bash /tmp/dw52-commit.sh
