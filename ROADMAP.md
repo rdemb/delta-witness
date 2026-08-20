@@ -172,3 +172,12 @@ A checked negative control, pre-execution plan, or owned-synthetic result docume
 - [ ] External contributors maintaining adapters or scenarios
 - [ ] Documented use in a repository not controlled by the original maintainer
 - [ ] Performance profile and operational guidance
+
+<!-- DW001_CLAIM_RELEVANT_PATH_ROADMAP_V1 -->
+## DW-001 claim-relevant path sequence
+
+1. Merge and reproduce the design-only v1 preregistration.
+2. Open a separate execution issue; freeze the executor, environment receipt, typed outcomes, and baseline comparison before running any candidate.
+3. Execute only the owned synthetic target. Retain errors, timeouts, unavailable evidence, over-refusal, duplicates, invalid renders, and equivalent-review outcomes.
+4. Compare against explicit route membership and raw selector-context paths. Prefer the simpler baseline if equivalent.
+5. Reassess the public claim boundary after complete results and independent reproduction. No automatic promotion to release or production is permitted.

@@ -103,3 +103,8 @@ The **diagnostic-only full result** is not the default public artifact. Retainin
 A publication-safe shape for this owned-synthetic fixture is not automatically safe for an external, private, employer, customer, or third-party repository. Reuse requires a new authorization, privacy, license, containment, and boundary review. External repository execution remains unauthorized.
 
 Do not present this result or checkpoint as evidence of general statement, branch, path, condition, MC/DC, combinatorial, checked-coverage, mutation, or oracle adequacy; method superiority; coding-agent or ecological effectiveness; a score, threshold, or merge blocker; containment or authentication; Gate completion; production readiness; scientific novelty; or award-level significance.
+
+<!-- DW001_CLAIM_RELEVANT_PATH_PUBLICATION_V1 -->
+## Claim-path preregistration claims
+
+A merged, reproduced preregistration may be described as a frozen design and integrity check only. It must not be described as executed evidence, fault localization, causal attribution, checked coverage, dynamic slicing, method superiority, scientific novelty, production readiness, release readiness, or safety. Result-bearing language requires a separately frozen execution protocol and complete typed receipts.

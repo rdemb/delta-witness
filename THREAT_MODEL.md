@@ -864,3 +864,8 @@ The result runner and Coverage.py are observation mechanisms, not a sandbox. Dis
 - Never infer general coverage, path, condition, MC/DC, mutation, or oracle adequacy, method superiority, ecological effectiveness, production readiness, scientific novelty, or merge-policy validity from this result.
 - Keep scores, thresholds, blockers, holdout, ecological inference, external execution, release, deployment, production-readiness, scientific-novelty, and award-level-significance claims disabled.
 - External repository execution remains unauthorized.
+
+<!-- DW001_CLAIM_RELEVANT_PATH_THREAT_V1 -->
+## Claim-relevant path preregistration boundary
+
+The v1 preregistration treats self-digests, filenames, schemas, Git metadata, and final-state test success as insufficient in isolation. Reviewed source/AST/test/control identities and exact semantic reconstruction are required. Loaders reject symbolic links, non-regular files, duplicate keys, malformed UTF-8, resealed substitutions, and result/claim promotion. The temporary reconstruction job is repository maintenance only, receives no secrets, removes itself, and cannot authorize research execution or publication claims. A future runtime adapter is a new trust boundary and requires a separate review.
