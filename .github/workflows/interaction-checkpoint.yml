@@ -243,6 +243,7 @@ jobs:
           EOF
           sed -i 's/^          //' research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md
 
+          rm -f .github/workflows/claim-relevant-path-preregistration.yml
           find . -type d -name __pycache__ -prune -exec rm -rf {} +
           rm -rf build dist
           git add -A
