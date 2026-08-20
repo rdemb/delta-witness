@@ -138,6 +138,14 @@ jobs:
           if source.count(old) != 1:
               raise SystemExit("reconstruction line-count guard patch cardinality mismatch")
           path.write_text(source.replace(old, new, 1), encoding="utf-8")
+
+          tests_path = Path(".github/dw51-reconstruction/tests_v2.py")
+          tests_source = tests_path.read_text(encoding="utf-8")
+          wrong = "bc2ab879595da61815aa7dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77"
+          reviewed = "bc2ab879595da61815a17dcc33a09c6334b93dea3fd464f2fe4a5437944ebb77"
+          if tests_source.count(wrong) != 1 or reviewed in tests_source:
+              raise SystemExit("interaction semantic identity correction cardinality mismatch")
+          tests_path.write_text(tests_source.replace(wrong, reviewed, 1), encoding="utf-8")
           PY
 
           for script in \
