@@ -1,0 +1,79 @@
+name: Expose DW-001 protocol-freeze run identity once
+
+on:
+  push:
+    branches:
+      - research/claim-relevant-path-execution-v1
+    paths:
+      - .github/workflows/dw52-diagnose-once.yml
+
+permissions:
+  actions: read
+  issues: write
+  contents: read
+
+env:
+  PR_NUMBER: "53"
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report recent protocol-freeze runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          branch = "research/claim-relevant-path-execution-v1"
+          query = urllib.parse.urlencode(
+              {"branch": branch, "event": "push", "per_page": 10}
+          )
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{repository}/actions/workflows/dw52-freeze-once.yml/runs?{query}",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          payload = json.loads(urllib.request.urlopen(request, timeout=30).read())
+          runs = payload.get("workflow_runs", [])
+          lines = [
+              "## Protocol-freeze workflow run identity",
+              "",
+              "```text",
+          ]
+          for run in runs[:5]:
+              lines.append(
+                  "run_id={id} head={head_sha} status={status} conclusion={conclusion}".format(
+                      **run
+                  )
+              )
+          if not runs:
+              lines.append("no matching runs found")
+          lines.extend(
+              [
+                  "```",
+                  "",
+                  "This diagnostic workflow does not execute the candidate or alter the frozen protocol. It will be removed before the final public tree is committed.",
+              ]
+          )
+          comment = urllib.request.Request(
+              f"https://api.github.com/repos/{repository}/issues/{os.environ['PR_NUMBER']}/comments",
+              data=json.dumps({"body": "\n".join(lines)}).encode(),
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          urllib.request.urlopen(comment, timeout=30).read()
+          PY
