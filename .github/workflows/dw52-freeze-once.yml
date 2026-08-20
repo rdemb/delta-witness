@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: read
+  issues: write
 
 env:
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -19,6 +20,7 @@ env:
   TARGET_BRANCH: research/claim-relevant-path-execution-v1
   RED_FIRST_HEAD: 553ed0289f498231574029623992bd41b69432e7
   RED_FIRST_RUN_ID: "32268617021"
+  PR_NUMBER: "53"
 
 concurrency:
   group: dw52-claim-path-protocol-freeze
@@ -166,12 +168,13 @@ jobs:
           python - <<'PY'
           import importlib.util
           import sys
-          assert importlib.util.find_spec("coverage") is None
+          assert importlib.util.find_spec("coverage" is None
           assert "coverage" not in sys.modules
           PY
           python .github/dw52-freeze/generate.py
           rm -rf .github/dw52-freeze
           rm -f .github/workflows/dw52-freeze-once.yml
+          rm -f .github/workflows/dw52-diagnose-once.yml
           git fetch --no-tags origin main:refs/remotes/origin/main
           git add -A
 
@@ -218,15 +221,15 @@ jobs:
           import importlib.util
           import sys
           from deltawitness.dw001_claim_relevant_path_execution import (
-              EXECUTION_MANIFEST_SHA256,
-              build_claim_relevant_path_execution_manifest,
+            EXECUTION_MANIFEST_SHA256,
+            build_claim_relevant_path_execution_manifest,
           )
           manifest = build_claim_relevant_path_execution_manifest()
           assert len(manifest["command_schedule"]) == 80
           assert manifest["manifest_sha256"] == EXECUTION_MANIFEST_SHA256
           assert manifest["authorization"]["execution_authorized"] is False
           assert manifest["authorization"]["result_execution_authorized"] is False
-          assert importlib.util.find_spec("coverage") is None
+          assert importlib.util.find_spec("coverage" is None
           assert "coverage" not in sys.modules
           print(f"reviewed_manifest_sha256={EXECUTION_MANIFEST_SHA256}")
           PY
@@ -248,3 +251,93 @@ jobs:
           remote_head="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)"
           test "$remote_head" = "$GITHUB_SHA"
           git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+
+      - name: Record terminal success
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          import urllib.request
+
+          generated_head = subprocess.check_output(
+              ["git", "rev-parse", "HEAD"], text=True
+          ).strip()
+          body = "\n".join(
+              [
+                  "## Protocol-freeze maintenance gate passed",
+                  "",
+                  "```text",
+                  f"starting_head:  {os.environ['GITHUB_SHA']}",
+                  f"generated_head: {generated_head}",
+                  f"run_id:         {os.environ['GITHUB_RUN_ID']}",
+                  "```",
+                  "",
+                  (
+                      "The exact design-only manifest, schema, verifier, tests, "
+                      "documentation, and read-only workflow were generated and "
+                      "validated. Candidate, selector, Coverage.py, fault, "
+                      "influence-observation, and target execution remain "
+                      "unauthorized. Ordinary exact-head PR CI must still be "
+                      "triggered externally and pass before any execution "
+                      "authorization."
+                  ),
+              ]
+          )
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues/{os.environ['PR_NUMBER']}/comments",
+              data=json.dumps({"body": body}).encode(),
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          urllib.request.urlopen(request, timeout=30).read()
+          PY
+
+      - name: Record terminal fail-closed state
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          body = "\n".join(
+              [
+                  "## Protocol-freeze maintenance gate failed closed",
+                  "",
+                  "```text",
+                  f"head:   {os.environ['GITHUB_SHA']}",
+                  f"run_id: {os.environ['GITHUB_RUN_ID']}",
+                  "```",
+                  "",
+                  (
+                      "No frozen identity, validator, assertion, allowlist, or "
+                      "claim boundary was weakened. The branch was not advanced "
+                      "by the failed job. Candidate, selector, Coverage.py, fault, "
+                      "influence-observation, target, and result execution remain "
+                      "unauthorized."
+                  ),
+              ]
+          )
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues/{os.environ['PR_NUMBER']}/comments",
+              data=json.dumps({"body": body}).encode(),
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          urllib.request.urlopen(request, timeout=30).read()
+          PY
+
