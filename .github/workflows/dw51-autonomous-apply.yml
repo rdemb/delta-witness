@@ -2,15 +2,11 @@ name: Apply reviewed DW-001 claim-path preregistration
 
 on:
   push:
-    branches:
-      - research/claim-relevant-path-divergence-v1
-    paths:
-      - .github/workflows/dw51-autonomous-apply.yml
+    branches: [research/claim-relevant-path-divergence-v1]
+    paths: [.github/workflows/dw51-autonomous-apply.yml]
 
 permissions:
   contents: write
-  actions: write
-  pull-requests: write
   issues: write
 
 env:
@@ -19,7 +15,6 @@ env:
   PYTHONUTF8: "1"
   TARGET_BRANCH: research/claim-relevant-path-divergence-v1
   PR_NUMBER: "51"
-  ISSUE_NUMBER: "50"
   KNOWN_CLEANUP_COMMIT: 818fa19da69e50319325b2544832fd1b7833b0e9
 
 concurrency:
@@ -28,169 +23,128 @@ concurrency:
 
 jobs:
   apply:
-    name: Reconstruct, validate, trigger final-head CI, merge, and reproduce
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - name: Check out exact branch history
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: research/claim-relevant-path-divergence-v1
           fetch-depth: 0
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
 
-      - name: Verify maintenance-job trust boundary
+      - name: Reconstruct and clean the reviewed tree
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "$TARGET_BRANCH"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git merge-base --is-ancestor "$KNOWN_CLEANUP_COMMIT" HEAD
           test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$GITHUB_SHA"
-          python - <<'PY'
-          from pathlib import Path
-          import stat
 
-          root = Path.cwd()
-          expected = (
-              ".github/dw51-reconstruction/code.py",
-              ".github/dw51-reconstruction/tests_v2.py",
-              ".github/dw51-reconstruction/docs_v2.py",
-              ".github/dw51-reconstruction/workflows_v2.py",
-          )
-          for relative in expected:
-              path = root / relative
-              mode = path.lstat().st_mode
-              if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
-                  raise SystemExit(f"untrusted reconstruction input: {relative}")
-          PY
+          for path in \
+            .github/dw51-reconstruction/code.py \
+            .github/dw51-reconstruction/tests_v2.py \
+            .github/dw51-reconstruction/docs_v2.py \
+            .github/dw51-reconstruction/workflows_v2.py
+          do
+            test -f "$path"
+            test ! -L "$path"
+          done
 
-      - name: Reconstruct exact reviewed files
-        run: |
-          set -euo pipefail
           python .github/dw51-reconstruction/code.py
           python .github/dw51-reconstruction/tests_v2.py
           python .github/dw51-reconstruction/docs_v2.py
           python .github/dw51-reconstruction/workflows_v2.py
 
-      - name: Remove every transient reconstruction and transport path
-        run: |
-          set -euo pipefail
-          rm -rf .github/dw51-reconstruction
-          rm -rf .github/dw51-text-transport
+          rm -rf .github/dw51-reconstruction .github/dw51-text-transport
           rm -rf research/DW-001/.claim-relevant-path-transport-recovery
           rm -f .github/workflows/dw51-autonomous-apply.yml
           rm -f .github/workflows/dw51-text-transport.yml
           rm -f .github/workflows/unpack-claim-relevant-path-bundle.yml
           rm -f research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz
+          rm -f research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_CI_TRIGGER_RECEIPT_V1.md
           rm -f .connector-file-probe .dw-inline-tree-probe .dw51-tree-content-probe
+
+          cat > /tmp/dw51-pre-gate-paths <<'EOF'
+          .github/workflows/claim-relevant-path-preregistration.yml
+          README.md
+          ROADMAP.md
+          THREAT_MODEL.md
+          docs/ARCHITECTURE.md
+          docs/PUBLICATION_POLICY.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ADVERSARIAL_REVIEW_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md
+          research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md
+          research/DW-001/claim-relevant-path-divergence-catalog.v1.json
+          research/DW-001/claim-relevant-path-divergence-plan.v1.json
+          research/DW-001/claim-relevant-path-prior-art-log.v1.json
+          research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json
+          research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json
+          research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json
+          scripts/smoke_dw001_claim_relevant_path_plan.py
+          src/deltawitness/dw001_claim_relevant_path_plan.py
+          tests/test_dw001_claim_relevant_path_adversarial.py
+          tests/test_dw001_claim_relevant_path_preregistration.py
+          tests/test_dw001_claim_relevant_path_schemas.py
+          EOF
+          sed -i 's/^          //' /tmp/dw51-pre-gate-paths
+          sort -o /tmp/dw51-pre-gate-paths /tmp/dw51-pre-gate-paths
           git add -A
+          git diff --cached --name-only origin/main | sort > /tmp/dw51-observed
+          diff -u /tmp/dw51-pre-gate-paths /tmp/dw51-observed
 
-      - name: Enforce final-tree allowlist before executing gates
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import stat
-          import subprocess
+          while IFS= read -r path; do
+            test -f "$path"
+            test ! -L "$path"
+          done < /tmp/dw51-pre-gate-paths
 
-          allowed = {
-              ".github/workflows/claim-relevant-path-preregistration.yml",
-              "README.md",
-              "ROADMAP.md",
-              "THREAT_MODEL.md",
-              "docs/ARCHITECTURE.md",
-              "docs/PUBLICATION_POLICY.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ADVERSARIAL_REVIEW_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md",
-              "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md",
-              "research/DW-001/claim-relevant-path-divergence-catalog.v1.json",
-              "research/DW-001/claim-relevant-path-divergence-plan.v1.json",
-              "research/DW-001/claim-relevant-path-prior-art-log.v1.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json",
-              "research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json",
-              "research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json",
-              "scripts/smoke_dw001_claim_relevant_path_plan.py",
-              "src/deltawitness/dw001_claim_relevant_path_plan.py",
-              "tests/test_dw001_claim_relevant_path_adversarial.py",
-              "tests/test_dw001_claim_relevant_path_preregistration.py",
-              "tests/test_dw001_claim_relevant_path_schemas.py",
-          }
-          observed = set(
-              subprocess.run(
-                  ["git", "diff", "--cached", "--name-only", "origin/main"],
-                  check=True,
-                  text=True,
-                  stdout=subprocess.PIPE,
-              ).stdout.splitlines()
-          )
-          if observed != allowed:
-              raise SystemExit(
-                  "final-tree allowlist mismatch: "
-                  f"missing={sorted(allowed-observed)!r} extra={sorted(observed-allowed)!r}"
-              )
-          root = Path.cwd()
-          for relative in sorted(allowed):
-              path = root / relative
-              mode = path.lstat().st_mode
-              if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
-                  raise SystemExit(f"final path is not a regular file: {relative}")
-          forbidden = (
-              ".github/dw51-reconstruction",
-              ".github/dw51-text-transport",
-              "research/DW-001/.claim-relevant-path-transport-recovery",
-              "research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz",
-              ".github/workflows/dw51-autonomous-apply.yml",
-              ".github/workflows/dw51-text-transport.yml",
-              ".github/workflows/unpack-claim-relevant-path-bundle.yml",
-          )
-          for relative in forbidden:
-              if (root / relative).exists() or (root / relative).is_symlink():
-                  raise SystemExit(f"transient path survived cleanup: {relative}")
-          PY
+          for path in \
+            .github/dw51-reconstruction \
+            .github/dw51-text-transport \
+            .github/workflows/dw51-autonomous-apply.yml \
+            .github/workflows/dw51-text-transport.yml \
+            .github/workflows/unpack-claim-relevant-path-bundle.yml \
+            research/DW-001/.claim-relevant-path-transport-recovery \
+            research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz \
+            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_CI_TRIGGER_RECEIPT_V1.md
+          do
+            test ! -e "$path"
+            test ! -L "$path"
+          done
 
-      - name: Install dependency-free editable package
+      - name: Run design-only validation
         run: |
           set -euo pipefail
           python -m pip uninstall --yes coverage || true
           python -m pip install --no-deps -e .
-
-      - name: Run targeted contract and adversarial gates
-        run: |
-          set -euo pipefail
           python -m unittest -v \
             tests.test_dw001_claim_relevant_path_preregistration \
             tests.test_dw001_claim_relevant_path_adversarial \
             tests.test_dw001_claim_relevant_path_schemas 2>&1 | tee /tmp/dw51-targeted.log
-          python scripts/smoke_dw001_claim_relevant_path_plan.py | tee /tmp/dw51-smoke.log
+          python scripts/smoke_dw001_claim_relevant_path_plan.py
           python scripts/validate_public_tree.py
           python -m compileall -q src tests scripts
-          python - <<'PY'
+          python -m unittest discover -s tests 2>&1 | tee /tmp/dw51-full.log
+          ./scripts/demo.sh
+          test "$(python - <<'PY'
           import importlib.util
           import sys
-          assert importlib.util.find_spec("coverage") is None
-          assert "coverage" not in sys.modules
+          print(importlib.util.find_spec("coverage") is None and "coverage" not in sys.modules)
           PY
+          )" = "True"
 
-      - name: Run complete repository regression suite
-        run: |
-          set -euo pipefail
-          python -m unittest discover -s tests 2>&1 | tee /tmp/dw51-full.log
-
-      - name: Build and reproduce installed wheel
+      - name: Reproduce installed wheel and frozen identities
         run: |
           set -euo pipefail
           rm -rf build dist
           python -m pip wheel --no-deps . --wheel-dir dist
           python -m pip install --no-deps --force-reinstall dist/deltawitness-*.whl
-          python scripts/smoke_dw001_claim_relevant_path_plan.py | tee /tmp/dw51-wheel-smoke.log
-          python scripts/validate_public_tree.py
+          python scripts/smoke_dw001_claim_relevant_path_plan.py
           python - <<'PY'
           import importlib.util
           import sys
@@ -215,575 +169,103 @@ jobs:
           PY
           rm -rf build dist
 
-      - name: Record local gate receipt
+      - name: Commit and publish exact final tree
+        id: publish
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import os
-          import re
+          targeted="$(grep -Eo 'Ran [0-9]+ tests?' /tmp/dw51-targeted.log | tail -1 | awk '{print $2}')"
+          complete="$(grep -Eo 'Ran [0-9]+ tests?' /tmp/dw51-full.log | tail -1 | awk '{print $2}')"
+          test -n "$targeted"
+          test -n "$complete"
+          cat > research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md <<EOF
+          # DW-001 Claim-Relevant Path Divergence Local Gate Receipt v1
 
-          def count(path: str) -> int:
-              text = Path(path).read_text(encoding="utf-8")
-              matches = re.findall(r"Ran ([0-9]+) tests?", text)
-              if not matches:
-                  raise SystemExit(f"cannot recover unittest count from {path}")
-              return int(matches[-1])
+          - Starting branch SHA: \`$GITHUB_SHA\`
+          - Targeted contract/adversarial/schema tests: \`$targeted\` passed
+          - Complete repository regression tests: \`$complete\` passed
+          - Public-tree validation: \`PASS\`
+          - Python compilation: \`PASS\`
+          - End-to-end demo: \`PASS\`
+          - Design-only smoke: \`PASS\`
+          - Dependency-free editable install: \`PASS\`
+          - Wheel build, force reinstall, and smoke: \`PASS\`
+          - Coverage.py import during preregistration checks: \`ABSENT\`
+          - Candidate/selector/Coverage.py/fault/influence/target execution: \`NOT AUTHORIZED\`
+          - Plan SHA-256: \`ff0403132c3424fc7309a15a05794eed93ac9eb526de172e17326f8409ca0888\`
+          - Catalog SHA-256: \`f36fbe58c00cfb8ed0fd994f3bb1dcdb45040774f7ae4663563b9f40ac15daa5\`
+          - Prior-art log SHA-256: \`5f697631a5ded7a413dd11f4da0606ee8809e2b0f5de257ecab53a7e2d7f790c\`
 
-          targeted = count("/tmp/dw51-targeted.log")
-          complete = count("/tmp/dw51-full.log")
-          receipt = f'''# DW-001 Claim-Relevant Path Divergence Local Gate Receipt v1
+          This receipt records local repository gates before branch publication. It is not final-head CI evidence and does not expand the design-only claim boundary.
+          EOF
+          sed -i 's/^          //' research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md
 
-- Starting branch SHA: `{os.environ["GITHUB_SHA"]}`
-- Targeted contract/adversarial/schema tests: `{targeted}` passed
-- Complete repository regression tests: `{complete}` passed
-- Public-tree validation: `PASS`
-- Python compilation: `PASS`
-- Design-only smoke: `PASS`
-- Dependency-free editable install: `PASS`
-- Wheel build, force reinstall, and smoke: `PASS`
-- Coverage.py import during preregistration checks: `ABSENT`
-- Candidate/selector/Coverage.py/fault/influence/target execution: `NOT AUTHORIZED`
-- Plan SHA-256: `ff0403132c3424fc7309a15a05794eed93ac9eb526de172e17326f8409ca0888`
-- Catalog SHA-256: `f36fbe58c00cfb8ed0fd994f3bb1dcdb45040774f7ae4663563b9f40ac15daa5`
-- Prior-art log SHA-256: `5f697631a5ded7a413dd11f4da0606ee8809e2b0f5de257ecab53a7e2d7f790c`
-
-This receipt records local repository gates before branch publication. It is not final-head CI evidence and does not expand the design-only claim boundary.
-'''
-          path = Path("research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md")
-          path.write_text(receipt, encoding="utf-8", newline="\n")
-          PY
-
-      - name: Create two auditable final branch commits
-        run: |
-          set -euo pipefail
           find . -type d -name __pycache__ -prune -exec rm -rf {} +
           rm -rf build dist
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git reset
+          git add -A
 
-          implementation=(
-            .github/workflows/claim-relevant-path-preregistration.yml
-            research/DW-001/claim-relevant-path-divergence-catalog.v1.json
-            research/DW-001/claim-relevant-path-divergence-plan.v1.json
-            research/DW-001/claim-relevant-path-prior-art-log.v1.json
-            research/DW-001/schema/claim-relevant-path-divergence-catalog.schema.json
-            research/DW-001/schema/claim-relevant-path-divergence-plan.schema.json
-            research/DW-001/schema/claim-relevant-path-prior-art-log.schema.json
-            scripts/smoke_dw001_claim_relevant_path_plan.py
-            src/deltawitness/dw001_claim_relevant_path_plan.py
-            tests/test_dw001_claim_relevant_path_adversarial.py
-            tests/test_dw001_claim_relevant_path_preregistration.py
-            tests/test_dw001_claim_relevant_path_schemas.py
-          )
-          git add -- "${implementation[@]}"
-          git add -A -- \
-            .github/dw51-reconstruction \
-            .github/dw51-text-transport \
-            .github/workflows/dw51-autonomous-apply.yml \
-            .github/workflows/dw51-text-transport.yml \
-            .github/workflows/unpack-claim-relevant-path-bundle.yml \
-            research/DW-001/.claim-relevant-path-transport-recovery \
-            research/DW-001/.claim-relevant-path-preregistration.bundle.tar.gz \
-            .connector-file-probe .dw-inline-tree-probe .dw51-tree-content-probe || true
+          cp /tmp/dw51-pre-gate-paths /tmp/dw51-final-paths
+          echo research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md >> /tmp/dw51-final-paths
+          sort -o /tmp/dw51-final-paths /tmp/dw51-final-paths
+          git diff --cached --name-only origin/main | sort > /tmp/dw51-observed
+          diff -u /tmp/dw51-final-paths /tmp/dw51-observed
+
           git commit -m "research: implement exact claim-path preregistration"
-
-          documentation=(
-            README.md
-            ROADMAP.md
-            THREAT_MODEL.md
-            docs/ARCHITECTURE.md
-            docs/PUBLICATION_POLICY.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ADVERSARIAL_REVIEW_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_ARCHITECTURE_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_LOCAL_GATE_RECEIPT_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PLAN_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_PUBLICATION_BOUNDARY_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_RED_FIRST_V1.md
-            research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_THREAT_BOUNDARY_V1.md
-          )
-          git add -- "${documentation[@]}"
-          test "$(git diff --cached --name-only | sort)" = "$(printf '%s\n' "${documentation[@]}" | sort)"
-          git commit -m "docs: bind claim-path preregistration boundaries"
-
           test -z "$(git status --porcelain --untracked-files=all)"
-          git log --oneline -4
-
-      - name: Fast-forward verified final commits to the PR branch
-        id: publish
-        run: |
-          set -euo pipefail
-          remote="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)"
-          test "$remote" = "$GITHUB_SHA"
-          generated_head="$(git rev-parse HEAD)"
+          test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$GITHUB_SHA"
           git push origin "HEAD:refs/heads/$TARGET_BRANCH"
-          echo "generated_head=$generated_head" >> "$GITHUB_OUTPUT"
-          echo "published generated head $generated_head"
+          echo "generated_head=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for external CI-trigger receipt, require final-head CI, merge, and validate main
+      - name: Report success
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
           GENERATED_HEAD: ${{ steps.publish.outputs.generated_head }}
-          REPOSITORY: ${{ github.repository }}
         run: |
-          set -euo pipefail
           python - <<'PY'
-          from __future__ import annotations
+          import json, os, urllib.request
+          body = (
+              "## Reconstruction gate passed\n\n"
+              "```text\n"
+              f"starting_head: {os.environ['GITHUB_SHA']}\n"
+              f"published_head: {os.environ['GENERATED_HEAD']}\n"
+              "public_tree: PASS\nfull_suite: PASS\ndemo: PASS\n"
+              "editable_and_wheel: PASS\ntransient_files: REMOVED\n"
+              "candidate_execution: NOT_AUTHORIZED\n```\n\n"
+              "An external exact-content receipt commit is still required before final-head CI."
+          )
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues/{os.environ['PR_NUMBER']}/comments",
+              data=json.dumps({"body": body}).encode(),
+              method="POST",
+              headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                       "Accept": "application/vnd.github+json",
+                       "X-GitHub-Api-Version": "2022-11-28"},
+          )
+          urllib.request.urlopen(request, timeout=30).read()
+          PY
 
-          import json
-          import os
-          from pathlib import Path
-          import subprocess
-          import time
-          import urllib.error
-          import urllib.request
-
-          repo = os.environ["REPOSITORY"]
-          owner, name = repo.split("/", 1)
-          token = os.environ["GH_TOKEN"]
-          branch = os.environ["TARGET_BRANCH"]
-          pr_number = int(os.environ["PR_NUMBER"])
-          issue_number = int(os.environ["ISSUE_NUMBER"])
-          generated_head = os.environ["GENERATED_HEAD"]
-          receipt_path = "research/DW-001/CLAIM_RELEVANT_PATH_DIVERGENCE_CI_TRIGGER_RECEIPT_V1.md"
-          receipt = '''# DW-001 Claim-Relevant Path Divergence CI Trigger Receipt v1
-
-- Role: external GitHub App commit used only to trigger CI on the reconstructed final tree
-- Work package: `DW-001-CLAIM-RELEVANT-PATH-DIVERGENCE-V1`
-- Claim boundary: `design_only_preregistration`
-- Research execution authorized: `false`
-- Candidate/selector/Coverage.py/fault/influence/target execution authorized: `false`
-- Plan SHA-256: `ff0403132c3424fc7309a15a05794eed93ac9eb526de172e17326f8409ca0888`
-- Catalog SHA-256: `f36fbe58c00cfb8ed0fd994f3bb1dcdb45040774f7ae4663563b9f40ac15daa5`
-- Prior-art log SHA-256: `5f697631a5ded7a413dd11f4da0606ee8809e2b0f5de257ecab53a7e2d7f790c`
-
-This fixed-content receipt carries no result, score, threshold, novelty, release, deployment, or production claim. Its only operational purpose is to create a GitHub App-authored commit after the self-removing maintenance job publishes the reviewed tree, causing ordinary pull-request workflows to run against the exact final head.
-'''
-          phase = "await_external_receipt"
-          merged = False
-          merge_sha: str | None = None
-          receipt_head: str | None = None
-
-          def api(method: str, path: str, payload: object | None = None) -> object:
-              url = f"https://api.github.com{path}"
-              data = None if payload is None else json.dumps(payload).encode("utf-8")
-              request = urllib.request.Request(
-                  url,
-                  data=data,
-                  method=method,
-                  headers={
-                      "Accept": "application/vnd.github+json",
-                      "Authorization": f"Bearer {token}",
-                      "X-GitHub-Api-Version": "2022-11-28",
-                      "User-Agent": "delta-witness-dw51-gate",
-                  },
-              )
-              try:
-                  with urllib.request.urlopen(request, timeout=30) as response:
-                      body = response.read()
-              except urllib.error.HTTPError as exc:
-                  detail = exc.read().decode("utf-8", errors="replace")
-                  raise RuntimeError(f"GitHub API {method} {path} failed: {exc.code}: {detail}") from exc
-              if not body:
-                  return {}
-              return json.loads(body.decode("utf-8"))
-
-          def graphql(query: str, variables: dict[str, object]) -> object:
-              return api("POST", "/graphql", {"query": query, "variables": variables})
-
-          def comment(number: int, body: str) -> None:
-              api("POST", f"/repos/{repo}/issues/{number}/comments", {"body": body})
-
-          def run(*args: str, cwd: Path | None = None) -> str:
-              completed = subprocess.run(
-                  args,
-                  cwd=cwd,
-                  check=True,
-                  text=True,
-                  stdout=subprocess.PIPE,
-                  stderr=subprocess.PIPE,
-              )
-              return completed.stdout.strip()
-
-          def branch_sha() -> str:
-              branch_data = api("GET", f"/repos/{repo}/branches/{branch}")
-              assert isinstance(branch_data, dict)
-              commit = branch_data.get("commit")
-              if not isinstance(commit, dict) or not isinstance(commit.get("sha"), str):
-                  raise RuntimeError("branch response lacks commit SHA")
-              return commit["sha"]
-
-          def pr_data() -> dict[str, object]:
-              value = api("GET", f"/repos/{repo}/pulls/{pr_number}")
-              if not isinstance(value, dict):
-                  raise RuntimeError("pull request response is not an object")
-              return value
-
-          def latest_action_runs(head_sha: str) -> dict[str, dict[str, object]]:
-              value = api(
-                  "GET",
-                  f"/repos/{repo}/actions/runs?head_sha={head_sha}&per_page=100",
-              )
-              if not isinstance(value, dict) or not isinstance(value.get("workflow_runs"), list):
-                  raise RuntimeError("workflow-runs response is malformed")
-              latest: dict[str, dict[str, object]] = {}
-              for item in value["workflow_runs"]:
-                  if not isinstance(item, dict):
-                      continue
-                  path = item.get("path")
-                  run_attempt = item.get("run_attempt", 1)
-                  run_number = item.get("run_number", 0)
-                  if not isinstance(path, str):
-                      continue
-                  current = latest.get(path)
-                  rank = (int(run_number), int(run_attempt))
-                  if current is None or rank > (
-                      int(current.get("run_number", 0)),
-                      int(current.get("run_attempt", 1)),
-                  ):
-                      latest[path] = item
-              return latest
-
-          def require_successful_ci(
-              head_sha: str,
-              *,
-              expected_paths: set[str],
-              timeout_seconds: int,
-              event: str | None = None,
-          ) -> dict[str, dict[str, object]]:
-              deadline = time.monotonic() + timeout_seconds
-              last: dict[str, dict[str, object]] = {}
-              while time.monotonic() < deadline:
-                  latest = latest_action_runs(head_sha)
-                  if event is not None:
-                      latest = {
-                          path: item
-                          for path, item in latest.items()
-                          if item.get("event") == event
-                      }
-                  last = latest
-                  if expected_paths.issubset(latest):
-                      if all(item.get("status") == "completed" for item in latest.values()):
-                          bad = {
-                              path: item.get("conclusion")
-                              for path, item in latest.items()
-                              if item.get("conclusion") not in {"success", "skipped", "neutral"}
-                          }
-                          if bad:
-                              raise RuntimeError(f"non-successful Actions conclusions for {head_sha}: {bad}")
-                          checks = api(
-                              "GET",
-                              f"/repos/{repo}/commits/{head_sha}/check-runs?per_page=100",
-                          )
-                          if not isinstance(checks, dict) or not isinstance(checks.get("check_runs"), list):
-                              raise RuntimeError("check-runs response is malformed")
-                          incomplete = []
-                          failed = []
-                          for check in checks["check_runs"]:
-                              if not isinstance(check, dict):
-                                  continue
-                              if check.get("status") != "completed":
-                                  incomplete.append(check.get("name"))
-                              elif check.get("conclusion") not in {"success", "skipped", "neutral"}:
-                                  failed.append((check.get("name"), check.get("conclusion")))
-                          if incomplete:
-                              time.sleep(15)
-                              continue
-                          if failed:
-                              raise RuntimeError(f"non-successful check runs for {head_sha}: {failed}")
-                          return latest
-                  time.sleep(15)
-              snapshot = {
-                  path: (item.get("status"), item.get("conclusion"), item.get("event"))
-                  for path, item in last.items()
-              }
-              raise RuntimeError(
-                  f"CI timeout for {head_sha}; expected={sorted(expected_paths)!r} observed={snapshot!r}"
-              )
-
-          def unresolved_threads() -> list[str]:
-              query = '''
-              query($owner:String!, $name:String!, $number:Int!) {
-                repository(owner:$owner, name:$name) {
-                  pullRequest(number:$number) {
-                    id
-                    reviewThreads(first:100) { nodes { id isResolved } }
-                  }
-                }
-              }
-              '''
-              value = graphql(
-                  query,
-                  {"owner": owner, "name": name, "number": pr_number},
-              )
-              try:
-                  nodes = value["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
-              except (KeyError, TypeError) as exc:
-                  raise RuntimeError(f"malformed review-thread response: {value!r}") from exc
-              return [node["id"] for node in nodes if not node["isResolved"]]
-
-          def mark_ready(node_id: str) -> None:
-              mutation = '''
-              mutation($id:ID!) {
-                markPullRequestReadyForReview(input:{pullRequestId:$id}) {
-                  pullRequest { id isDraft }
-                }
-              }
-              '''
-              value = graphql(mutation, {"id": node_id})
-              try:
-                  is_draft = value["data"]["markPullRequestReadyForReview"]["pullRequest"]["isDraft"]
-              except (KeyError, TypeError) as exc:
-                  raise RuntimeError(f"malformed ready-for-review response: {value!r}") from exc
-              if is_draft:
-                  raise RuntimeError("pull request remained draft after ready transition")
-
-          def choose_merge_method() -> str:
-              repository = api("GET", f"/repos/{repo}")
-              if not isinstance(repository, dict):
-                  raise RuntimeError("repository response is malformed")
-              allowed = {
-                  "merge": repository.get("allow_merge_commit") is True,
-                  "squash": repository.get("allow_squash_merge") is True,
-                  "rebase": repository.get("allow_rebase_merge") is True,
-              }
-              enabled = [method for method, value in allowed.items() if value]
-              if len(enabled) == 1:
-                  return enabled[0]
-              history = run(
-                  "git",
-                  "log",
-                  "origin/main",
-                  "--first-parent",
-                  "-n",
-                  "12",
-                  "--pretty=%P%x09%s",
-              ).splitlines()
-              merge_like = sum(
-                  len(line.split("\t", 1)[0].split()) == 2
-                  for line in history
-                  if "\t" in line
-              )
-              if merge_like >= 3 and allowed["merge"]:
-                  return "merge"
-              if allowed["squash"]:
-                  return "squash"
-              if allowed["rebase"]:
-                  return "rebase"
-              if allowed["merge"]:
-                  return "merge"
-              raise RuntimeError("repository exposes no supported merge method")
-
-          def dispatch(workflow: str) -> None:
-              api(
-                  "POST",
-                  f"/repos/{repo}/actions/workflows/{workflow}/dispatches",
-                  {"ref": "main"},
-              )
-
-          try:
-              deadline = time.monotonic() + 1800
-              while time.monotonic() < deadline:
-                  observed = branch_sha()
-                  if observed != generated_head:
-                      receipt_head = observed
-                      break
-                  time.sleep(10)
-              if receipt_head is None:
-                  raise RuntimeError("external CI-trigger receipt did not arrive within 30 minutes")
-
-              phase = "verify_external_receipt"
-              run("git", "fetch", "origin", branch)
-              remote_ref = f"origin/{branch}"
-              parent = run("git", "rev-parse", f"{remote_ref}^")
-              if parent != generated_head:
-                  raise RuntimeError(
-                      f"receipt commit parent mismatch: expected {generated_head}, observed {parent}"
-                  )
-              changed = run("git", "diff", "--name-only", generated_head, remote_ref).splitlines()
-              if changed != [receipt_path]:
-                  raise RuntimeError(f"receipt commit changed unexpected paths: {changed!r}")
-              observed_receipt = run("git", "show", f"{remote_ref}:{receipt_path}") + "\n"
-              if observed_receipt != receipt:
-                  raise RuntimeError("external CI-trigger receipt content mismatch")
-              receipt_head = run("git", "rev-parse", remote_ref)
-
-              current_pr = pr_data()
-              head = current_pr.get("head")
-              if not isinstance(head, dict) or head.get("sha") != receipt_head:
-                  raise RuntimeError("pull request head does not equal verified receipt head")
-              if current_pr.get("state") != "open":
-                  raise RuntimeError("pull request is not open before final-head CI")
-
-              phase = "final_head_ci"
-              premerge_runs = require_successful_ci(
-                  receipt_head,
-                  expected_paths={
-                      ".github/workflows/claim-relevant-path-preregistration.yml",
-                      ".github/workflows/interaction-checkpoint.yml",
-                  },
-                  timeout_seconds=2700,
-              )
-
-              phase = "adversarial_review_boundary"
-              if unresolved_threads():
-                  raise RuntimeError("unresolved pull-request review threads remain")
-              current_pr = pr_data()
-              reviews = api("GET", f"/repos/{repo}/pulls/{pr_number}/reviews?per_page=100")
-              if not isinstance(reviews, list):
-                  raise RuntimeError("reviews response is malformed")
-              latest_state: dict[str, str] = {}
-              for review in reviews:
-                  if not isinstance(review, dict):
-                      continue
-                  user = review.get("user")
-                  if isinstance(user, dict) and isinstance(user.get("login"), str):
-                      latest_state[user["login"]] = str(review.get("state"))
-              blockers = {user: state for user, state in latest_state.items() if state == "CHANGES_REQUESTED"}
-              if blockers:
-                  raise RuntimeError(f"changes-requested reviews remain: {blockers}")
-
-              phase = "ready_and_exact_head_merge"
-              node_id = current_pr.get("node_id")
-              if not isinstance(node_id, str):
-                  raise RuntimeError("pull request node ID missing")
-              if current_pr.get("draft") is True:
-                  mark_ready(node_id)
-              for _ in range(20):
-                  current_pr = pr_data()
-                  if current_pr.get("mergeable") is not None:
-                      break
-                  time.sleep(3)
-              head = current_pr.get("head")
-              if not isinstance(head, dict) or head.get("sha") != receipt_head:
-                  raise RuntimeError("pull request head moved before merge")
-              if current_pr.get("draft") is True:
-                  raise RuntimeError("pull request is still draft before merge")
-              method = choose_merge_method()
-
-              run_summary = {
-                  path: {
-                      "id": item.get("id"),
-                      "conclusion": item.get("conclusion"),
-                      "html_url": item.get("html_url"),
-                  }
-                  for path, item in sorted(premerge_runs.items())
-              }
-              comment(
-                  pr_number,
-                  "## Final-head gate passed\n\n"
-                  f"- exact head: `{receipt_head}`\n"
-                  f"- local generated parent: `{generated_head}`\n"
-                  f"- final-head workflows: `{json.dumps(run_summary, sort_keys=True)}`\n"
-                  "- unresolved review threads: `0`\n"
-                  "- changes-requested reviews: `0`\n"
-                  "- public-tree, complete regression, adversarial substitutions, compile, smoke, build, and wheel gates: `PASS`\n"
-                  f"- selected repository merge convention: `{method}`\n\n"
-                  "Claim boundary remains design-only; research execution is not authorized.",
-              )
-
-              merge_result = api(
-                  "PUT",
-                  f"/repos/{repo}/pulls/{pr_number}/merge",
-                  {
-                      "sha": receipt_head,
-                      "merge_method": method,
-                      "commit_title": "research: freeze exact claim-path preregistration (#51)",
-                      "commit_message": (
-                          "Merge the integrity-bound DW-001 design-only claim-path preregistration. "
-                          "Candidate, selector, Coverage.py, fault, influence, and target execution remain unauthorized."
-                      ),
-                  },
-              )
-              if not isinstance(merge_result, dict) or merge_result.get("merged") is not True:
-                  raise RuntimeError(f"GitHub did not merge PR #51: {merge_result!r}")
-              merge_sha = merge_result.get("sha")
-              if not isinstance(merge_sha, str):
-                  raise RuntimeError("merge response lacks merge SHA")
-              merged = True
-
-              phase = "post_merge_local_validation"
-              run("git", "fetch", "origin", "main")
-              if run("git", "rev-parse", "origin/main") != merge_sha:
-                  raise RuntimeError("origin/main does not equal merge response SHA")
-              run("git", "checkout", "--detach", merge_sha)
-              run("git", "clean", "-ffdX")
-              run("python", "-m", "pip", "uninstall", "--yes", "coverage")
-              run("python", "-m", "pip", "install", "--no-deps", "-e", ".")
-              run("python", "scripts/validate_public_tree.py")
-              run("python", "-m", "compileall", "-q", "src", "tests", "scripts")
-              run("python", "-m", "unittest", "discover", "-s", "tests")
-              run("python", "scripts/smoke_dw001_claim_relevant_path_plan.py")
-              run("python", "-m", "pip", "wheel", "--no-deps", ".", "--wheel-dir", "/tmp/dw51-postmerge-dist")
-              wheels = sorted(Path("/tmp/dw51-postmerge-dist").glob("deltawitness-*.whl"))
-              if len(wheels) != 1:
-                  raise RuntimeError(f"expected one post-merge wheel, observed {wheels!r}")
-              run("python", "-m", "pip", "install", "--no-deps", "--force-reinstall", str(wheels[0]))
-              run("python", "scripts/smoke_dw001_claim_relevant_path_plan.py")
-
-              phase = "post_merge_ci_dispatch"
-              dispatch("claim-relevant-path-preregistration.yml")
-              dispatch("interaction-checkpoint.yml")
-              ci_path = Path(".github/workflows/ci.yml")
-              expected_post = {
-                  ".github/workflows/claim-relevant-path-preregistration.yml",
-                  ".github/workflows/interaction-checkpoint.yml",
-              }
-              if ci_path.exists() and "workflow_dispatch" in ci_path.read_text(encoding="utf-8"):
-                  dispatch("ci.yml")
-                  expected_post.add(".github/workflows/ci.yml")
-
-              phase = "post_merge_ci"
-              post_runs = require_successful_ci(
-                  merge_sha,
-                  expected_paths=expected_post,
-                  timeout_seconds=2700,
-                  event="workflow_dispatch",
-              )
-
-              phase = "close_issue_and_record_terminal_evidence"
-              terminal = {
-                  path: {
-                      "id": item.get("id"),
-                      "conclusion": item.get("conclusion"),
-                      "html_url": item.get("html_url"),
-                  }
-                  for path, item in sorted(post_runs.items())
-              }
-              body = (
-                  "## PR #51 merged and reproduced\n\n"
-                  f"- final PR head: `{receipt_head}`\n"
-                  f"- merged main SHA: `{merge_sha}`\n"
-                  "- post-merge local complete regression, public-tree, compile, smoke, build, and wheel reproduction: `PASS`\n"
-                  f"- post-merge dispatched workflows: `{json.dumps(terminal, sort_keys=True)}`\n"
-                  "- unresolved review threads before merge: `0`\n"
-                  "- Issue #50 closure reason: `completed`\n\n"
-                  "Claim boundary: exact design-only preregistration reproduction. Candidate, selector, Coverage.py, fault, influence, and target execution remain unauthorized; novelty, superiority, production, release, and deployment claims remain disallowed."
-              )
-              comment(pr_number, body)
-              comment(issue_number, body)
-              api(
-                  "PATCH",
-                  f"/repos/{repo}/issues/{issue_number}",
-                  {"state": "closed", "state_reason": "completed"},
-              )
-              print(body)
-          except BaseException as exc:
-              blocker = (
-                  "## Autonomous gate stopped fail-closed\n\n"
-                  f"- phase: `{phase}`\n"
-                  f"- generated head: `{generated_head}`\n"
-                  f"- receipt head: `{receipt_head}`\n"
-                  f"- merged: `{str(merged).lower()}`\n"
-                  f"- merge SHA: `{merge_sha}`\n"
-                  f"- blocker: `{type(exc).__name__}: {str(exc)[:3000]}`\n\n"
-                  "No failed or ambiguous state is asserted as success. Issue #50 remains open unless terminal post-merge validation completed."
-              )
-              try:
-                  comment(pr_number, blocker)
-                  if merged:
-                      comment(issue_number, blocker)
-              finally:
-                  raise
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          body = (
+              "## Reconstruction gate failed closed\n\n"
+              f"Run: {os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}\n\n"
+              "No validator, digest, test, allowlist, or claim boundary was weakened. "
+              "Merge and candidate execution remain unauthorized."
+          )
+          request = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues/{os.environ['PR_NUMBER']}/comments",
+              data=json.dumps({"body": body}).encode(),
+              method="POST",
+              headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                       "Accept": "application/vnd.github+json",
+                       "X-GitHub-Api-Version": "2022-11-28"},
+          )
+          urllib.request.urlopen(request, timeout=30).read()
           PY
