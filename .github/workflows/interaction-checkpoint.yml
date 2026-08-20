@@ -90,6 +90,8 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
     steps:
       - name: Check out exact PR head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -107,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           start_head="$(git rev-parse HEAD)"
-          test "$start_head" = "$GITHUB_SHA"
+          test "$start_head" = "$EXPECTED_HEAD"
           git merge-base --is-ancestor 818fa19da69e50319325b2544832fd1b7833b0e9 HEAD
 
           for script in \
@@ -213,5 +215,5 @@ jobs:
           git commit -m "research: implement exact claim-path preregistration"
 
           remote_head="$(git ls-remote origin refs/heads/research/claim-relevant-path-divergence-v1 | cut -f1)"
-          test "$remote_head" = "$GITHUB_SHA"
+          test "$remote_head" = "$EXPECTED_HEAD"
           git push origin HEAD:refs/heads/research/claim-relevant-path-divergence-v1
